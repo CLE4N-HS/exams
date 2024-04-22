@@ -1,0 +1,22 @@
+[all]
+animation loadingAnim ../Ressources/Textures/loading.anim
+music test ../Ressources/Musics/Evergreen.ogg
+[end]
+[menu]
+single menu ../Ressources/Textures/Menu.png
+[end]
+[game]
+single BG2 ../Ressources/Textures/BG2.png
+single BG1 ../Ressources/Textures/BG1.png
+single player ../Ressources/Textures/playerShip1_blue.png
+single enemy ../Ressources/Textures/enemyGreen1.png
+single enemy2 ../Ressources/Textures/enemyRed3.png
+single boss ../Ressources/Textures/ufoRed.png
+single tir ../Ressources/Textures/tir.png
+single tirEnemy ../Ressources/Textures/TirEnemy.png
+animation explosionAnim ../Ressources/Textures/explosion.anim
+music tmpMusic ../Ressources/Musics/Impossible.ogg
+soundfx tmpSound ../Ressources/SoundsFX/jump.ogg
+soundfx tmpSound2 ../Ressources/SoundsFX/Crocs.ogg
+font tmpFont ../Ressources/Fonts/3Dventure.ttf
+[end]

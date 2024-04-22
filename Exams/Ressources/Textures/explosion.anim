@@ -1,0 +1,7 @@
+[path]
+../Ressources/Textures/explosion.png
+[end]
+// Sprite Name | left | top | width | height | Frame | TimeAnim | row
+[config]
+explosion	0	0	72	73	9	0.05		0
+[end]
