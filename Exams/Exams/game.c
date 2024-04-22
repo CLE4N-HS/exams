@@ -6,6 +6,9 @@
 #include "stateManager.h"
 #include "Gamepad.h"
 #include "pause.h"
+#include "map.h"
+#include "editor.h"
+#include "player.h"
 
 #include <Windows.h>
 
@@ -59,6 +62,13 @@ void initGame(Window* _window)
 
 	SetViewPosition(mainView, vector2f(960.f, 540.f));
 	
+	initMap();
+	if (isEditor) {
+		initEditor();
+	}
+	else {
+		initPlayer();
+	}
 	
 	GamepadDetection();
 
@@ -70,47 +80,54 @@ void initGame(Window* _window)
 
 void updateGame(Window* _window)
 {
-		timer += getDeltaTime();
-		
-		for (int i = 0; i < /*8*/nbPlayer; i++)
-		{
-			if (Gamepad_isButtonPressed(i, OPTION) && timer > 0.2f)
-			{
-				togglePause();
-				timer = 0.0f;
-			}
-		}
-
-		if (isKeyboardOrControllerButtonPressed(sfKeyEscape, SELECT_XBOX) && timer > 0.2f)
+	timer += getDeltaTime();
+	
+	for (int i = 0; i < /*8*/nbPlayer; i++)
+	{
+		if (Gamepad_isButtonPressed(i, OPTION) && timer > 0.2f)
 		{
 			togglePause();
 			timer = 0.0f;
 		}
+	}
 
-		if (sfKeyboard_isKeyPressed(sfKeyA)) {
-			PlayASound("tmpMusic", sfTrue);
-		}
-		if (sfKeyboard_isKeyPressed(sfKeyZ)) {
-			PlayASound("tmpSound", sfFalse);
-		}
-		if (sfKeyboard_isKeyPressed(sfKeyE)) {
-			PlayASound("tmpSound2", sfTrue);
-		}
+	if (isKeyboardOrControllerButtonPressed(sfKeyEscape, SELECT_XBOX) && timer > 0.2f)
+	{
+		togglePause();
+		timer = 0.0f;
+	}
+
+	if (sfKeyboard_isKeyPressed(sfKeyA)) {
+		PlayASound("tmpMusic", sfTrue);
+	}
+	if (sfKeyboard_isKeyPressed(sfKeyZ)) {
+		PlayASound("tmpSound", sfFalse);
+	}
+	if (sfKeyboard_isKeyPressed(sfKeyE)) {
+		PlayASound("tmpSound2", sfTrue);
+	}
 
 
-		gamepadChangePos = sfFalse;
+	gamepadChangePos = sfFalse;
 
 
-		BG1Pos.y = BG1Pos.y + 100.f * getDeltaTime();
-		BG2Pos.y = BG2Pos.y + 100.f * getDeltaTime();
-		if (BG1Pos.y >= 1080.0f)
-			BG1Pos.y = BG2Pos.y - 1080.0f;
-		if (BG2Pos.y >= 1080.0f)
-			BG2Pos.y = BG1Pos.y - 1080.0f;
+	BG1Pos.y = BG1Pos.y + 100.f * getDeltaTime();
+	BG2Pos.y = BG2Pos.y + 100.f * getDeltaTime();
+	if (BG1Pos.y >= 1080.0f)
+		BG1Pos.y = BG2Pos.y - 1080.0f;
+	if (BG2Pos.y >= 1080.0f)
+		BG2Pos.y = BG1Pos.y - 1080.0f;
 
-		sfSprite_setPosition(spBG1, BG1Pos);
-		sfSprite_setPosition(spBG2, BG2Pos);
+	sfSprite_setPosition(spBG1, BG1Pos);
+	sfSprite_setPosition(spBG2, BG2Pos);
 	
+	updateMap(_window);
+	if (isEditor) {
+		updateEditor(_window);
+	}
+	else {
+		updatePlayer(_window);
+	}
 }
 
 void displayGame(Window* _window)
@@ -118,6 +135,14 @@ void displayGame(Window* _window)
 	sfRenderTexture_drawSprite(_window->renderTexture, spBG1, NULL);
 	
 	sfRenderTexture_drawSprite(_window->renderTexture, spBG2, NULL);
+
+	displayMap(_window);
+	if (isEditor) {
+		displayEditor(_window);
+	}
+	else {
+		displayPlayer(_window);
+	}
 
 }
 

@@ -87,6 +87,12 @@
     <ClCompile Include="viewManager.c">
       <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
+    <ClCompile Include="editor.c">
+      <Filter>Fichiers sources\GAME</Filter>
+    </ClCompile>
+    <ClCompile Include="player.c">
+      <Filter>Fichiers sources\GAME</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomMath.h">
@@ -139,6 +145,12 @@
     </ClInclude>
     <ClInclude Include="windowManager.h">
       <Filter>Fichiers d%27en-tête\ENGINE</Filter>
+    </ClInclude>
+    <ClInclude Include="editor.h">
+      <Filter>Fichiers d%27en-tête\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Fichiers d%27en-tête\GAME</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

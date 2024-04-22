@@ -52,6 +52,10 @@ struct bodies
 };
 bodies* debList;
 
+sfVector2f getfWorldMousePos(sfRenderWindow* _window);
+
+sfVector2f getfMousePos(sfRenderWindow* _window);
+
 //-----------------------------------------------------------
 //	Fonction vector2i ( int _x, int _y )
 //  Renvoi un sfVector2i en partant de 2 int

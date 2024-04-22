@@ -4,4 +4,6 @@ animation loadingAnim ../Ressources/Textures/loading.anim
 [menu]
 [end]
 [game]
+single tileset ../Ressources/Textures/tileset.png
+single mario ../Ressources/Textures/mario.png
 [end]

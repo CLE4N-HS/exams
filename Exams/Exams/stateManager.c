@@ -9,6 +9,8 @@
 #include "gamepad.h"
 #include "options.h"
 #include "viewManager.h"
+#include "editor.h"
+#include "map.h"
 
 
 void stateInit(Window* _window)
@@ -36,6 +38,7 @@ void stateInit(Window* _window)
 		nbPlayer = NbConnectedControllers();
 		
 		firstload = sfTrue;
+		isEditor = sfFalse;
 	}
 
 	if (!onePass)
@@ -93,6 +96,10 @@ void stateEventUpdate(Window* _window, sfEvent* _event)
 
 void stateUpdate(Window* _window)
 {
+	// to remove debug
+	if (sfMouse_isButtonPressed(sfMouseMiddle)) {
+		_window->isDone = sfTrue;
+	}
 	if (w.state)
 	{
 		if (!isDialogBox)

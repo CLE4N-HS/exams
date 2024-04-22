@@ -28,6 +28,7 @@ static State state = MENU;
 static sfBool onePass = sfFalse;
 static sfBool isPaused = sfFalse;
 static sfBool isOption = sfFalse;
+sfBool isEditor;
 
 sfThread* loadingThread;
 sfSprite* spLoading;

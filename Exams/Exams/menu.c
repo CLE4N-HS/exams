@@ -157,10 +157,12 @@ void updateMenu(Window* _window)
 		switch (menuSelection)
 		{
 		case 0:
+			isEditor = sfFalse;
 			changeState(_window, GAME);
 			break;
 		case 1:
-			//changeState(_window, EDITOR);
+			isEditor = sfTrue;
+			changeState(_window, GAME);
 			break;
 		case 2:
 			toggleOptions();
