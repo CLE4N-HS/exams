@@ -123,6 +123,50 @@ void getSticksPosition(t_joyNum joyNum, sfVector2f* left, sfVector2f* right)
     right->y = (float)(state.Gamepad.sThumbRY / 327);
 }
 
+float getStickPos(t_joyNum _id, sfBool _leftStick, sfBool _XAxis)
+{
+    XINPUT_STATE state;
+    ZeroMemory(&state, sizeof(XINPUT_STATE));
+
+    XInputGetState(_id, &state);
+
+    // Verifie la "DEAD ZONE"
+    // Stick Gauche
+    if ((state.Gamepad.sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+        state.Gamepad.sThumbLX > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) &&
+        (state.Gamepad.sThumbLY < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+            state.Gamepad.sThumbLY > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)) {
+
+        state.Gamepad.sThumbLX = 0;
+        state.Gamepad.sThumbLY = 0;
+
+    }
+
+    // Stick Droit
+    if ((state.Gamepad.sThumbRX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+        state.Gamepad.sThumbRX > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) &&
+        (state.Gamepad.sThumbRY < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+            state.Gamepad.sThumbRY > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)) {
+
+        state.Gamepad.sThumbRX = 0;
+        state.Gamepad.sThumbRY = 0;
+
+    }
+
+    // Converti les valeurs dans le style SFML (-100..100)
+    float value = 0.f;
+    if (_leftStick) {
+        if (_XAxis) value = (float)(state.Gamepad.sThumbLX / 327);
+        else value = (float)(state.Gamepad.sThumbLY / 327);
+    }
+    else {
+        if (_XAxis) value = (float)(state.Gamepad.sThumbRX / 327);
+        else value = (float)(state.Gamepad.sThumbRY / 327);
+    }
+
+    return value;
+}
+
 // Cette méthode configure les vibrations de 0.0 à 1.0
 // 0 arrête les vibrations, 1 vibration au plus fort
 void setVibration(t_joyNum joyNum, float leftMotor, float rightMotor)

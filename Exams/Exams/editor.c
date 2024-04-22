@@ -198,13 +198,13 @@ void updateEditor(Window* _window)
 			//	{
 					switch (b[j][i].type)
 					{
-					case T_STAIR: b[j][i].rect = IntRect(0 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+					case T_STAIR: b[j][i].rect = IntRect(0 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_CASTLEBLOCK: b[j][i].rect = IntRect(0 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_GROUND: b[j][i].rect = IntRect(1 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+					case T_GROUND: b[j][i].rect = IntRect(1 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_L_BUSH: b[j][i].rect = IntRect(1 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_BLOCK: b[j][i].rect = IntRect(2 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+					case T_BLOCK: b[j][i].rect = IntRect(2 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_M_BUSH: b[j][i].rect = IntRect(2 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_QUESTION: b[j][i].rect = IntRect(3 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+					case T_QUESTION: b[j][i].rect = IntRect(3 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_R_BUSH: b[j][i].rect = IntRect(3 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_UL_CLOUD: b[j][i].rect = IntRect(4 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_BL_CLOUD: b[j][i].rect = IntRect(4 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
@@ -218,10 +218,10 @@ void updateEditor(Window* _window)
 					case T_BM_HILL: b[j][i].rect = IntRect(8 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_GREEN: b[j][i].rect = IntRect(9 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_BR_HILL: b[j][i].rect = IntRect(9 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_UL_PIPE: b[j][i].rect = IntRect(10 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_BL_PIPE: b[j][i].rect = IntRect(10 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_UR_PIPE: b[j][i].rect = IntRect(11 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_BR_PIPE: b[j][i].rect = IntRect(11 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+					case T_UL_PIPE: b[j][i].rect = IntRect(10 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_BL_PIPE: b[j][i].rect = IntRect(10 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_UR_PIPE: b[j][i].rect = IntRect(11 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_BR_PIPE: b[j][i].rect = IntRect(11 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_U_FLAG: b[j][i].rect = IntRect(12 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_B_FLAG: b[j][i].rect = IntRect(12 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_U_EMPTYCASTLE: b[j][i].rect = IntRect(13 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;

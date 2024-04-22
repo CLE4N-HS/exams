@@ -244,10 +244,10 @@ sfVector2i getPlayerBlockPos(sfVector2f _pos)
 	return iPos;
 }
 
-sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f* _drag)
+sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity)
 {
-	sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - 32.f, _pos.y + 48.f)); // offset to not count the alpha 0
-	sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + 32.f, _pos.y + 48.f));
+	sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - 9.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE)); // offset to not count the alpha 0
+	sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + 9.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE));
 
 	if (blockPos.y < 0 || blockPos.y >= NB_BLOCKS_Y || blockPos.x < 0 || blockPos.x >= NB_BLOCKS_X || blockPos2.y < 0 || blockPos2.y >= NB_BLOCKS_Y || blockPos2.x < 0 || blockPos2.x >= NB_BLOCKS_X) // out of array
 		return sfFalse;
@@ -255,12 +255,12 @@ sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f* _drag)
 	if (_velocity->y < -0.f) // prolly flying
 		return sfFalse;
 
-	//tmpRect = FlRect(b[blockPos.y][blockPos.x].pos.x, b[blockPos.y][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-	//tmpRect2 = FlRect(b[blockPos2.y][blockPos2.x].pos.x, b[blockPos2.y][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+	tmpRect = FlRect(b[blockPos.y][blockPos.x].pos.x, b[blockPos.y][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+	tmpRect2 = FlRect(b[blockPos2.y][blockPos2.x].pos.x, b[blockPos2.y][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 
 	if (b[blockPos.y][blockPos.x].isSolid || b[blockPos2.y][blockPos2.x].isSolid) {
 
-
+		_velocity->y = 0.f;
 		return sfTrue;
 	}
 
@@ -275,24 +275,32 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft)
 	sfVector2f playerPos2 = VECTOR2F_NULL;
 	if (_XAxis) {
 		if (_UpOrLeft) {
-			playerPos = vector2f(_rect.left + 12.f, _rect.top + 12.f);
-			playerPos2 = vector2f(_rect.left + 12.f, _rect.top + 84.f);
+			playerPos = vector2f(_rect.left, _rect.top + BLOCK_SCALE);
+			playerPos2 = vector2f(_rect.left, _rect.top + _rect.height - BLOCK_SCALE * 2.f);
+			_rect.left -= BLOCK_SCALE;
 		}
 		else {
-			playerPos = vector2f(_rect.left + 84.f, _rect.top + 12.f);
-			playerPos2 = vector2f(_rect.left + 84.f, _rect.top + 94.f);
+			playerPos = vector2f(_rect.left + _rect.width, _rect.top + BLOCK_SCALE);
+			playerPos2 = vector2f(_rect.left + _rect.width, _rect.top + _rect.height - BLOCK_SCALE * 2.f);
+			_rect.width += BLOCK_SCALE;
 		}
 	}
 	else {
 		if (_UpOrLeft) {
-			playerPos = vector2f(_rect.left + 12.f, _rect.top + 12.f);
-			playerPos2 = vector2f(_rect.left + 84.f, _rect.top + 94.f);
+			playerPos = vector2f(_rect.left, _rect.top);
+			playerPos2 = vector2f(_rect.left + _rect.width, _rect.top);
+			_rect.top -= BLOCK_SCALE * 3.f;
+			_rect.left += BLOCK_SCALE * 3.f;
+			_rect.width -= BLOCK_SCALE * 6.f;
 		}
 		else {
-			playerPos = vector2f(_rect.left + 12.f, _rect.top + 94.f);
-			playerPos2 = vector2f(_rect.left + 84.f, _rect.top + 94.f);
+			playerPos = vector2f(_rect.left, _rect.top + _rect.height);
+			playerPos2 = vector2f(_rect.left + _rect.width, _rect.top + _rect.height);
+			_rect.height -= BLOCK_SCALE;
 		}
 	}
+
+	tmpRect3 = _rect;
 
 	sfVector2i blockPos = getPlayerBlockPos(playerPos);
 	sfVector2i blockPos2 = getPlayerBlockPos(playerPos2);
@@ -327,6 +335,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft)
 			if (b[blockPos.y][blockPos.x + 1].isSolid)
 			{
 				sfFloatRect blockRect = FlRect(b[blockPos.y][blockPos.x + 1].pos.x, b[blockPos.y][blockPos.x + 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				//tmpRect = blockRect;
 				if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
 				{
 						return sfTrue;
@@ -335,6 +344,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft)
 			if (b[blockPos2.y][blockPos2.x + 1].isSolid)
 			{
 				sfFloatRect blockRect2 = FlRect(b[blockPos2.y][blockPos2.x + 1].pos.x, b[blockPos2.y][blockPos2.x + 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				//tmpRect2 = blockRect2;
 				if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
 				{
 						return sfTrue;
@@ -346,6 +356,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft)
 	{
 		if (_UpOrLeft && blockPos.y > 0 && blockPos2.y > 0)
 		{
+			tmpRect = FlRect(b[blockPos.y - 1][blockPos.x].pos.x, b[blockPos.y - 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 			if (b[blockPos.y - 1][blockPos.x].isSolid)
 			{
 				sfFloatRect blockRect = FlRect(b[blockPos.y - 1][blockPos.x].pos.x, b[blockPos.y - 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
@@ -354,6 +365,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft)
 						return sfTrue;
 				}
 			}
+			tmpRect2 = FlRect(b[blockPos2.y - 1][blockPos2.x].pos.x, b[blockPos2.y - 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 			if (b[blockPos2.y - 1][blockPos2.x].isSolid)
 			{
 				sfFloatRect blockRect2 = FlRect(b[blockPos2.y - 1][blockPos2.x].pos.x, b[blockPos2.y - 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);

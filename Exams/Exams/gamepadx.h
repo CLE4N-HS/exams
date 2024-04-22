@@ -73,6 +73,8 @@ void getTriggers(t_joyNum joyNum, float* left, float* right);
 /// <param name="right">Right stick</param>
 void getSticksPosition(t_joyNum joyNum, sfVector2f* left, sfVector2f* right);
 
+float getStickPos(t_joyNum _id, sfBool _leftStick, sfBool _XAxis);
+
 /// <summary>
 /// Sets the vibration of a controller (between 0.f and 1.f) (dosn't go back to 0 automatically)
 /// </summary>
