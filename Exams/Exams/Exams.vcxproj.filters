@@ -13,114 +13,132 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Fichiers sources\ENGINE">
+      <UniqueIdentifier>{11fa3a71-6951-4fe6-8b3f-7a1dbe69e6a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\GAME">
+      <UniqueIdentifier>{53dc3a61-edf7-47c9-8c64-496ca0093c70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MENU">
+      <UniqueIdentifier>{a90c5b80-88e7-4982-9711-79e8d07fbf87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\ENGINE">
+      <UniqueIdentifier>{c65cb5f9-4ac5-4a08-8b96-63fcd21aae60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\GAME">
+      <UniqueIdentifier>{ab1b7fbb-fd2b-4086-8fa9-de194977ba92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\MENU">
+      <UniqueIdentifier>{3c54ffef-78c6-41cb-bce0-78bee5074af4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="customMath.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="dialogBox.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="fontManager.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="game.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\GAME</Filter>
     </ClCompile>
     <ClCompile Include="gamepad.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="gamepadx.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="map.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\GAME</Filter>
     </ClCompile>
     <ClCompile Include="menu.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\MENU</Filter>
     </ClCompile>
     <ClCompile Include="options.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\MENU</Filter>
     </ClCompile>
     <ClCompile Include="pause.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\MENU</Filter>
     </ClCompile>
     <ClCompile Include="ressourcesManager.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="soundManager.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="stateManager.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="textureManager.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="tools.c">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="viewManager.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
     <ClCompile Include="windowManager.c">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\ENGINE</Filter>
+    </ClCompile>
+    <ClCompile Include="viewManager.c">
+      <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomMath.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="dialogBox.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="fontManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="game.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="gamepad.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="gamepadx.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\GAME</Filter>
     </ClInclude>
     <ClInclude Include="map.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\GAME</Filter>
     </ClInclude>
     <ClInclude Include="menu.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\MENU</Filter>
     </ClInclude>
     <ClInclude Include="options.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\MENU</Filter>
     </ClInclude>
     <ClInclude Include="pause.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\MENU</Filter>
+    </ClInclude>
+    <ClInclude Include="gamepad.h">
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
+    </ClInclude>
+    <ClInclude Include="gamepadx.h">
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="ressourcesManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="soundManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="stateManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="textureManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="tools.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="viewManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
     <ClInclude Include="windowManager.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
