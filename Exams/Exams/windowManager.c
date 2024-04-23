@@ -126,7 +126,7 @@ void windowUpdate(Window* This)
 
 void windowDraw(Window* This)
 {
-	sfRenderWindow_setView(This->renderWindow, mainView->view);
+	sfRenderTexture_setView(This->renderTexture, mainView->view);
 	stateDisplay(This);
 
 	sfRenderTexture_display(This->renderTexture);

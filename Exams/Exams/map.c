@@ -247,24 +247,40 @@ sfVector2i getPlayerBlockPos(sfVector2f _pos)
 	return iPos;
 }
 
-sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin)
+sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sfFloatRect _bounds)
 {
-	sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE)); // offset to not count the alpha 0
-	sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE));
+	//sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE)); // offset to not count the alpha 0
+	//sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE));
+
+	sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - _bounds.height / BLOCK_SCALE) * BLOCK_SCALE)); // offset to not count the alpha 0
+	sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - _bounds.height / BLOCK_SCALE) * BLOCK_SCALE));
+
+	//sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - (_origin.x - 8.f) * BLOCK_SCALE * 2.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE)); // offset to not count the alpha 0
+	//sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + (_origin.x - 8.f) * BLOCK_SCALE * 2.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE));
+	
+	//sfVector2i blockPos = getPlayerBlockPos(vector2f(_bounds.left, _bounds.top + _bounds.height / 2.f));
+	//sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_bounds.left + _bounds.width, _bounds.top + _bounds.height / 2.f));
 
 	if (blockPos.y < 0 || blockPos.y >= NB_BLOCKS_Y || blockPos.x < 0 || blockPos.x >= NB_BLOCKS_X || blockPos2.y < 0 || blockPos2.y >= NB_BLOCKS_Y || blockPos2.x < 0 || blockPos2.x >= NB_BLOCKS_X) // out of array
 		return sfFalse;
 
+	tmpRect4 = FlRect(b[blockPos.y][blockPos.x].pos.x, b[blockPos.y][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+	tmpRect5 = FlRect(b[blockPos2.y][blockPos2.x].pos.x, b[blockPos2.y][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+
 	if (_velocity->y < -0.f) // prolly flying
 		return sfFalse;
 
-	tmpRect = FlRect(b[blockPos.y][blockPos.x].pos.x, b[blockPos.y][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-	tmpRect2 = FlRect(b[blockPos2.y][blockPos2.x].pos.x, b[blockPos2.y][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 
 	if (b[blockPos.y][blockPos.x].isSolid || b[blockPos2.y][blockPos2.x].isSolid) {
-
-		_velocity->y = 0.f;
 		return sfTrue;
+		_bounds.height += _velocity->y;
+		sfFloatRect tmRect = FlRect(b[blockPos.y][blockPos.x].pos.x, b[blockPos.y][blockPos.x].pos.y, BLOCK_SCALE * BLOCK_SIZE, BLOCK_SCALE * BLOCK_SIZE);
+		sfFloatRect tmppRect = FlRect(b[blockPos2.y][blockPos2.x].pos.x, b[blockPos2.y][blockPos2.x].pos.y, BLOCK_SCALE * BLOCK_SIZE, BLOCK_SCALE * BLOCK_SIZE);
+
+		if (sfFloatRect_intersects(&_bounds, &tmRect, NULL) || sfFloatRect_intersects(&_bounds, &tmppRect, NULL)) {
+			_velocity->y = 0.f;
+			return sfTrue;
+		}
 	}
 
 	return sfFalse;
@@ -389,7 +405,11 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				case T_QUESTION:
 					if (b[blockPos.y - 1][blockPos.x].color.r > 200) {
 						b[blockPos.y - 1][blockPos.x].color = color(100, 100, 100, 255);
-						createItem(I_MUSHROOM, b[blockPos.y - 1][blockPos.x].pos);
+						ItemType type = I_MUSHROOM;
+						int random = rand() % 2;
+						if (random == 0) type = I_MUSHROOM;
+						else if (random == 1) type = I_FIREFLOWER;
+						createItem(type, b[blockPos.y - 1][blockPos.x].pos);
 					}
 					break;
 				default:
@@ -410,7 +430,11 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				case T_QUESTION:
 					if (b[blockPos2.y - 1][blockPos2.x].color.r > 200) {
 						b[blockPos2.y - 1][blockPos2.x].color = color(100, 100, 100, 255);
-						createItem(I_MUSHROOM, b[blockPos2.y - 1][blockPos2.x].pos);
+						ItemType type = I_MUSHROOM;
+						int random = rand() % 2;
+						if (random == 0) type = I_MUSHROOM;
+						else if (random == 1) type = I_FIREFLOWER;
+						createItem(type, b[blockPos2.y - 1][blockPos2.x].pos);
 					}
 					break;
 				default:
@@ -430,23 +454,25 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 		}
 		else if (!_UpOrLeft && blockPos.y < NB_BLOCKS_Y - 1 && blockPos2.y < NB_BLOCKS_Y - 1)
 		{
+			//return sfFalse;
+			_rect.height += _nextVelocity.y * BLOCK_SCALE;
 			if (b[blockPos.y + 1][blockPos.x].isSolid)
 			{
 				return sfTrue;
-				////sfFloatRect blockRect = FlRect(b[blockPos.y + 1][blockPos.x].pos.x, b[blockPos.y + 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				////if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
-				//{
-				//		return sfTrue;
-				//}
+				sfFloatRect blockRect = FlRect(b[blockPos.y + 1][blockPos.x].pos.x, b[blockPos.y + 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
+				{
+						return sfTrue;
+				}
 			}
 			if (b[blockPos2.y + 1][blockPos2.x].isSolid)
 			{
 				return sfTrue;
-				////sfFloatRect blockRect2 = FlRect(b[blockPos2.y + 1][blockPos2.x].pos.x, b[blockPos2.y + 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				////if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
-				//{
-				//		return sfTrue;
-				//}
+				sfFloatRect blockRect2 = FlRect(b[blockPos2.y + 1][blockPos2.x].pos.x, b[blockPos2.y + 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
+				{
+						return sfTrue;
+				}
 			}
 		}
 	}

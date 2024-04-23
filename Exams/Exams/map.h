@@ -61,6 +61,7 @@ sfFloatRect tmpRect;
 sfFloatRect tmpRect2;
 sfFloatRect tmpRect3;
 sfFloatRect tmpRect4;
+sfFloatRect tmpRect5;
 
 sfVector2f tmpcrpos;
 sfVector2f tmpcrpos2;
@@ -81,7 +82,7 @@ void loadMap(int _nbMap);
 sfVector2i getPlayerBlockPos(sfVector2f _pos);
 
 // collisions for the ground
-sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin);
+sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sfFloatRect _bounds);
 
 // global collisions
 sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity);

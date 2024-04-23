@@ -45,6 +45,7 @@ typedef struct Player {
 	float fallAcc;
 	sfBool canJump;
 	sfVector2f nextPos;
+	playerPower power;
 }Player;
 Player p[2];
 
@@ -76,6 +77,7 @@ void initPlayer()
 		p[i].bounds = FlRect(0.f, 0.f, 0.f, 0.f);
 		p[i].canJump = sfFalse;
 		p[i].nextPos = p[i].pos;
+		p[i].power = P_SMALL;
 
 	}
 }
@@ -118,12 +120,13 @@ void updatePlayer(Window* _window)
 		//}
 
 		float TICK = dt;
-		if (!isButtonPressed(i, A) || isGrounded(p[i].pos, &p[i].velocity, p[i].origin))
+		if (!isButtonPressed(i, A) || isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds))
 			p[i].canJump = sfTrue;
 		else
 			//p[i].canJump = sfFalse;
 
-		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin)) {
+		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
+		//if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity)) {
 			p[i].state = P_IDLE;
 		}
 
@@ -189,7 +192,8 @@ void updatePlayer(Window* _window)
 
 			p[i].velocity.y += p[i].fallAcc * TICK;
 
-			if (p[i].canJump && isButtonPressed(i, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin)) { // jump
+			if (p[i].canJump && isButtonPressed(i, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) { // jump
+			//if (p[i].canJump && isButtonPressed(i, A) && isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity)) { // jump
 				if (fabsf(p[i].velocity.x) < 16.f) {
 					p[i].velocity.y = -240.f;
 					p[i].fallAcc = STOP_FALL;
@@ -240,7 +244,8 @@ void updatePlayer(Window* _window)
 
 		p[i].velocity.y += p[i].fallAcc * TICK;
 
-		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin))
+		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds))
+		//if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity))
 			p[i].state = P_IDLE;
 
 		if (isCollision3(p[i].bounds, &p[i].velocity))
@@ -300,5 +305,46 @@ void displayPlayer(Window* _window)
 		//sfRectangleShape_setPosition(rec, vector2f(tmpRect3.left, tmpRect3.top));
 		//sfRectangleShape_setSize(rec, vector2f(tmpRect3.width, tmpRect3.height));
 		//sfRenderTexture_drawRectangleShape(_window->renderTexture, rec, NULL);
+		//
+		sfRectangleShape_setFillColor(rec, color(0, 255, 255, 100));
+		sfRectangleShape_setPosition(rec, vector2f(tmpRect4.left, tmpRect4.top));
+		sfRectangleShape_setSize(rec, vector2f(tmpRect4.width, tmpRect4.height));
+		sfRenderTexture_drawRectangleShape(_window->renderTexture, rec, NULL);
+		
+		sfRectangleShape_setFillColor(rec, color(255, 255, 255, 100));
+		sfRectangleShape_setPosition(rec, vector2f(tmpRect5.left, tmpRect5.top));
+		sfRectangleShape_setSize(rec, vector2f(tmpRect5.width, tmpRect5.height));
+		sfRenderTexture_drawRectangleShape(_window->renderTexture, rec, NULL);
+	}
+}
+
+sfFloatRect* pgetPlayerBounds(int _id)
+{
+	return &p[_id].bounds;
+}
+
+void setPlayerPower(int _id, playerPower _power)
+{
+	if (_power <= p[_id].power)
+		return;
+
+	p[_id].power = _power;
+
+	switch (p[_id].power)
+	{
+	case P_SMALL:
+		p[_id].rect = IntRect(0, 32, 18, 16);
+		p[_id].origin = vector2f(8.f, 16.f);
+		break;
+	case P_BIG:
+		p[_id].rect = IntRect(0, 0, 18, 32);
+		p[_id].origin = vector2f(8.f, 32.f);
+		break;
+	case P_FIRETHROWER:
+		p[_id].rect = IntRect(0, 53, 18, 32);
+		p[_id].origin = vector2f(8.f, 32.f);
+		break;
+	default:
+		break;
 	}
 }
