@@ -9,6 +9,7 @@
 #include "map.h"
 #include "editor.h"
 #include "player.h"
+#include "items.h"
 
 #include <Windows.h>
 
@@ -68,6 +69,7 @@ void initGame(Window* _window)
 	}
 	else {
 		initPlayer();
+		initItems();
 	}
 	
 	GamepadDetection();
@@ -127,6 +129,7 @@ void updateGame(Window* _window)
 	}
 	else {
 		updatePlayer(_window);
+		updateItem(_window);
 	}
 }
 
@@ -141,6 +144,7 @@ void displayGame(Window* _window)
 		displayEditor(_window);
 	}
 	else {
+		displayItem(_window);
 		displayPlayer(_window);
 	}
 

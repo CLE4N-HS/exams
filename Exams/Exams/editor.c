@@ -189,6 +189,7 @@ void updateEditor(Window* _window)
 			b[y][x].isSolid = sfFalse;
 			b[y][x].timer = 0.f;
 			b[y][x].pos = vector2f(x * BLOCK_SCALE * BLOCK_SIZE, y * BLOCK_SCALE * BLOCK_SIZE);
+			b[y][x].color = color(255, 255, 255, 255);
 			int j = y;
 			int i = x;
 

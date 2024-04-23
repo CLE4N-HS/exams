@@ -118,12 +118,12 @@ void updatePlayer(Window* _window)
 		//}
 
 		float TICK = dt;
-		if (!isButtonPressed(i, A) || isGrounded(p[i].pos, &p[i].velocity))
+		if (!isButtonPressed(i, A) || isGrounded(p[i].pos, &p[i].velocity, p[i].origin))
 			p[i].canJump = sfTrue;
 		else
 			//p[i].canJump = sfFalse;
 
-		if (isGrounded(p[i].pos, &p[i].velocity)) {
+		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin)) {
 			p[i].state = P_IDLE;
 		}
 
@@ -189,7 +189,7 @@ void updatePlayer(Window* _window)
 
 			p[i].velocity.y += p[i].fallAcc * TICK;
 
-			if (p[i].canJump && isButtonPressed(i, A) && isGrounded(p[i].pos, &p[i].velocity)) { // jump
+			if (p[i].canJump && isButtonPressed(i, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin)) { // jump
 				if (fabsf(p[i].velocity.x) < 16.f) {
 					p[i].velocity.y = -240.f;
 					p[i].fallAcc = STOP_FALL;
@@ -240,7 +240,7 @@ void updatePlayer(Window* _window)
 
 		p[i].velocity.y += p[i].fallAcc * TICK;
 
-		if (isGrounded(p[i].pos, &p[i].velocity))
+		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin))
 			p[i].state = P_IDLE;
 
 		if (isCollision3(p[i].bounds, &p[i].velocity))

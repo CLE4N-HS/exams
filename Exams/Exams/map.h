@@ -4,7 +4,7 @@
 
 #define BLOCK_SIZE 16
 
-#define BLOCK_SCALE 4.821428f
+#define BLOCK_SCALE /*4.821428f*/ 5.f
 
 #define NB_BLOCKS_X 212
 #define NB_BLOCKS_Y 14
@@ -53,6 +53,7 @@ typedef struct {
 	sfIntRect rect;
 	sfBool isSolid;
 	float timer;
+	sfColor color;
 }Blocks;
 Blocks b[NB_BLOCKS_Y][NB_BLOCKS_X];
 
@@ -80,7 +81,7 @@ void loadMap(int _nbMap);
 sfVector2i getPlayerBlockPos(sfVector2f _pos);
 
 // collisions for the ground
-sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity);
+sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin);
 
 // global collisions
 sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity);

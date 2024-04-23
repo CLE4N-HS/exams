@@ -3,6 +3,7 @@
 #include "CustomMath.h"
 #include "gamepadx.h"
 #include "soundManager.h"
+#include "items.h"
 
 sfSprite* mapSprite;
 
@@ -65,7 +66,7 @@ void displayMap(Window* _window)
 		{
 			sfSprite_setPosition(mapSprite, b[j][i].pos);
 			sfSprite_setScale(mapSprite, vector2f(BLOCK_SCALE, BLOCK_SCALE));
-			sfSprite_setColor(mapSprite, color(255, 255, 255, 255));
+			sfSprite_setColor(mapSprite, b[j][i].color);
 
 			blockType tmpType = b[j][i].type;
 
@@ -103,6 +104,8 @@ void defaultMap()
 			b[j][i].rect = IntRect(7 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 			b[j][i].pos = vector2f(i * BLOCK_SIZE * BLOCK_SCALE, j * BLOCK_SIZE * BLOCK_SCALE);
 			b[j][i].timer = 0.f;
+			b[j][i].color = color(255, 255, 255, 255);
+
 		}
 	}
 }
@@ -244,10 +247,10 @@ sfVector2i getPlayerBlockPos(sfVector2f _pos)
 	return iPos;
 }
 
-sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity)
+sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin)
 {
-	sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - 8.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE + BLOCK_SCALE * BLOCK_SIZE * 0.f)); // offset to not count the alpha 0
-	sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + 8.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE + BLOCK_SCALE * BLOCK_SIZE * 0.f));
+	sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE)); // offset to not count the alpha 0
+	sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE));
 
 	if (blockPos.y < 0 || blockPos.y >= NB_BLOCKS_Y || blockPos.x < 0 || blockPos.x >= NB_BLOCKS_X || blockPos2.y < 0 || blockPos2.y >= NB_BLOCKS_Y || blockPos2.x < 0 || blockPos2.x >= NB_BLOCKS_X) // out of array
 		return sfFalse;
@@ -324,6 +327,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 	if (blockPos.y < 0 || blockPos.y >= NB_BLOCKS_Y || blockPos.x < 0 || blockPos.x >= NB_BLOCKS_X || blockPos2.y < 0 || blockPos2.y >= NB_BLOCKS_Y || blockPos2.x < 0 || blockPos2.x >= NB_BLOCKS_X) // out of array
 		return sfFalse;
 
+	sfBool collide = sfFalse;
+
 
 	if (_XAxis)
 	{
@@ -331,40 +336,44 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 		{
 			if (b[blockPos.y][blockPos.x - 1].isSolid)
 			{
-				//sfFloatRect blockRect = FlRect(b[blockPos.y][blockPos.x - 1].pos.x, b[blockPos.y][blockPos.x - 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				//if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
-				{
-						return sfTrue;
-				}
+				return sfTrue;
+				////sfFloatRect blockRect = FlRect(b[blockPos.y][blockPos.x - 1].pos.x, b[blockPos.y][blockPos.x - 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				////if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
+				//{
+				//		return sfTrue;
+				//}
 			}
 			if (b[blockPos2.y][blockPos2.x - 1].isSolid)
 			{
-				//sfFloatRect blockRect2 = FlRect(b[blockPos2.y][blockPos2.x - 1].pos.x, b[blockPos2.y][blockPos2.x - 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				//if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
-				{
-						return sfTrue;
-				}
+				return sfTrue;
+				////sfFloatRect blockRect2 = FlRect(b[blockPos2.y][blockPos2.x - 1].pos.x, b[blockPos2.y][blockPos2.x - 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				////if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
+				//{
+				//		return sfTrue;
+				//}
 			}
 		}
 		else if (!_UpOrLeft && blockPos.x < NB_BLOCKS_X - 1 && blockPos2.x < NB_BLOCKS_X - 1)
 		{
 			if (b[blockPos.y][blockPos.x + 1].isSolid)
 			{
-				//sfFloatRect blockRect = FlRect(b[blockPos.y][blockPos.x + 1].pos.x, b[blockPos.y][blockPos.x + 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				//tmpRect = blockRect;
-				//if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
-				{
-						return sfTrue;
-				}
+				return sfTrue;
+				////sfFloatRect blockRect = FlRect(b[blockPos.y][blockPos.x + 1].pos.x, b[blockPos.y][blockPos.x + 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				////tmpRect = blockRect;
+				////if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
+				//{
+				//		return sfTrue;
+				//}
 			}
 			if (b[blockPos2.y][blockPos2.x + 1].isSolid)
 			{
-				//sfFloatRect blockRect2 = FlRect(b[blockPos2.y][blockPos2.x + 1].pos.x, b[blockPos2.y][blockPos2.x + 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				//tmpRect2 = blockRect2;
-				//if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
-				{
-						return sfTrue;
-				}
+				return sfTrue;
+				////sfFloatRect blockRect2 = FlRect(b[blockPos2.y][blockPos2.x + 1].pos.x, b[blockPos2.y][blockPos2.x + 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				////tmpRect2 = blockRect2;
+				////if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
+				//{
+				//		return sfTrue;
+				//}
 			}
 		}
 	}
@@ -375,40 +384,69 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			//tmpRect = FlRect(b[blockPos.y - 1][blockPos.x].pos.x, b[blockPos.y - 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 			if (b[blockPos.y - 1][blockPos.x].isSolid)
 			{
-				//sfFloatRect blockRect = FlRect(b[blockPos.y - 1][blockPos.x].pos.x, b[blockPos.y - 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				//if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
+				switch (b[blockPos.y - 1][blockPos.x].type)
 				{
-						return sfTrue;
+				case T_QUESTION:
+					if (b[blockPos.y - 1][blockPos.x].color.r > 200) {
+						b[blockPos.y - 1][blockPos.x].color = color(100, 100, 100, 255);
+						createItem(I_MUSHROOM, b[blockPos.y - 1][blockPos.x].pos);
+					}
+					break;
+				default:
+					break;
 				}
+				collide = sfTrue;
+				////sfFloatRect blockRect = FlRect(b[blockPos.y - 1][blockPos.x].pos.x, b[blockPos.y - 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				////if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
+				//{
+				//		return sfTrue;
+				//}
 			}
 			//tmpRect2 = FlRect(b[blockPos2.y - 1][blockPos2.x].pos.x, b[blockPos2.y - 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 			if (b[blockPos2.y - 1][blockPos2.x].isSolid)
 			{
-				//sfFloatRect blockRect2 = FlRect(b[blockPos2.y - 1][blockPos2.x].pos.x, b[blockPos2.y - 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				//if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
+				switch (b[blockPos2.y - 1][blockPos2.x].type)
 				{
-
-						return sfTrue;
+				case T_QUESTION:
+					if (b[blockPos2.y - 1][blockPos2.x].color.r > 200) {
+						b[blockPos2.y - 1][blockPos2.x].color = color(100, 100, 100, 255);
+						createItem(I_MUSHROOM, b[blockPos2.y - 1][blockPos2.x].pos);
+					}
+					break;
+				default:
+					break;
 				}
+				return sfTrue;
+				////sfFloatRect blockRect2 = FlRect(b[blockPos2.y - 1][blockPos2.x].pos.x, b[blockPos2.y - 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				////if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
+				//{
+				//
+				//		return sfTrue;
+				//}
 			}
+
+			if (collide)
+				return sfTrue;
 		}
 		else if (!_UpOrLeft && blockPos.y < NB_BLOCKS_Y - 1 && blockPos2.y < NB_BLOCKS_Y - 1)
 		{
 			if (b[blockPos.y + 1][blockPos.x].isSolid)
 			{
-				//sfFloatRect blockRect = FlRect(b[blockPos.y + 1][blockPos.x].pos.x, b[blockPos.y + 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				//if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
-				{
-						return sfTrue;
-				}
+				return sfTrue;
+				////sfFloatRect blockRect = FlRect(b[blockPos.y + 1][blockPos.x].pos.x, b[blockPos.y + 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				////if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
+				//{
+				//		return sfTrue;
+				//}
 			}
 			if (b[blockPos2.y + 1][blockPos2.x].isSolid)
 			{
-				//sfFloatRect blockRect2 = FlRect(b[blockPos2.y + 1][blockPos2.x].pos.x, b[blockPos2.y + 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				//if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
-				{
-						return sfTrue;
-				}
+				return sfTrue;
+				////sfFloatRect blockRect2 = FlRect(b[blockPos2.y + 1][blockPos2.x].pos.x, b[blockPos2.y + 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				////if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
+				//{
+				//		return sfTrue;
+				//}
 			}
 		}
 	}
