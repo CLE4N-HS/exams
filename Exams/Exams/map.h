@@ -61,6 +61,9 @@ sfFloatRect tmpRect2;
 sfFloatRect tmpRect3;
 sfFloatRect tmpRect4;
 
+sfVector2f tmpcrpos;
+sfVector2f tmpcrpos2;
+
 void initMap();
 
 void updateMap(Window* _window);
@@ -83,7 +86,7 @@ sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity);
 sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity);
 
 // collisions on a certain axis
-sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft);
+sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector2f _nextVelocity);
 
 sfBool isMapFinished();
 

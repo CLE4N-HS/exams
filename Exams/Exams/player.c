@@ -44,6 +44,7 @@ typedef struct Player {
 	playerState state;
 	float fallAcc;
 	sfBool canJump;
+	sfVector2f nextPos;
 }Player;
 Player p[2];
 
@@ -67,13 +68,14 @@ void initPlayer()
 		p[i].rect = IntRect(0, 32, 18, 16);
 		p[i].origin = vector2f(9.f, 16.f);
 		p[i].scale = vector2f(BLOCK_SCALE, BLOCK_SCALE);
-		p[i].pos = vector2f(100.f, 800.f);
+		p[i].pos = vector2f(100.f, 200.f);
 		p[i].velocity = VECTOR2F_NULL;
 		p[i].releaseTimer = 0.f;
 		p[i].state = P_IDLE;
 		p[i].fallAcc = 562.5f;
 		p[i].bounds = FlRect(0.f, 0.f, 0.f, 0.f);
 		p[i].canJump = sfFalse;
+		p[i].nextPos = p[i].pos;
 
 	}
 }
@@ -82,7 +84,7 @@ void updatePlayer(Window* _window)
 {
 	float dt = getDeltaTime();
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		float lStickXPos = getStickPos(i, sfTrue, sfTrue);
 
@@ -130,18 +132,18 @@ void updatePlayer(Window* _window)
 			if (fabsf(p[i].velocity.x) < MIN_WALK) {  // slower than a walk // starting, stopping or turning around
 				p[i].velocity.x = 0;
 				p[i].state = P_IDLE;
-				if (lStickXPos < 0.f/* && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue)) {
+				if (lStickXPos < 0.f/* && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-MIN_WALK, 0.f))) {
 					p[i].scale.x = -BLOCK_SCALE;
 					p[i].velocity.x -= MIN_WALK;
 				}
-				if (lStickXPos > 0.f /*&& !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse)) {
+				if (lStickXPos > 0.f /*&& !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(MIN_WALK, 0.f))) {
 					p[i].scale.x = BLOCK_SCALE;
 					p[i].velocity.x += MIN_WALK;
 				}
 			}
 			else if (fabsf(p[i].velocity.x) >= MIN_WALK) {  // faster than a walk // accelerating or decelerating
 				if (1) {
-					if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/) {
+					if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(ACC_RUN * dt, 0.f))) {
 						p[i].scale.x = BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
 							p[i].velocity.x += ACC_RUN * TICK;
@@ -150,7 +152,7 @@ void updatePlayer(Window* _window)
 							p[i].velocity.x += ACC_WALK * TICK;
 						}
 					}
-					else if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/) {
+					else if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-DEC_SKID * dt, 0.f))) {
 						p[i].scale.x = -BLOCK_SCALE;
 						p[i].velocity.x -= DEC_SKID * TICK;
 						p[i].state = P_SKID;
@@ -164,7 +166,7 @@ void updatePlayer(Window* _window)
 					}
 				}
 				if (0) {
-					if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue)) {
+					if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f))) {
 						p[i].scale.x = -BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
 							p[i].velocity.x -= ACC_RUN * TICK;
@@ -174,7 +176,7 @@ void updatePlayer(Window* _window)
 						}
 						
 					}
-					else if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse)) {
+					else if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(DEC_SKID * dt, 0.f))) {
 						p[i].scale.x = BLOCK_SCALE;
 						p[i].velocity.x += DEC_SKID * TICK;
 						p[i].state = P_SKID;
@@ -217,14 +219,14 @@ void updatePlayer(Window* _window)
 			}
 
 			// horizontal physics
-			if (lStickXPos > 0.f/* && !p[i].game.left*/) {
+			if (lStickXPos > 0.f/* && !p[i].game.left*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(ACC_RUN * dt, 0.f))) {
 				p[i].scale.x = BLOCK_SCALE;
 				if (fabsf(p[i].velocity.x) > MAX_WALK) {
 					p[i].velocity.x += ACC_RUN * TICK;
 				}
 				else p[i].velocity.x += ACC_WALK * TICK;
 			}
-			else if (lStickXPos < 0.f/* && !p[i].game.right*/) {
+			else if (lStickXPos < 0.f/* && !p[i].game.right*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f))) {
 				p[i].scale.x = -BLOCK_SCALE;
 				if (fabsf(p[i].velocity.x) > MAX_WALK) {
 					p[i].velocity.x -= ACC_RUN * TICK;
@@ -273,6 +275,7 @@ void displayPlayer(Window* _window)
 		sfRenderTexture_drawSprite(_window->renderTexture, playerSprite, NULL);
 
 		p[i].bounds = sfSprite_getGlobalBounds(playerSprite);
+
 
 
 		//sfCircleShape_setPosition(cr, p[i].pos);
