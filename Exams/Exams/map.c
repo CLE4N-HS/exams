@@ -405,11 +405,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				case T_QUESTION:
 					if (b[blockPos.y - 1][blockPos.x].color.r > 200) {
 						b[blockPos.y - 1][blockPos.x].color = color(100, 100, 100, 255);
-						ItemType type = I_MUSHROOM;
-						int random = rand() % 2;
-						if (random == 0) type = I_MUSHROOM;
-						else if (random == 1) type = I_FIREFLOWER;
-						createItem(type, b[blockPos.y - 1][blockPos.x].pos);
+						int random = rand() % 5;
+						createItem(random, b[blockPos.y - 1][blockPos.x].pos);
 					}
 					break;
 				default:
@@ -430,11 +427,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				case T_QUESTION:
 					if (b[blockPos2.y - 1][blockPos2.x].color.r > 200) {
 						b[blockPos2.y - 1][blockPos2.x].color = color(100, 100, 100, 255);
-						ItemType type = I_MUSHROOM;
-						int random = rand() % 2;
-						if (random == 0) type = I_MUSHROOM;
-						else if (random == 1) type = I_FIREFLOWER;
-						createItem(type, b[blockPos2.y - 1][blockPos2.x].pos);
+						int random = rand() % 5;
+						createItem(random, b[blockPos2.y - 1][blockPos2.x].pos);
 					}
 					break;
 				default:

@@ -46,6 +46,7 @@ typedef struct Player {
 	sfBool canJump;
 	sfVector2f nextPos;
 	playerPower power;
+	float invincibilityTimer;
 }Player;
 Player p[2];
 
@@ -78,6 +79,7 @@ void initPlayer()
 		p[i].canJump = sfFalse;
 		p[i].nextPos = p[i].pos;
 		p[i].power = P_SMALL;
+		p[i].invincibilityTimer = 0.f;
 
 	}
 }
@@ -119,7 +121,6 @@ void updatePlayer(Window* _window)
 		//	p[i].velocity.x = Lerp(p[i].velocity.x, 0.f, p[i].releaseTimer);
 		//}
 
-		float TICK = dt;
 		if (!isButtonPressed(i, A) || isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds))
 			p[i].canJump = sfTrue;
 		else
@@ -149,22 +150,22 @@ void updatePlayer(Window* _window)
 					if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(ACC_RUN * dt, 0.f))) {
 						p[i].scale.x = BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
-							p[i].velocity.x += ACC_RUN * TICK;
+							p[i].velocity.x += ACC_RUN * dt;
 						}
 						else {
-							p[i].velocity.x += ACC_WALK * TICK;
+							p[i].velocity.x += ACC_WALK * dt;
 						}
 					}
 					else if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-DEC_SKID * dt, 0.f))) {
 						p[i].scale.x = -BLOCK_SCALE;
-						p[i].velocity.x -= DEC_SKID * TICK;
+						p[i].velocity.x -= DEC_SKID * dt;
 						p[i].state = P_SKID;
 					}
 					else {
 						if (p[i].velocity.x > 0.f)
-							p[i].velocity.x -= DEC_REL * TICK;
+							p[i].velocity.x -= DEC_REL * dt;
 						else
-							p[i].velocity.x += DEC_REL * TICK;
+							p[i].velocity.x += DEC_REL * dt;
 
 					}
 				}
@@ -172,25 +173,25 @@ void updatePlayer(Window* _window)
 					if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f))) {
 						p[i].scale.x = -BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
-							p[i].velocity.x -= ACC_RUN * TICK;
+							p[i].velocity.x -= ACC_RUN * dt;
 						}
 						else {
-							p[i].velocity.x -= ACC_WALK * TICK;
+							p[i].velocity.x -= ACC_WALK * dt;
 						}
 						
 					}
 					else if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(DEC_SKID * dt, 0.f))) {
 						p[i].scale.x = BLOCK_SCALE;
-						p[i].velocity.x += DEC_SKID * TICK;
+						p[i].velocity.x += DEC_SKID * dt;
 						p[i].state = P_SKID;
 					}
 					else {
-						p[i].velocity.x += DEC_REL * TICK;
+						p[i].velocity.x += DEC_REL * dt;
 					}
 				}
 			}
 
-			p[i].velocity.y += p[i].fallAcc * TICK;
+			p[i].velocity.y += p[i].fallAcc * dt;
 
 			if (p[i].canJump && isButtonPressed(i, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) { // jump
 			//if (p[i].canJump && isButtonPressed(i, A) && isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity)) { // jump
@@ -217,32 +218,32 @@ void updatePlayer(Window* _window)
 			// air physics
 			// vertical physics
 			if (p[i].velocity.y < 0 && isButtonPressed(i, A)) { // holding A while jumping jumps higher
-				if (p[i].fallAcc == STOP_FALL) p[i].velocity.y -= (STOP_FALL - STOP_FALL_A) * TICK;
-				if (p[i].fallAcc == WALK_FALL) p[i].velocity.y -= (WALK_FALL - WALK_FALL_A) * TICK;
-				if (p[i].fallAcc == RUN_FALL) p[i].velocity.y -= (RUN_FALL - RUN_FALL_A) * TICK;
+				if (p[i].fallAcc == STOP_FALL) p[i].velocity.y -= (STOP_FALL - STOP_FALL_A) * dt;
+				if (p[i].fallAcc == WALK_FALL) p[i].velocity.y -= (WALK_FALL - WALK_FALL_A) * dt;
+				if (p[i].fallAcc == RUN_FALL) p[i].velocity.y -= (RUN_FALL - RUN_FALL_A) * dt;
 			}
 
 			// horizontal physics
 			if (lStickXPos > 0.f/* && !p[i].game.left*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(ACC_RUN * dt, 0.f))) {
 				p[i].scale.x = BLOCK_SCALE;
 				if (fabsf(p[i].velocity.x) > MAX_WALK) {
-					p[i].velocity.x += ACC_RUN * TICK;
+					p[i].velocity.x += ACC_RUN * dt;
 				}
-				else p[i].velocity.x += ACC_WALK * TICK;
+				else p[i].velocity.x += ACC_WALK * dt;
 			}
 			else if (lStickXPos < 0.f/* && !p[i].game.right*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f))) {
 				p[i].scale.x = -BLOCK_SCALE;
 				if (fabsf(p[i].velocity.x) > MAX_WALK) {
-					p[i].velocity.x -= ACC_RUN * TICK;
+					p[i].velocity.x -= ACC_RUN * dt;
 				}
-				else p[i].velocity.x -= ACC_WALK * TICK;
+				else p[i].velocity.x -= ACC_WALK * dt;
 			}
 			else {
 				// do nothing
 			}
 		}
 
-		p[i].velocity.y += p[i].fallAcc * TICK;
+		p[i].velocity.y += p[i].fallAcc * dt;
 
 		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds))
 		//if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity))
@@ -266,6 +267,12 @@ void updatePlayer(Window* _window)
 
 		p[i].pos = AddVectors(p[i].pos, MultiplyVector(p[i].velocity, BLOCK_SCALE * dt));
 
+
+		// Invincibility
+		p[i].invincibilityTimer -= dt;
+		if (p[i].invincibilityTimer > 0.f) {
+			// TODO color
+		}
 	}
 }
 
@@ -323,13 +330,8 @@ sfFloatRect* pgetPlayerBounds(int _id)
 	return &p[_id].bounds;
 }
 
-void setPlayerPower(int _id, playerPower _power)
+void changePower(int _id)
 {
-	if (_power <= p[_id].power)
-		return;
-
-	p[_id].power = _power;
-
 	switch (p[_id].power)
 	{
 	case P_SMALL:
@@ -346,5 +348,34 @@ void setPlayerPower(int _id, playerPower _power)
 		break;
 	default:
 		break;
+	}
+}
+
+void setPlayerPower(int _id, playerPower _power)
+{
+	if (_power <= p[_id].power)
+		return;
+
+	p[_id].power = _power;
+
+	changePower(_id);
+}
+
+void DamagePlayer(int _id)
+{
+	if (p[_id].invincibilityTimer > 0.f)
+		return;
+
+	p[_id].invincibilityTimer = 3.f;
+
+	if (p[_id].power > P_DEAD)
+		p[_id].power--;
+
+	if (p[_id].power <= P_DEAD) {
+		// dead
+		printf("dead");
+	}
+	else {
+		changePower(_id);
 	}
 }

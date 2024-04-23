@@ -3,6 +3,7 @@
 #include "stateManager.h"
 
 typedef enum playerPower {
+	P_DEAD,
 	P_SMALL,
 	P_BIG,
 	P_FIRETHROWER
@@ -14,3 +15,4 @@ void displayPlayer(Window* _window);
 
 sfFloatRect* pgetPlayerBounds(int _id);
 void setPlayerPower(int _id, playerPower _power);
+void DamagePlayer(int _id);

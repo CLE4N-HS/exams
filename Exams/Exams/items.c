@@ -63,8 +63,23 @@ void createItem(ItemType _type, sfVector2f _pos)
 		isMovingLeft = sfFalse;
 		break;
 	case I_FIREFLOWER:
-		rect = IntRect(16, 0, 16, 16);
+		rect = IntRect(0, 16, 16, 16);
 		velocity = VECTOR2F_NULL;
+		break;
+	case I_ONEUP:
+		rect = IntRect(0, 32, 16, 16);
+		velocity = vector2f(200.f, 270.f);
+		isMovingLeft = sfFalse;
+		break;
+	case I_STAR:
+		rect = IntRect(0, 48, 16, 16);
+		velocity = vector2f(200.f, 270.f);
+		isMovingLeft = sfFalse;
+		break;
+	case I_COIN:
+		rect = IntRect(0, 64, 16, 16);
+		velocity = vector2f(0.f, -270.f);
+		isMovingLeft = sfFalse;
 		break;
 	default:
 		break;
@@ -151,6 +166,97 @@ void updateItem(Window* _window)
 				if (shouldContinue)
 					continue;
 			}
+			break;
+		case I_ONEUP:
+			GD_ITEM->timer += dt;
+
+			if (GD_ITEM->timer < 1.f) {
+				GD_ITEM->pos.y -= 100.f * dt;
+			}
+			else {
+				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f)))
+					GD_ITEM->velocity.y = 0.f;
+				else
+					GD_ITEM->velocity.y = 270.f;
+
+				if (GD_ITEM->velocity.x < 0.f) {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfTrue, vector2f(-200.f, 0.f))) {
+						GD_ITEM->velocity.x = 200.f;
+					}
+				}
+				else {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfFalse, vector2f(200.f, 0.f))) {
+						GD_ITEM->velocity.x = -200.f;
+					}
+				}
+
+				GD_ITEM->pos = AddVectors(GD_ITEM->pos, MultiplyVector(GD_ITEM->velocity, dt));
+
+
+				sfBool shouldContinue = sfFalse;
+				for (int j = 0; j < 2; j++)
+				{
+					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						itemList->erase(&itemList, i);
+						// oneUp
+						shouldContinue = sfTrue;
+						break;
+					}
+				}
+				if (shouldContinue)
+					continue;
+			}
+			break;
+		case I_STAR:
+			GD_ITEM->timer += dt;
+
+			if (GD_ITEM->timer < 1.f) {
+				GD_ITEM->pos.y -= 100.f * dt;
+			}
+			else {
+				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f)))
+					GD_ITEM->velocity.y = 0.f;
+				else
+					GD_ITEM->velocity.y = 270.f;
+
+				if (GD_ITEM->velocity.x < 0.f) {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfTrue, vector2f(-200.f, 0.f))) {
+						GD_ITEM->velocity.x = 200.f;
+					}
+				}
+				else {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfFalse, vector2f(200.f, 0.f))) {
+						GD_ITEM->velocity.x = -200.f;
+					}
+				}
+
+				GD_ITEM->pos = AddVectors(GD_ITEM->pos, MultiplyVector(GD_ITEM->velocity, dt));
+
+
+				sfBool shouldContinue = sfFalse;
+				for (int j = 0; j < 2; j++)
+				{
+					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						itemList->erase(&itemList, i);
+						// star
+						shouldContinue = sfTrue;
+						break;
+					}
+				}
+				if (shouldContinue)
+					continue;
+			}
+			break;
+		case I_COIN:
+			GD_ITEM->timer += dt * 6.f;
+
+			GD_ITEM->pos.y -= sin(GD_ITEM->timer) * 600.f * dt;
+
+			if (GD_ITEM->timer > 5.f) {
+				itemList->erase(&itemList, i);
+				continue;
+			}
+
 			break;
 		default:
 			break;

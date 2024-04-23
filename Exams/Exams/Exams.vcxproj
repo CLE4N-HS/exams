@@ -136,6 +136,7 @@
     <ClCompile Include="customMath.c" />
     <ClCompile Include="dialogBox.c" />
     <ClCompile Include="editor.c" />
+    <ClCompile Include="enemies.c" />
     <ClCompile Include="fontManager.c" />
     <ClCompile Include="game.c" />
     <ClCompile Include="gamepad.c" />
@@ -159,6 +160,7 @@
     <ClInclude Include="CustomMath.h" />
     <ClInclude Include="dialogBox.h" />
     <ClInclude Include="editor.h" />
+    <ClInclude Include="enemies.h" />
     <ClInclude Include="fontManager.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gamepad.h" />

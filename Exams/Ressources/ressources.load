@@ -7,4 +7,5 @@ animation loadingAnim ../Ressources/Textures/loading.anim
 single tileset ../Ressources/Textures/tileset.png
 single mario ../Ressources/Textures/mario.png
 single items ../Ressources/Textures/items.png
+single enemies ../Ressources/Textures/enemies.png
 [end]

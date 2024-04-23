@@ -10,6 +10,7 @@
 #include "editor.h"
 #include "player.h"
 #include "items.h"
+#include "enemies.h"
 
 #include <Windows.h>
 
@@ -70,6 +71,7 @@ void initGame(Window* _window)
 	else {
 		initPlayer();
 		initItems();
+		initEnemies();
 	}
 	
 	GamepadDetection();
@@ -99,29 +101,16 @@ void updateGame(Window* _window)
 		timer = 0.0f;
 	}
 
-	if (sfKeyboard_isKeyPressed(sfKeyA)) {
-		PlayASound("tmpMusic", sfTrue);
+	float dt = getDeltaTime();
+
+	static float timerr = 0.f;
+	timerr += dt;
+
+	if (isButtonPressed(0, X) && timerr > 0.5f) {
+		createEnemy(E_GOOMBA, vector2f(1500.f, 200.f));
+		timerr = 0.f;
 	}
-	if (sfKeyboard_isKeyPressed(sfKeyZ)) {
-		PlayASound("tmpSound", sfFalse);
-	}
-	if (sfKeyboard_isKeyPressed(sfKeyE)) {
-		PlayASound("tmpSound2", sfTrue);
-	}
-
-
-	gamepadChangePos = sfFalse;
-
-
-	BG1Pos.y = BG1Pos.y + 100.f * getDeltaTime();
-	BG2Pos.y = BG2Pos.y + 100.f * getDeltaTime();
-	if (BG1Pos.y >= 1080.0f)
-		BG1Pos.y = BG2Pos.y - 1080.0f;
-	if (BG2Pos.y >= 1080.0f)
-		BG2Pos.y = BG1Pos.y - 1080.0f;
-
-	sfSprite_setPosition(spBG1, BG1Pos);
-	sfSprite_setPosition(spBG2, BG2Pos);
+	
 	
 	updateMap(_window);
 	if (isEditor) {
@@ -130,14 +119,12 @@ void updateGame(Window* _window)
 	else {
 		updatePlayer(_window);
 		updateItem(_window);
+		updateEnemies(_window);
 	}
 }
 
 void displayGame(Window* _window)
 {
-	sfRenderTexture_drawSprite(_window->renderTexture, spBG1, NULL);
-	
-	sfRenderTexture_drawSprite(_window->renderTexture, spBG2, NULL);
 
 	displayMap(_window);
 	if (isEditor) {
@@ -145,6 +132,7 @@ void displayGame(Window* _window)
 	}
 	else {
 		displayItem(_window);
+		displayEnemies(_window);
 		displayPlayer(_window);
 	}
 

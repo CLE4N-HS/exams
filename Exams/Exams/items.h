@@ -5,7 +5,9 @@
 typedef enum ItemType {
 	I_MUSHROOM,
 	I_FIREFLOWER,
-	I_ONEUP
+	I_ONEUP,
+	I_STAR,
+	I_COIN
 }ItemType;
 
 void initItems();
