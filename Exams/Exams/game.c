@@ -11,6 +11,7 @@
 #include "player.h"
 #include "items.h"
 #include "enemies.h"
+#include "fireballs.h"
 
 #include <Windows.h>
 
@@ -72,6 +73,7 @@ void initGame(Window* _window)
 		initPlayer();
 		initItems();
 		initEnemies();
+		initFireballs();
 	}
 	
 	GamepadDetection();
@@ -120,6 +122,7 @@ void updateGame(Window* _window)
 		updatePlayer(_window);
 		updateItem(_window);
 		updateEnemies(_window);
+		updateFireballs(_window);
 	}
 }
 
@@ -134,6 +137,7 @@ void displayGame(Window* _window)
 		displayItem(_window);
 		displayEnemies(_window);
 		displayPlayer(_window);
+		displayFireballs(_window);
 	}
 
 }

@@ -5,7 +5,7 @@
 #include "textureManager.h"
 
 #define SAVE_PATH "../Ressources/Saves/"
-#define NB_MAX_TILES 31
+#define NB_MAX_TILES 39
 
 void initEditor();
 void updateEditor(Window* _window);

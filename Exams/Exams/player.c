@@ -3,6 +3,8 @@
 #include "map.h"
 #include "CustomMath.h"
 #include "gamepadx.h"
+#include "fireballs.h"
+#include "viewManager.h"
 
 #define PLAYER_SPEED 1400.f
 #define MAX_PLAYER_SPEED 400.f
@@ -47,12 +49,15 @@ typedef struct Player {
 	sfVector2f nextPos;
 	playerPower power;
 	float invincibilityTimer;
+	float firethrowerTimer;
 }Player;
 Player p[2];
 
 sfSprite* playerSprite;
 sfCircleShape* cr;
 sfRectangleShape* rec;
+
+sfVector2f greatestViewPos;
 
 void initPlayer()
 {
@@ -80,13 +85,18 @@ void initPlayer()
 		p[i].nextPos = p[i].pos;
 		p[i].power = P_SMALL;
 		p[i].invincibilityTimer = 0.f;
+		p[i].firethrowerTimer = 1.f;
 
 	}
+
+	greatestViewPos = vector2f(960.f, 540.f);
 }
 
 void updatePlayer(Window* _window)
 {
 	float dt = getDeltaTime();
+
+	sfVector2f firstPlayerPos = vector2f(960.f, 540.f);
 
 	for (int i = 0; i < 1; i++)
 	{
@@ -136,18 +146,18 @@ void updatePlayer(Window* _window)
 			if (fabsf(p[i].velocity.x) < MIN_WALK) {  // slower than a walk // starting, stopping or turning around
 				p[i].velocity.x = 0;
 				p[i].state = P_IDLE;
-				if (lStickXPos < 0.f/* && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-MIN_WALK, 0.f))) {
+				if (lStickXPos < 0.f/* && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-MIN_WALK, 0.f), sfTrue)) {
 					p[i].scale.x = -BLOCK_SCALE;
 					p[i].velocity.x -= MIN_WALK;
 				}
-				if (lStickXPos > 0.f /*&& !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(MIN_WALK, 0.f))) {
+				if (lStickXPos > 0.f /*&& !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(MIN_WALK, 0.f), sfTrue)) {
 					p[i].scale.x = BLOCK_SCALE;
 					p[i].velocity.x += MIN_WALK;
 				}
 			}
 			else if (fabsf(p[i].velocity.x) >= MIN_WALK) {  // faster than a walk // accelerating or decelerating
 				if (1) {
-					if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(ACC_RUN * dt, 0.f))) {
+					if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(ACC_RUN * dt, 0.f), sfTrue)) {
 						p[i].scale.x = BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
 							p[i].velocity.x += ACC_RUN * dt;
@@ -156,7 +166,7 @@ void updatePlayer(Window* _window)
 							p[i].velocity.x += ACC_WALK * dt;
 						}
 					}
-					else if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-DEC_SKID * dt, 0.f))) {
+					else if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-DEC_SKID * dt, 0.f), sfTrue)) {
 						p[i].scale.x = -BLOCK_SCALE;
 						p[i].velocity.x -= DEC_SKID * dt;
 						p[i].state = P_SKID;
@@ -170,7 +180,7 @@ void updatePlayer(Window* _window)
 					}
 				}
 				if (0) {
-					if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f))) {
+					if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f), sfTrue)) {
 						p[i].scale.x = -BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
 							p[i].velocity.x -= ACC_RUN * dt;
@@ -178,9 +188,9 @@ void updatePlayer(Window* _window)
 						else {
 							p[i].velocity.x -= ACC_WALK * dt;
 						}
-						
+
 					}
-					else if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(DEC_SKID * dt, 0.f))) {
+					else if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(DEC_SKID * dt, 0.f), sfTrue)) {
 						p[i].scale.x = BLOCK_SCALE;
 						p[i].velocity.x += DEC_SKID * dt;
 						p[i].state = P_SKID;
@@ -194,7 +204,7 @@ void updatePlayer(Window* _window)
 			p[i].velocity.y += p[i].fallAcc * dt;
 
 			if (p[i].canJump && isButtonPressed(i, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) { // jump
-			//if (p[i].canJump && isButtonPressed(i, A) && isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity)) { // jump
+				//if (p[i].canJump && isButtonPressed(i, A) && isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity)) { // jump
 				if (fabsf(p[i].velocity.x) < 16.f) {
 					p[i].velocity.y = -240.f;
 					p[i].fallAcc = STOP_FALL;
@@ -224,14 +234,14 @@ void updatePlayer(Window* _window)
 			}
 
 			// horizontal physics
-			if (lStickXPos > 0.f/* && !p[i].game.left*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(ACC_RUN * dt, 0.f))) {
+			if (lStickXPos > 0.f/* && !p[i].game.left*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(ACC_RUN * dt, 0.f), sfTrue)) {
 				p[i].scale.x = BLOCK_SCALE;
 				if (fabsf(p[i].velocity.x) > MAX_WALK) {
 					p[i].velocity.x += ACC_RUN * dt;
 				}
 				else p[i].velocity.x += ACC_WALK * dt;
 			}
-			else if (lStickXPos < 0.f/* && !p[i].game.right*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f))) {
+			else if (lStickXPos < 0.f/* && !p[i].game.right*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f), sfTrue)) {
 				p[i].scale.x = -BLOCK_SCALE;
 				if (fabsf(p[i].velocity.x) > MAX_WALK) {
 					p[i].velocity.x -= ACC_RUN * dt;
@@ -246,11 +256,10 @@ void updatePlayer(Window* _window)
 		p[i].velocity.y += p[i].fallAcc * dt;
 
 		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds))
-		//if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity))
+			//if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity))
 			p[i].state = P_IDLE;
 
-		if (isCollision3(p[i].bounds, &p[i].velocity))
-			printf("3");
+		if (isCollision3(p[i].bounds, &p[i].velocity, sfTrue)) {}
 
 		// max speed calculation
 		if (p[i].velocity.y >= MAX_FALL) p[i].velocity.y = MAX_FALL;
@@ -265,14 +274,47 @@ void updatePlayer(Window* _window)
 		//p[i].velocity.x = MAX(p[i].velocity.x, -MAX_PLAYER_SPEED);
 		//p[i].velocity.x = MIN(p[i].velocity.x, MAX_PLAYER_SPEED);
 
+
 		p[i].pos = AddVectors(p[i].pos, MultiplyVector(p[i].velocity, BLOCK_SCALE * dt));
 
+		if (p[i].pos.x + p[i].velocity.x * BLOCK_SCALE * dt < greatestViewPos.x - 960.f + p[i].origin.x * fabsf(p[i].scale.x)) {
+			p[i].pos.x = greatestViewPos.x - 960.f + p[i].origin.x * fabsf(p[i].scale.x);
+			p[i].velocity.x = 0.f;
+		}
 
 		// Invincibility
 		p[i].invincibilityTimer -= dt;
 		if (p[i].invincibilityTimer > 0.f) {
 			// TODO color
 		}
+
+		// Fireballs
+		if (p[i].power == P_FIRETHROWER) {
+			p[i].firethrowerTimer += dt;
+			if (isButtonPressed(i, Y) && p[i].firethrowerTimer > 0.2f && getNbFireballs() < 2) { // if debug
+				p[i].firethrowerTimer = 0.f;
+				sfBool isLeftSide = sfFalse;
+				if (p[i].scale.x < 0.f)
+					isLeftSide = sfTrue;
+				createFireball(p[i].pos, isLeftSide);
+
+			}
+		}
+
+		// View Setup
+		if (p[i].pos.x > firstPlayerPos.x)
+			firstPlayerPos.x = p[i].pos.x;
+	}
+
+	// View
+	if (0) { // TODO maxPos
+
+	}
+	else {
+		if (firstPlayerPos.x > greatestViewPos.x) {
+			greatestViewPos.x = firstPlayerPos.x;
+		}
+		SetViewPosition(mainView, greatestViewPos);
 	}
 }
 
@@ -313,15 +355,15 @@ void displayPlayer(Window* _window)
 		//sfRectangleShape_setSize(rec, vector2f(tmpRect3.width, tmpRect3.height));
 		//sfRenderTexture_drawRectangleShape(_window->renderTexture, rec, NULL);
 		//
-		sfRectangleShape_setFillColor(rec, color(0, 255, 255, 100));
-		sfRectangleShape_setPosition(rec, vector2f(tmpRect4.left, tmpRect4.top));
-		sfRectangleShape_setSize(rec, vector2f(tmpRect4.width, tmpRect4.height));
-		sfRenderTexture_drawRectangleShape(_window->renderTexture, rec, NULL);
-		
-		sfRectangleShape_setFillColor(rec, color(255, 255, 255, 100));
-		sfRectangleShape_setPosition(rec, vector2f(tmpRect5.left, tmpRect5.top));
-		sfRectangleShape_setSize(rec, vector2f(tmpRect5.width, tmpRect5.height));
-		sfRenderTexture_drawRectangleShape(_window->renderTexture, rec, NULL);
+		//sfRectangleShape_setFillColor(rec, color(0, 255, 255, 100));
+		//sfRectangleShape_setPosition(rec, vector2f(tmpRect4.left, tmpRect4.top));
+		//sfRectangleShape_setSize(rec, vector2f(tmpRect4.width, tmpRect4.height));
+		//sfRenderTexture_drawRectangleShape(_window->renderTexture, rec, NULL);
+		//
+		//sfRectangleShape_setFillColor(rec, color(255, 255, 255, 100));
+		//sfRectangleShape_setPosition(rec, vector2f(tmpRect5.left, tmpRect5.top));
+		//sfRectangleShape_setSize(rec, vector2f(tmpRect5.width, tmpRect5.height));
+		//sfRenderTexture_drawRectangleShape(_window->renderTexture, rec, NULL);
 	}
 }
 
@@ -378,4 +420,15 @@ void DamagePlayer(int _id)
 	else {
 		changePower(_id);
 	}
+}
+
+sfVector2f getGreatestViewPos()
+{
+	return greatestViewPos;
+}
+
+sfBool isOffView(sfVector2f _pos)
+{
+	// pas mal
+	return sfFalse;
 }

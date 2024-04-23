@@ -1,4 +1,5 @@
 #include "CustomMath.h"
+#include "viewManager.h"
 
 sfVector2i vector2i(int _x, int _y)
 {
@@ -39,11 +40,7 @@ double rand_float(float _min, float _max)
 sfVector2f getfWorldMousePos(sfRenderWindow* _window)
 {
     sfVector2i iMousePos = sfMouse_getPositionRenderWindow(_window);
-    sfVector2f fWorldMousePos;
-    fWorldMousePos.x = (float)iMousePos.x;
-    fWorldMousePos.y = (float)iMousePos.y;
-    //fWorldMousePos = sfRenderWindow_mapPixelToCoords(_window, iMousePos, getView());
-    return fWorldMousePos;
+    return sfRenderWindow_mapPixelToCoords(_window, iMousePos, getView());
 }
 
 sfVector2f getfMousePos(sfRenderWindow* _window)

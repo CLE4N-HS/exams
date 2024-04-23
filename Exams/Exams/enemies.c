@@ -4,6 +4,7 @@
 #include "CustomMath.h"
 #include "map.h"
 #include "player.h"
+#include "fireballs.h"
 
 #define GD_ENEMY STD_LIST_GETDATA(enemiesList, Enemies, i)
 #define GOOMBAX_SPEED 100.f
@@ -59,18 +60,18 @@ void updateEnemies(Window* _window)
 		switch (GD_ENEMY->type)
 		{
 		case E_GOOMBA:
-			if (isCollision2(GD_ENEMY->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f)))
+			if (isCollision2(GD_ENEMY->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), sfFalse))
 				GD_ENEMY->velocity.y = 0.f;
 			else
 				GD_ENEMY->velocity.y = GOOMBAY_SPEED;
 
 			if (GD_ENEMY->velocity.x < 0.f) {
-				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfTrue, vector2f(-GOOMBAX_SPEED, 0.f))) {
+				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfTrue, vector2f(-GOOMBAX_SPEED, 0.f), sfFalse)) {
 					GD_ENEMY->velocity.x = GOOMBAX_SPEED;
 				}
 			}
 			else {
-				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfFalse, vector2f(GOOMBAX_SPEED, 0.f))) {
+				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfFalse, vector2f(GOOMBAX_SPEED, 0.f), sfFalse)) {
 					GD_ENEMY->velocity.x = -GOOMBAX_SPEED;
 				}
 			}
@@ -78,6 +79,7 @@ void updateEnemies(Window* _window)
 			GD_ENEMY->pos = AddVectors(GD_ENEMY->pos, MultiplyVector(GD_ENEMY->velocity, dt));
 
 
+			// player Collisions
 			for (int j = 0; j < 2; j++)
 			{
 				if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
@@ -86,6 +88,13 @@ void updateEnemies(Window* _window)
 					break;
 				}
 			}
+
+			// fireballs Collisions
+			if (isFireballInBounds(&GD_ENEMY->bounds)) {
+				enemiesList->erase(&enemiesList, i);
+				continue;
+			}
+
 			break;
 		default:
 			break;

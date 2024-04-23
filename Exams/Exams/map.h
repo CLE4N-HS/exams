@@ -4,7 +4,7 @@
 
 #define BLOCK_SIZE 16
 
-#define BLOCK_SCALE /*4.821428f*/ 5.f
+#define BLOCK_SCALE 4.821428f /*5.f*/
 
 #define NB_BLOCKS_X 212
 #define NB_BLOCKS_Y 14
@@ -43,8 +43,17 @@ typedef enum {
 	T_U_DOORCASTLE,
 	T_B_DOORCASTLE,
 	T_U_CASTLE,
-	T_L_WINDOWCASTLE
-
+	T_L_WINDOWCASTLE,
+	T_UL_DARK_PIPE,
+	T_BL_DARK_PIPE,
+	T_UR_DARK_PIPE,
+	T_BR_DARK_PIPE,
+	T_DARK_SKY,
+	T_LSIDE_DARK_PIPE,
+	T_DARK_COIN,
+	T_RSIDE_DARK_PIPE,
+	T_DARK_BLOCK,
+	T_DARK_GROUND
 }blockType;
 
 typedef struct {
@@ -85,10 +94,10 @@ sfVector2i getPlayerBlockPos(sfVector2f _pos);
 sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sfFloatRect _bounds);
 
 // global collisions
-sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity);
+sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity, sfBool _isPlayer);
 
 // collisions on a certain axis
-sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector2f _nextVelocity);
+sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector2f _nextVelocity, sfBool _isPlayer);
 
 sfBool isMapFinished();
 

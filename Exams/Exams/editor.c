@@ -172,6 +172,16 @@ void updateEditor(Window* _window)
 			case T_B_DOORCASTLE: tileCursorRect = IntRect(14 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 			case T_U_CASTLE: tileCursorRect = IntRect(15 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 			case T_L_WINDOWCASTLE: tileCursorRect = IntRect(15 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_UL_DARK_PIPE: tileCursorRect = IntRect(16 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_BL_DARK_PIPE: tileCursorRect = IntRect(16 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_UR_DARK_PIPE: tileCursorRect = IntRect(17 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_BR_DARK_PIPE: tileCursorRect = IntRect(17 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_DARK_SKY: tileCursorRect = IntRect(18 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_LSIDE_DARK_PIPE: tileCursorRect = IntRect(18 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_DARK_COIN: tileCursorRect = IntRect(19 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_RSIDE_DARK_PIPE: tileCursorRect = IntRect(19 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_DARK_BLOCK: tileCursorRect = IntRect(20 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_DARK_GROUND: tileCursorRect = IntRect(20 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 			
 			default: break;
 		}
@@ -230,7 +240,17 @@ void updateEditor(Window* _window)
 					case T_U_DOORCASTLE: b[j][i].rect = IntRect(14 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_B_DOORCASTLE: b[j][i].rect = IntRect(14 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_U_CASTLE: b[j][i].rect = IntRect(15 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_L_WINDOWCASTLE: b[j][i].rect = IntRect(15 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+					case T_L_WINDOWCASTLE: b[j][i].rect = IntRect(15 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_UL_DARK_PIPE: b[j][i].rect = IntRect(16 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_BL_DARK_PIPE: b[j][i].rect = IntRect(16 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_UR_DARK_PIPE: b[j][i].rect = IntRect(17 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_BR_DARK_PIPE: b[j][i].rect = IntRect(17 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_DARK_SKY: b[j][i].rect = IntRect(18 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+					case T_LSIDE_DARK_PIPE: b[j][i].rect = IntRect(18 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_DARK_COIN: b[j][i].rect = IntRect(19 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_RSIDE_DARK_PIPE: b[j][i].rect = IntRect(19 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_DARK_BLOCK: b[j][i].rect = IntRect(20 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_DARK_GROUND: b[j][i].rect = IntRect(20 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 
 					default: break;
 					//}
@@ -332,6 +352,28 @@ void updateEditor(Window* _window)
 			else if ((mousePosX > 480.f * EDITOR_SCALE && mousePosX < 512.f * EDITOR_SCALE) && (mousePosY > 32.f * EDITOR_SCALE && mousePosY < 64.f * EDITOR_SCALE))
 				currentTile = T_L_WINDOWCASTLE;
 
+			else if ((mousePosX > 512.f * EDITOR_SCALE && mousePosX < 544.f * EDITOR_SCALE) && (mousePosY > 0.f * EDITOR_SCALE && mousePosY < 32.f * EDITOR_SCALE))
+				currentTile = T_UL_DARK_PIPE;
+			else if ((mousePosX > 512.f * EDITOR_SCALE && mousePosX < 544.f * EDITOR_SCALE) && (mousePosY > 32.f * EDITOR_SCALE && mousePosY < 64.f * EDITOR_SCALE))
+				currentTile = T_BL_DARK_PIPE;
+			else if ((mousePosX > 544.f * EDITOR_SCALE && mousePosX < 576.f * EDITOR_SCALE) && (mousePosY > 0.f * EDITOR_SCALE && mousePosY < 32.f * EDITOR_SCALE))
+				currentTile = T_UR_DARK_PIPE;
+			else if ((mousePosX > 544.f * EDITOR_SCALE && mousePosX < 576.f * EDITOR_SCALE) && (mousePosY > 32.f * EDITOR_SCALE && mousePosY < 64.f * EDITOR_SCALE))
+				currentTile = T_BR_DARK_PIPE;
+			else if ((mousePosX > 576.f * EDITOR_SCALE && mousePosX < 608.f * EDITOR_SCALE) && (mousePosY > 0.f * EDITOR_SCALE && mousePosY < 32.f * EDITOR_SCALE))
+				currentTile = T_DARK_SKY;
+			else if ((mousePosX > 576.f * EDITOR_SCALE && mousePosX < 608.f * EDITOR_SCALE) && (mousePosY > 32.f * EDITOR_SCALE && mousePosY < 64.f * EDITOR_SCALE))
+				currentTile = T_LSIDE_DARK_PIPE;
+			else if ((mousePosX > 608.f * EDITOR_SCALE && mousePosX < 640.f * EDITOR_SCALE) && (mousePosY > 0.f * EDITOR_SCALE && mousePosY < 32.f * EDITOR_SCALE))
+				currentTile = T_DARK_COIN;
+			else if ((mousePosX > 608.f * EDITOR_SCALE && mousePosX < 640.f * EDITOR_SCALE) && (mousePosY > 32.f * EDITOR_SCALE && mousePosY < 64.f * EDITOR_SCALE))
+				currentTile = T_RSIDE_DARK_PIPE;
+
+			else if ((mousePosX > 640.f * EDITOR_SCALE && mousePosX < 672.f * EDITOR_SCALE) && (mousePosY > 0.f * EDITOR_SCALE && mousePosY < 32.f * EDITOR_SCALE))
+				currentTile = T_DARK_BLOCK;
+			else if ((mousePosX > 640.f * EDITOR_SCALE && mousePosX < 672.f * EDITOR_SCALE) && (mousePosY > 32.f * EDITOR_SCALE && mousePosY < 64.f * EDITOR_SCALE))
+				currentTile = T_DARK_GROUND;
+
 
 			else
 				canPlaceTile = sfFalse;
@@ -339,11 +381,12 @@ void updateEditor(Window* _window)
 	}
 
 	// to remove improve
-	//if (sfKeyboard_isKeyPressed(sfKeyEscape) && timer > 0.2f)
-	//{
-	//	isEditor = sfFalse;
-	//	timer = 0.f;
-	//}
+	if (sfKeyboard_isKeyPressed(sfKeyEscape) && timer > 0.2f)
+	{
+		//isEditor = sfFalse;
+		changeState(_window, MENU);
+		timer = 0.f;
+	}
 
 		//if (getPause())
 		//	updatePause(_window);

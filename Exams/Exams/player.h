@@ -16,3 +16,5 @@ void displayPlayer(Window* _window);
 sfFloatRect* pgetPlayerBounds(int _id);
 void setPlayerPower(int _id, playerPower _power);
 void DamagePlayer(int _id);
+sfVector2f getGreatestViewPos();
+sfBool isOffView(sfVector2f _pos);

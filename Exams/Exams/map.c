@@ -247,6 +247,13 @@ sfVector2i getPlayerBlockPos(sfVector2f _pos)
 	return iPos;
 }
 
+void BecomeDarkSky(int _y, int _x)
+{
+	b[_y][_x].type = T_DARK_SKY;
+	b[_y][_x].rect = IntRect(18 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+	b[_y][_x].isSolid = sfFalse;
+}
+
 sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sfFloatRect _bounds)
 {
 	//sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE)); // offset to not count the alpha 0
@@ -288,7 +295,7 @@ sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sf
 
 }
 
-sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector2f _nextVelocity)
+sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector2f _nextVelocity, sfBool _isPlayer)
 {
 	float dt = getDeltaTime();
 	float offset = 1.f;
@@ -352,7 +359,15 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 		{
 			if (b[blockPos.y][blockPos.x - 1].isSolid)
 			{
-				return sfTrue;
+				switch (b[blockPos.y][blockPos.x - 1].type)
+				{
+				case T_DARK_COIN:
+					BecomeDarkSky(blockPos.y, blockPos.x - 1);
+					break;
+				default:
+					return sfTrue;
+					break;
+				}
 				////sfFloatRect blockRect = FlRect(b[blockPos.y][blockPos.x - 1].pos.x, b[blockPos.y][blockPos.x - 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 				////if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
 				//{
@@ -361,7 +376,15 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			}
 			if (b[blockPos2.y][blockPos2.x - 1].isSolid)
 			{
-				return sfTrue;
+				switch (b[blockPos2.y][blockPos2.x - 1].type)
+				{
+				case T_DARK_COIN:
+					BecomeDarkSky(blockPos2.y, blockPos2.x - 1);
+					break;
+				default:
+					return sfTrue;
+					break;
+				}
 				////sfFloatRect blockRect2 = FlRect(b[blockPos2.y][blockPos2.x - 1].pos.x, b[blockPos2.y][blockPos2.x - 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 				////if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
 				//{
@@ -373,7 +396,15 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 		{
 			if (b[blockPos.y][blockPos.x + 1].isSolid)
 			{
-				return sfTrue;
+				switch (b[blockPos.y][blockPos.x + 1].type)
+				{
+				case T_DARK_COIN:
+					BecomeDarkSky(blockPos.y, blockPos.x + 1);
+					break;
+				default:
+					return sfTrue;
+					break;
+				}
 				////sfFloatRect blockRect = FlRect(b[blockPos.y][blockPos.x + 1].pos.x, b[blockPos.y][blockPos.x + 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 				////tmpRect = blockRect;
 				////if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
@@ -383,7 +414,15 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			}
 			if (b[blockPos2.y][blockPos2.x + 1].isSolid)
 			{
-				return sfTrue;
+				switch (b[blockPos2.y][blockPos2.x + 1].type)
+				{
+				case T_DARK_COIN:
+					BecomeDarkSky(blockPos2.y, blockPos2.x + 1);
+					break;
+				default:
+					return sfTrue;
+					break;
+				}
 				////sfFloatRect blockRect2 = FlRect(b[blockPos2.y][blockPos2.x + 1].pos.x, b[blockPos2.y][blockPos2.x + 1].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 				////tmpRect2 = blockRect2;
 				////if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
@@ -400,19 +439,28 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			//tmpRect = FlRect(b[blockPos.y - 1][blockPos.x].pos.x, b[blockPos.y - 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 			if (b[blockPos.y - 1][blockPos.x].isSolid)
 			{
-				switch (b[blockPos.y - 1][blockPos.x].type)
-				{
-				case T_QUESTION:
-					if (b[blockPos.y - 1][blockPos.x].color.r > 200) {
-						b[blockPos.y - 1][blockPos.x].color = color(100, 100, 100, 255);
-						int random = rand() % 5;
-						createItem(random, b[blockPos.y - 1][blockPos.x].pos);
+				if (_isPlayer) {
+					collide = sfTrue;
+					switch (b[blockPos.y - 1][blockPos.x].type)
+					{
+					case T_QUESTION:
+						if (b[blockPos.y - 1][blockPos.x].color.r > 200) {
+							b[blockPos.y - 1][blockPos.x].color = color(100, 100, 100, 255);
+							int random = rand() % 5;
+							createItem(random, b[blockPos.y - 1][blockPos.x].pos);
+						}
+						break;
+					case T_DARK_COIN:
+						BecomeDarkSky(blockPos.y - 1, blockPos.x);
+						collide = sfFalse;
+						break;
+					default:
+						return sfTrue;
+						break;
 					}
-					break;
-				default:
-					break;
 				}
-				collide = sfTrue;
+				else
+					return sfTrue;
 				////sfFloatRect blockRect = FlRect(b[blockPos.y - 1][blockPos.x].pos.x, b[blockPos.y - 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 				////if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
 				//{
@@ -422,19 +470,26 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			//tmpRect2 = FlRect(b[blockPos2.y - 1][blockPos2.x].pos.x, b[blockPos2.y - 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 			if (b[blockPos2.y - 1][blockPos2.x].isSolid)
 			{
-				switch (b[blockPos2.y - 1][blockPos2.x].type)
-				{
-				case T_QUESTION:
-					if (b[blockPos2.y - 1][blockPos2.x].color.r > 200) {
-						b[blockPos2.y - 1][blockPos2.x].color = color(100, 100, 100, 255);
-						int random = rand() % 5;
-						createItem(random, b[blockPos2.y - 1][blockPos2.x].pos);
+				if (_isPlayer) {
+					switch (b[blockPos2.y - 1][blockPos2.x].type)
+					{
+					case T_QUESTION:
+						if (b[blockPos2.y - 1][blockPos2.x].color.r > 200) {
+							b[blockPos2.y - 1][blockPos2.x].color = color(100, 100, 100, 255);
+							int random = rand() % 5;
+							createItem(random, b[blockPos2.y - 1][blockPos2.x].pos);
+						}
+						break;
+					case T_DARK_COIN:
+						BecomeDarkSky(blockPos2.y - 1, blockPos2.x);
+						break;
+					default:
+						return sfTrue;
+						break;
 					}
-					break;
-				default:
-					break;
 				}
-				return sfTrue;
+				else
+					return sfTrue;
 				////sfFloatRect blockRect2 = FlRect(b[blockPos2.y - 1][blockPos2.x].pos.x, b[blockPos2.y - 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 				////if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
 				//{
@@ -452,21 +507,53 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			_rect.height += _nextVelocity.y * BLOCK_SCALE;
 			if (b[blockPos.y + 1][blockPos.x].isSolid)
 			{
-				return sfTrue;
-				sfFloatRect blockRect = FlRect(b[blockPos.y + 1][blockPos.x].pos.x, b[blockPos.y + 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
+				switch (b[blockPos.y + 1][blockPos.x].type)
 				{
-						return sfTrue;
+				case T_DARK_COIN:
+					BecomeDarkSky(blockPos.y + 1, blockPos.x);
+					break;
+				default:
+					return sfTrue;
+					break;
 				}
+				//sfFloatRect blockRect = FlRect(b[blockPos.y + 1][blockPos.x].pos.x, b[blockPos.y + 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				//if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
+				//{
+				//	switch (b[blockPos.y + 1][blockPos.x].type)
+				//	{
+				//	case T_DARK_COIN:
+				//		BecomeDarkSky(blockPos.y + 1, blockPos.x);
+				//		break;
+				//	default:
+				//		return sfTrue;
+				//		break;
+				//	}
+				//}
 			}
 			if (b[blockPos2.y + 1][blockPos2.x].isSolid)
 			{
-				return sfTrue;
-				sfFloatRect blockRect2 = FlRect(b[blockPos2.y + 1][blockPos2.x].pos.x, b[blockPos2.y + 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
-				if (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
+				switch (b[blockPos2.y + 1][blockPos2.x].type)
 				{
-						return sfTrue;
+				case T_DARK_COIN:
+					BecomeDarkSky(blockPos2.y + 1, blockPos2.x);
+					break;
+				default:
+					return sfTrue;
+					break;
 				}
+				//fFloatRect blockRect2 = FlRect(b[blockPos2.y + 1][blockPos2.x].pos.x, b[blockPos2.y + 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
+				//f (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
+				//
+				//	switch (b[blockPos2.y + 1][blockPos2.x].type)
+				//	{
+				//	case T_DARK_COIN:
+				//		BecomeDarkSky(blockPos2.y + 1, blockPos2.x);
+				//		break;
+				//	default:
+				//		return sfTrue;
+				//		break;
+				//	}
+				//
 			}
 		}
 	}
@@ -474,11 +561,11 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 	return sfFalse;
 }
 
-sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity)
+sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity, sfBool _isPlayer)
 {
 	if (_velocity->x > EPSILON)
 	{
-		if (isCollision2(_rect, sfTrue, sfFalse, *_velocity))
+		if (isCollision2(_rect, sfTrue, sfFalse, *_velocity, _isPlayer))
 		{
 			_velocity->x = 0.f;
 			return sfTrue;
@@ -486,7 +573,7 @@ sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity)
 	}
 	if (_velocity->x < -EPSILON)
 	{
-		if (isCollision2(_rect, sfTrue, sfTrue, *_velocity))
+		if (isCollision2(_rect, sfTrue, sfTrue, *_velocity, _isPlayer))
 		{
 			_velocity->x = 0.f;
 			return sfTrue;
@@ -494,7 +581,7 @@ sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity)
 	}
 	if (_velocity->y > EPSILON)
 	{
-		if (isCollision2(_rect, sfFalse, sfFalse, *_velocity))
+		if (isCollision2(_rect, sfFalse, sfFalse, *_velocity, _isPlayer))
 		{
 			_velocity->y = 0.f;
 			return sfTrue;
@@ -502,7 +589,7 @@ sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity)
 	}
 	if (_velocity->y < -EPSILON)
 	{
-		if (isCollision2(_rect, sfFalse, sfTrue, *_velocity))
+		if (isCollision2(_rect, sfFalse, sfTrue, *_velocity, _isPlayer))
 		{
 			_velocity->y = 0.f;
 			return sfTrue;
