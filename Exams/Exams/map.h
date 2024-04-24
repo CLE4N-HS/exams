@@ -4,10 +4,10 @@
 
 #define BLOCK_SIZE 16
 
-#define BLOCK_SCALE /*4.5f*/ 4.821428f /*5.f*/
+#define BLOCK_SCALE 4.5f /*4.821428f*/ /*5.f*/
 
 #define NB_BLOCKS_X 212
-#define NB_BLOCKS_Y 14
+#define NB_BLOCKS_Y 15
 
 int nbMap;
 
@@ -53,7 +53,8 @@ typedef enum {
 	T_DARK_COIN,
 	T_RSIDE_DARK_PIPE,
 	T_DARK_BLOCK,
-	T_DARK_GROUND
+	T_DARK_GROUND,
+	T_HIT_BLOCK
 }blockType;
 
 typedef struct {

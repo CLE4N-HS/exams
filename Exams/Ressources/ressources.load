@@ -9,4 +9,5 @@ single mario ../Ressources/Textures/mario.png
 single items ../Ressources/Textures/items.png
 single enemies ../Ressources/Textures/enemies.png
 single fireball ../Ressources/Textures/fireball.png
+single ref ../Ressources/Textures/ref.png
 [end]

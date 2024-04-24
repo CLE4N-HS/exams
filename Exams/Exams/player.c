@@ -315,13 +315,13 @@ void updatePlayer(Window* _window)
 			firstPlayerPos.x = p[i].pos.x;
 
 		// Pipes
-		if (p[i].canGoInYPipe && lStickYPos < -50.f) {
+		if (p[i].canGoInYPipe && lStickYPos < -50.f && p[i].pos.x >= 3800.f && p[i].pos.x <= 4500.f) {
 			p[i].canGoInYPipe = sfFalse;
 			nbMap = 2;
 			loadMap(2);
 			for (int j = 0; j < 2; j++)
 			{
-				p[j].pos = vector2f(125.f, 100.f);
+				p[j].pos = vector2f(2.f * BLOCK_SCALE * BLOCK_SIZE + p[i].origin.x * BLOCK_SCALE, 3.f * BLOCK_SCALE * BLOCK_SIZE);
 				p[j].velocity = VECTOR2F_NULL;
 			}
 			greatestViewPos = vector2f(8.5f * BLOCK_SCALE * BLOCK_SIZE, 540.f);
@@ -332,10 +332,10 @@ void updatePlayer(Window* _window)
 			loadMap(1);
 			for (int j = 0; j < 2; j++)
 			{
-				p[j].pos = vector2f(163.5f * BLOCK_SCALE * BLOCK_SIZE, 600.f);
+				p[j].pos = vector2f(163.5f * BLOCK_SCALE * BLOCK_SIZE + p[i].origin.x * BLOCK_SCALE, 11.f * BLOCK_SCALE * BLOCK_SIZE);
 				p[j].velocity = VECTOR2F_NULL;
 			}
-			greatestViewPos = vector2f(168.f * BLOCK_SCALE * BLOCK_SIZE, 540.f);
+			greatestViewPos = vector2f(168.5f * BLOCK_SCALE * BLOCK_SIZE, 540.f);
 		}
 	}
 
@@ -472,4 +472,12 @@ void setPlayerPossiblePipe(int _id, sfBool _canEnter, sfBool _YPipe)
 		p[_id].canGoInYPipe = _canEnter;
 	else
 		p[_id].canGoInXPipe = _canEnter;
+}
+
+sfBool isPlayerBig(int _id)
+{
+	if (p[_id].power >= P_BIG)
+		return sfTrue;
+
+	return sfFalse;
 }

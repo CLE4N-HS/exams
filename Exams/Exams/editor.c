@@ -13,7 +13,7 @@ sfSprite* tileCursor;
 sfSprite* hudEditor;
 sfRectangleShape* rectCursor;
 
-sfSprite* otherSprite;
+sfSprite* refSprite;
 sfTexture* tileSetTexture;
 
 int currentTile;
@@ -31,7 +31,9 @@ sfBool canHud;
 
 void initEditor()
 {
-	otherSprite = sfSprite_create();
+	refSprite = sfSprite_create();
+	sfSprite_setTexture(refSprite, GetTexture("ref"), sfTrue);
+
 	tileSetTexture = GetTexture("tileset");
 	
 	//initParallax();
@@ -182,7 +184,8 @@ void updateEditor(Window* _window)
 			case T_RSIDE_DARK_PIPE: tileCursorRect = IntRect(19 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 			case T_DARK_BLOCK: tileCursorRect = IntRect(20 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 			case T_DARK_GROUND: tileCursorRect = IntRect(20 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-			
+			case T_HIT_BLOCK: tileCursorRect = IntRect(21 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+
 			default: break;
 		}
 
@@ -240,7 +243,7 @@ void updateEditor(Window* _window)
 					case T_U_DOORCASTLE: b[j][i].rect = IntRect(14 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_B_DOORCASTLE: b[j][i].rect = IntRect(14 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_U_CASTLE: b[j][i].rect = IntRect(15 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
-					case T_L_WINDOWCASTLE: b[j][i].rect = IntRect(15 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_L_WINDOWCASTLE: b[j][i].rect = IntRect(15 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 					case T_UL_DARK_PIPE: b[j][i].rect = IntRect(16 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_BL_DARK_PIPE: b[j][i].rect = IntRect(16 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_UR_DARK_PIPE: b[j][i].rect = IntRect(17 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
@@ -251,6 +254,7 @@ void updateEditor(Window* _window)
 					case T_RSIDE_DARK_PIPE: b[j][i].rect = IntRect(19 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_DARK_BLOCK: b[j][i].rect = IntRect(20 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_DARK_GROUND: b[j][i].rect = IntRect(20 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_HIT_BLOCK: b[j][i].rect = IntRect(21 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 
 					default: break;
 					//}
@@ -454,14 +458,19 @@ void updateEditor(Window* _window)
 		togglePause();
 	}
 
-	if (sfKeyboard_isKeyPressed(sfKeyQ)) SetViewPosition(mainView, vector2f(GetViewPosition(mainView).x - 1000.f * dt, GetViewPosition(mainView).y));
-	if (sfKeyboard_isKeyPressed(sfKeyD)) SetViewPosition(mainView, vector2f(GetViewPosition(mainView).x + 1000.f * dt, GetViewPosition(mainView).y));
+	if (sfKeyboard_isKeyPressed(sfKeyQ)) SetViewPosition(mainView, vector2f(GetViewPosition(mainView).x - 2000.f * dt, GetViewPosition(mainView).y));
+	if (sfKeyboard_isKeyPressed(sfKeyD)) SetViewPosition(mainView, vector2f(GetViewPosition(mainView).x + 2000.f * dt, GetViewPosition(mainView).y));
 	if (sfKeyboard_isKeyPressed(sfKeyS)) SetViewPosition(mainView, vector2f(GetViewPosition(mainView).x, GetViewPosition(mainView).y + 1000.f * dt));
 	if (sfKeyboard_isKeyPressed(sfKeyZ)) SetViewPosition(mainView, vector2f(GetViewPosition(mainView).x, GetViewPosition(mainView).y - 1000.f * dt));
 }
 
 void displayEditor(Window* _window)
 {
+	if (sfKeyboard_isKeyPressed(sfKeyR)) {
+		sfSprite_setPosition(refSprite, vector2f(-24.f * 3.61204013f, 0.f));
+		sfSprite_setScale(refSprite, vector2f(3.61204013f, 3.61204013f));
+		sfRenderTexture_drawSprite(_window->renderTexture, refSprite, NULL);
+	}
 	/// TILE CURSOR
 	sfSprite_setScale(tileCursor, vector2f(2.f, 2.f));
 
@@ -490,6 +499,8 @@ void displayEditor(Window* _window)
 
 	}
 	sfRenderTexture_setView(_window->renderTexture, mainView->view);
+
+
 
 	//if (getPause())
 	//	displayPause(_window);
@@ -663,7 +674,7 @@ void deinitEditor()
 	sfSprite_destroy(tileCursor);
 	sfSprite_destroy(hudEditor);
 	sfRectangleShape_destroy(rectCursor);
-	sfSprite_destroy(otherSprite);
+	sfSprite_destroy(refSprite);
 	sfText_destroy(txtSpace);
 	sfText_destroy(txtMap);
 	sfText_destroy(txtNbMap);
