@@ -54,7 +54,8 @@ typedef enum {
 	T_RSIDE_DARK_PIPE,
 	T_DARK_BLOCK,
 	T_DARK_GROUND,
-	T_HIT_BLOCK
+	T_HIT_BLOCK,
+	T_HIDDEN_BLOCK
 }blockType;
 
 typedef struct {

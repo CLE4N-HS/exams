@@ -12,35 +12,21 @@
 #include "items.h"
 #include "enemies.h"
 #include "fireballs.h"
+#include "fontManager.h"
 
 #include <Windows.h>
 
-//sfSprite* sprite;
-sfSprite* spBG1;
-sfSprite* spBG2;
-
-
-
-sfBool gamepadChangePos;
-sfVector2f BG1Pos;
-sfVector2f BG2Pos;
-
-
-
 float timer;
-int nbreJoueur;
-int waveCount;
 
-float waveTimer;
-float soloTimer;
-float defaultwaveTimer;
-float defaultsoloTimer;
-float bossTimer;
+sfText* gameText;
+char buffer[30];
 
-sfBool phaseWave;
-sfBool phaseBoss;
-sfBool phaseBossCompleted;
-sfBool gameover;
+sfSprite* gameSprite;
+
+int gameScore;
+float gameTime;
+
+int nbPlayerMode;
 
 void initGame(Window* _window)
 {
@@ -48,22 +34,23 @@ void initGame(Window* _window)
 	Sound_Onload(GAME);
 	Font_Onload(GAME);
 
-	spBG1 = sfSprite_create();
-	spBG2 = sfSprite_create();
-	
-	sfSprite_setTexture(spBG1, GetTexture("BG1"), sfTrue);
-	sfSprite_setTexture(spBG2, GetTexture("BG2"), sfTrue);
-
-	sfSprite_setPosition(spBG2, vector2f(0.0f, -1080.0f));
-	
-
-
-	sfVector3f ambientLight = { 0.1f, 0.1f, 0.3f };
-	
-	BG1Pos = vector2f(0.0f, 0.0f);
-	BG2Pos = vector2f(0.0f, -1080.0f);
-
 	SetViewPosition(mainView, vector2f(960.f, 540.f));
+
+	timer = 0.f;
+
+	gameText = sfText_create();
+	sfText_setFont(gameText, GetFont("marioFont"));
+	sfText_setColor(gameText, sfWhite);
+	sfText_setCharacterSize(gameText, 30);
+
+	gameSprite = sfSprite_create();
+	sfSprite_setTexture(gameSprite, GetTexture("items"), sfFalse);
+	sfSprite_setTextureRect(gameSprite, IntRect(0, 64, 16, 16));
+	sfSprite_setPosition(gameSprite, vector2f(500.f, 80.f));
+	sfSprite_setScale(gameSprite, vector2f(3.f, 3.f));
+
+	gameScore = 0;
+	gameTime = 400.f;
 	
 	initMap();
 	if (isEditor) {
@@ -108,11 +95,17 @@ void updateGame(Window* _window)
 	static float timerr = 0.f;
 	timerr += dt;
 
-	if (isButtonPressed(0, X) && timerr > 0.5f) {
-		createEnemy(E_GOOMBA, vector2f(1500.f, 200.f));
+	if (isButtonPressed(0, X) && timerr > 0.5f) { // TODO remove
+		createEnemy(E_GOOMBA, vector2f(getPlayerPos(0).x + 500.f, 200.f));
 		timerr = 0.f;
 	}
-	
+	if (isButtonPressed(0, Y) && timerr > 0.5f) { // TODO remove
+		createEnemy(E_KOOPA, vector2f(getPlayerPos(0).x + 500.f, 200.f));
+		timerr = 0.f;
+	}
+
+	gameTime -= dt * 2.2f;
+	gameTime = max(gameTime, 0.f);
 	
 	updateMap(_window);
 	if (isEditor) {
@@ -124,11 +117,12 @@ void updateGame(Window* _window)
 		updateEnemies(_window);
 		updateFireballs(_window);
 	}
+
+	gameScore = min(gameScore, 999999);
 }
 
 void displayGame(Window* _window)
 {
-
 	displayMap(_window);
 	if (isEditor) {
 		displayEditor(_window);
@@ -138,6 +132,33 @@ void displayGame(Window* _window)
 		displayEnemies(_window);
 		displayPlayer(_window);
 		displayFireballs(_window);
+
+		sfRenderTexture_setView(_window->renderTexture, sfRenderTexture_getDefaultView(_window->renderTexture));
+
+		sprintf(buffer, "MARIO\n%06d", gameScore);
+		sfText_setString(gameText, buffer);
+		sfText_setPosition(gameText, vector2f(100.f, 20.f));
+		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
+
+		sfRenderTexture_drawSprite(_window->renderTexture, gameSprite, NULL);
+
+		sprintf(buffer, "x\n");
+		sfText_setString(gameText, buffer);
+		sfText_setPosition(gameText, vector2f(500.f, 20.f));
+		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
+
+		sprintf(buffer, "WORLD\n 1-1");
+		sfText_setString(gameText, buffer);
+		sfText_setPosition(gameText, vector2f(1000.f, 20.f));
+		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
+
+		sprintf(buffer, "TIME\n %03.f", gameTime);
+		sfText_setString(gameText, buffer);
+		sfText_setPosition(gameText, vector2f(1500.f, 20.f));
+		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
+
+
+		sfRenderTexture_setView(_window->renderTexture, mainView->view);
 	}
 
 }
@@ -145,7 +166,5 @@ void displayGame(Window* _window)
 void deinitGame()
 {
 	deinitPause();
-	sfSprite_destroy(spBG1);
-	sfSprite_destroy(spBG2);
 	RemoveAllTextureButALL();
 }

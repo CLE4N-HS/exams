@@ -402,6 +402,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos.y, blockPos.x - 1);
 						break;
+					case T_HIDDEN_BLOCK:
+						break;
 					default:
 						return sfTrue;
 						break;
@@ -423,6 +425,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos2.y, blockPos2.x - 1);
 						break;
+					case T_HIDDEN_BLOCK:
+						break;
 					default:
 						return sfTrue;
 						break;
@@ -442,6 +446,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				{
 				case T_DARK_COIN:
 					BecomeDarkSky(blockPos3.y, blockPos3.x - 1);
+					break;
+				case T_HIDDEN_BLOCK:
 					break;
 				default:
 					return sfTrue;
@@ -469,6 +475,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 							return sfTrue;
 						}
 						break;
+					case T_HIDDEN_BLOCK:
+						break;
 					default:
 						return sfTrue;
 						break;
@@ -495,6 +503,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						setPlayerPossiblePipe(_playerId, sfTrue, sfFalse);
 						return sfTrue;
 						break;
+					case T_HIDDEN_BLOCK:
+						break;
 					default:
 						return sfTrue;
 						break;
@@ -520,6 +530,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					setPlayerPossiblePipe(_playerId, sfTrue, sfFalse);
 					return sfTrue;
 					break;
+				case T_HIDDEN_BLOCK:
+					break;
 				default:
 					return sfTrue;
 					break;
@@ -538,19 +550,22 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					switch (b[blockPos.y - 1][blockPos.x].type)
 					{
 					case T_BLOCK:
-						if (isBig) {
-							BecomeBlueSky(blockPos.y - 1, blockPos.x);
+						if (blockPos.y - 1 == 9 && blockPos.x == 94) {
+							BecomeHitBlock(blockPos.y - 1, blockPos.x);
+							createItem(I_COIN, b[blockPos.y - 1][blockPos.x].pos);
 						}
-						else {
-
+						else if (blockPos.y - 1 == 9 && blockPos.x == 101) {
+							BecomeHitBlock(blockPos.y - 1, blockPos.x);
+							createItem(I_STAR, b[blockPos.y - 1][blockPos.x].pos);
+						}
+						else if (isBig) {
+							BecomeBlueSky(blockPos.y - 1, blockPos.x);
 						}
 						collide = sfTrue;
 						break;
 					case T_QUESTION:
 						BecomeHitBlock(blockPos.y - 1, blockPos.x);
-
-						int random = rand() % 5;
-						createItem(random, b[blockPos.y - 1][blockPos.x].pos);
+						createItem(getCorrectItem(blockPos.x, blockPos.y - 1, isBig), b[blockPos.y - 1][blockPos.x].pos);
 						collide = sfTrue;
 						break;
 					case T_DARK_COIN:
@@ -563,6 +578,11 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						else {
 
 						}
+						collide = sfTrue;
+						break;
+					case T_HIDDEN_BLOCK:
+						BecomeHitBlock(blockPos.y - 1, blockPos.x);
+						createItem(I_ONEUP, b[blockPos.y - 1][blockPos.x].pos);
 						collide = sfTrue;
 						break;
 					default:
@@ -585,18 +605,22 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					switch (b[blockPos2.y - 1][blockPos2.x].type)
 					{
 					case T_BLOCK:
-						if (isBig) {
-							BecomeBlueSky(blockPos2.y - 1, blockPos2.x);
+						if (blockPos2.y - 1 == 9 && blockPos2.x == 94) {
+							BecomeHitBlock(blockPos2.y - 1, blockPos2.x);
+							createItem(I_COIN, b[blockPos2.y - 1][blockPos2.x].pos);
 						}
-						else {
-
+						else if (blockPos2.y - 1 == 9 && blockPos2.x == 101) {
+							BecomeHitBlock(blockPos2.y - 1, blockPos2.x);
+							createItem(I_STAR, b[blockPos2.y - 1][blockPos2.x].pos);
+						}
+						else if (isBig) {
+							BecomeBlueSky(blockPos2.y - 1, blockPos2.x);
 						}
 						collide = sfTrue;
 						break;
 					case T_QUESTION:
 						BecomeHitBlock(blockPos2.y - 1, blockPos2.x);
-						int random = rand() % 5;
-						createItem(random, b[blockPos2.y - 1][blockPos2.x].pos);
+						createItem(getCorrectItem(blockPos2.x, blockPos2.y - 1, isBig), b[blockPos2.y - 1][blockPos2.x].pos);
 						collide = sfTrue;
 						break;
 					case T_DARK_COIN:
@@ -609,6 +633,11 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						else {
 
 						}
+						collide = sfTrue;
+						break;
+					case T_HIDDEN_BLOCK:
+						BecomeHitBlock(blockPos2.y - 1, blockPos2.x);
+						createItem(I_ONEUP, b[blockPos2.y - 1][blockPos2.x].pos);
 						collide = sfTrue;
 						break;
 					default:
@@ -631,18 +660,22 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					switch (b[blockPos3.y - 1][blockPos3.x].type)
 					{
 					case T_BLOCK:
-						if (isBig) {
-							BecomeBlueSky(blockPos3.y - 1, blockPos3.x);
+						if (blockPos3.y - 1 == 9 && blockPos3.x == 94) {
+							BecomeHitBlock(blockPos3.y - 1, blockPos3.x);
+							createItem(I_COIN, b[blockPos3.y - 1][blockPos3.x].pos);
 						}
-						else {
-
+						else if (blockPos3.y - 1 == 9 && blockPos3.x == 101) {
+							BecomeHitBlock(blockPos3.y - 1, blockPos3.x);
+							createItem(I_STAR, b[blockPos3.y - 1][blockPos3.x].pos);
+						}
+						else if (isBig) {
+							BecomeBlueSky(blockPos3.y - 1, blockPos3.x);
 						}
 						collide = sfTrue;
 						break;
 					case T_QUESTION:
 						BecomeHitBlock(blockPos3.y - 1, blockPos3.x);
-						int random = rand() % 5;
-						createItem(random, b[blockPos3.y - 1][blockPos3.x].pos);
+						createItem(getCorrectItem(blockPos3.x, blockPos3.y - 1, isBig), b[blockPos3.y - 1][blockPos3.x].pos);
 						collide = sfTrue;
 						break;
 					case T_DARK_COIN:
@@ -655,6 +688,11 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						else {
 
 						}
+						collide = sfTrue;
+						break;
+					case T_HIDDEN_BLOCK:
+						BecomeHitBlock(blockPos3.y - 1, blockPos3.x);
+						createItem(I_ONEUP, b[blockPos3.y - 1][blockPos3.x].pos);
 						collide = sfTrue;
 						break;
 					default:
@@ -686,6 +724,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					case T_UL_PIPE:
 						leftPipe = sfTrue;
 						collide = sfTrue;
+						break;
+					case T_HIDDEN_BLOCK:
 						break;
 					default:
 						return sfTrue;
@@ -721,6 +761,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 							setPlayerPossiblePipe(_playerId, sfTrue, sfTrue);
 						return sfTrue;
 						break;
+					case T_HIDDEN_BLOCK:
+						break;
 					default:
 						return sfTrue;
 						break;
@@ -754,6 +796,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						if (leftPipe)
 							setPlayerPossiblePipe(_playerId, sfTrue, sfTrue);
 						return sfTrue;
+						break;
+					case T_HIDDEN_BLOCK:
 						break;
 					default:
 						return sfTrue;

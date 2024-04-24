@@ -3,7 +3,7 @@
 
 
 // Variables
-typedef struct 
+typedef struct
 {
 	sfRenderWindow* renderWindow;
 	sfRenderTexture* renderTexture;

@@ -185,6 +185,7 @@ void updateEditor(Window* _window)
 			case T_DARK_BLOCK: tileCursorRect = IntRect(20 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 			case T_DARK_GROUND: tileCursorRect = IntRect(20 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 			case T_HIT_BLOCK: tileCursorRect = IntRect(21 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
+			case T_HIDDEN_BLOCK: tileCursorRect = IntRect(21 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); break;
 
 			default: break;
 		}
@@ -255,6 +256,7 @@ void updateEditor(Window* _window)
 					case T_DARK_BLOCK: b[j][i].rect = IntRect(20 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_DARK_GROUND: b[j][i].rect = IntRect(20 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
 					case T_HIT_BLOCK: b[j][i].rect = IntRect(21 * BLOCK_SIZE, 0 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE); b[j][i].isSolid = sfTrue; break;
+					case T_HIDDEN_BLOCK: b[j][i].rect = IntRect(21 * BLOCK_SIZE, 1 * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);  b[j][i].isSolid = sfTrue; break;
 
 					default: break;
 					//}
@@ -377,6 +379,10 @@ void updateEditor(Window* _window)
 				currentTile = T_DARK_BLOCK;
 			else if ((mousePosX > 640.f * EDITOR_SCALE && mousePosX < 672.f * EDITOR_SCALE) && (mousePosY > 32.f * EDITOR_SCALE && mousePosY < 64.f * EDITOR_SCALE))
 				currentTile = T_DARK_GROUND;
+			else if ((mousePosX > 672.f * EDITOR_SCALE && mousePosX < 704.f * EDITOR_SCALE) && (mousePosY > 0.f * EDITOR_SCALE && mousePosY < 32.f * EDITOR_SCALE))
+				currentTile = T_HIT_BLOCK;
+			else if ((mousePosX > 672.f * EDITOR_SCALE && mousePosX < 704.f * EDITOR_SCALE) && (mousePosY > 32.f * EDITOR_SCALE && mousePosY < 64.f * EDITOR_SCALE))
+				currentTile = T_HIDDEN_BLOCK;
 
 
 			else

@@ -2,6 +2,7 @@
 #include "ressourcesManager.h"
 #include "textureManager.h"
 #include "soundManager.h"
+#include "fontManager.h"
 #include "pause.h"
 #include "menu.h"
 #include "game.h"
@@ -21,6 +22,7 @@ void stateInit(Window* _window)
 		OnLoad("../Ressources/ressources.load");
 		Texture_Onload(ALL);
 		Sound_Onload(ALL);
+		Font_Onload(ALL);
 		spLoading = sfSprite_create();
 		sfSprite_setTexture(spLoading, GetTexture("loading"), sfTrue);
 		sfIntRect AnimRect = { 0, 0, 128, 128 };

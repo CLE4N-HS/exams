@@ -24,3 +24,5 @@ sfVector2f getPlayerPos(int _id);
 void setPlayerPos(int _id, sfVector2f _pos);
 void setPlayerVelocity(int _id, float _x, float _y);
 void MakePlayerJump(int _id);
+void setPlayerStarPower(int _id);
+sfBool PlayerHasStar(int _id);

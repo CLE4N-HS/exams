@@ -1,5 +1,6 @@
 [all]
 animation loadingAnim ../Ressources/Textures/loading.anim
+font marioFont ../Ressources/Fonts/marioFont.ttf
 [end]
 [menu]
 [end]
