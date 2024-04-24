@@ -18,18 +18,19 @@
 #define DEC_SKID 365.625f
 #define MIN_SKID 33.75f
 
-#define STOP_FALL 1575
-#define WALK_FALL 1800
-#define RUN_FALL 2025
+#define STOP_FALL 1575.f
+#define WALK_FALL 1800.f
+#define RUN_FALL 2025.f
 #define STOP_FALL_A /*450*/ 450.f * 0.8f
 #define WALK_FALL_A /*421.875f*/ 421.875f * 0.8f
 #define RUN_FALL_A /*562.5f*/ 562.5f * 0.8f
 
-#define MAX_FALL 270
+#define MAX_FALL 270.f
+#define MAX_JUMP 270.f
 
 typedef enum playerState {
 	P_IDLE,
-	P_WAL,
+	P_WALK,
 	P_RUN,
 	P_SKID,
 	P_JUMP
@@ -52,6 +53,8 @@ typedef struct Player {
 	float firethrowerTimer;
 	sfBool canGoInYPipe;
 	sfBool canGoInXPipe;
+	sfBool wasReJumping;
+	sfColor color;
 }Player;
 Player p[2];
 
@@ -74,8 +77,8 @@ void initPlayer()
 
 	for (int i = 0; i < 2; i++)
 	{
-		p[i].rect = IntRect(0, 32, 18, 16);
-		p[i].origin = vector2f(9.f, 16.f);
+		p[i].rect = IntRect(0, 32, 16, 16);
+		p[i].origin = vector2f(8.f, 16.f);
 		p[i].scale = vector2f(BLOCK_SCALE, BLOCK_SCALE);
 		p[i].pos = vector2f(100.f, 200.f);
 		p[i].velocity = VECTOR2F_NULL;
@@ -90,6 +93,8 @@ void initPlayer()
 		p[i].firethrowerTimer = 1.f;
 		p[i].canGoInYPipe = sfFalse;
 		p[i].canGoInXPipe = sfFalse;
+		p[i].wasReJumping = sfFalse;
+		p[i].color = color(255, 255, 255, 255);
 
 	}
 
@@ -102,10 +107,12 @@ void updatePlayer(Window* _window)
 
 	sfVector2f firstPlayerPos = vector2f(960.f, 540.f);
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		float lStickXPos = getStickPos(i, sfTrue, sfTrue);
 		float lStickYPos = getStickPos(i, sfTrue, sfFalse);
+
+		playerState lastState = p[i].state;
 
 		//sfKeyCode keyLeft;
 		//sfKeyCode keyRight;
@@ -145,9 +152,10 @@ void updatePlayer(Window* _window)
 		else
 			//p[i].canJump = sfFalse;
 
-		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
-		//if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity)) {
+		//if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
+		if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity, i)) {
 			p[i].state = P_IDLE;
+			p[i].wasReJumping = sfFalse;
 		}
 
 		if (p[i].state != P_JUMP) { // not jumping
@@ -165,7 +173,8 @@ void updatePlayer(Window* _window)
 				}
 			}
 			else if (fabsf(p[i].velocity.x) >= MIN_WALK) {  // faster than a walk // accelerating or decelerating
-				if (1) {
+				//if (1) {
+				if (lStickXPos >= 0.f) {
 					if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(ACC_RUN * dt, 0.f), i)) {
 						p[i].scale.x = BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
@@ -188,7 +197,8 @@ void updatePlayer(Window* _window)
 
 					}
 				}
-				if (0) {
+				//if (0) {
+				else {
 					if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f), i)) {
 						p[i].scale.x = -BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
@@ -213,7 +223,7 @@ void updatePlayer(Window* _window)
 			p[i].velocity.y += p[i].fallAcc * dt;
 
 			if (p[i].canJump && isButtonPressed(i, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) { // jump
-				//if (p[i].canJump && isButtonPressed(i, A) && isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity)) { // jump
+			//if (p[i].canJump && isButtonPressed(i, A) && isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity, i)) { // jump
 				if (fabsf(p[i].velocity.x) < 16.f) {
 					p[i].velocity.y = -240.f;
 					p[i].fallAcc = STOP_FALL;
@@ -264,15 +274,20 @@ void updatePlayer(Window* _window)
 
 		p[i].velocity.y += p[i].fallAcc * dt;
 
-		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds))
+		if (p[i].state == P_SKID)
+			lastState = P_SKID;
+
 			//if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity))
+		if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
 			p[i].state = P_IDLE;
+		}
 
 		if (isCollision3(p[i].bounds, &p[i].velocity, i)) {}
 
 		// max speed calculation
 		if (p[i].velocity.y >= MAX_FALL) p[i].velocity.y = MAX_FALL;
-		if (p[i].velocity.y <= -MAX_FALL) p[i].velocity.y = -MAX_FALL;
+		if (p[i].velocity.y <= -MAX_FALL && !p[i].wasReJumping) p[i].velocity.y = -MAX_FALL;
+		if (p[i].velocity.y <= -MAX_JUMP) p[i].velocity.y = -MAX_JUMP;
 
 		if (p[i].velocity.x >= MAX_RUN) p[i].velocity.x = MAX_RUN;
 		if (p[i].velocity.x <= -MAX_RUN) p[i].velocity.x = -MAX_RUN;
@@ -282,6 +297,10 @@ void updatePlayer(Window* _window)
 
 		//p[i].velocity.x = MAX(p[i].velocity.x, -MAX_PLAYER_SPEED);
 		//p[i].velocity.x = MIN(p[i].velocity.x, MAX_PLAYER_SPEED);
+
+		if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity, i)) {
+			p[i].velocity.y = -1.f;
+		}
 
 
 		p[i].pos = AddVectors(p[i].pos, MultiplyVector(p[i].velocity, BLOCK_SCALE * dt));
@@ -300,7 +319,7 @@ void updatePlayer(Window* _window)
 		// Fireballs
 		if (p[i].power == P_FIRETHROWER) {
 			p[i].firethrowerTimer += dt;
-			if (isButtonPressed(i, Y) && p[i].firethrowerTimer > 0.2f && getNbFireballs() < 2) { // if debug
+			if (isButtonPressed(i, B) && p[i].firethrowerTimer > 0.4f/* && getNbFireballs() < 2*/) { // if debug
 				p[i].firethrowerTimer = 0.f;
 				sfBool isLeftSide = sfFalse;
 				if (p[i].scale.x < 0.f)
@@ -328,7 +347,7 @@ void updatePlayer(Window* _window)
 		}
 		if (p[i].canGoInXPipe && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds) && lStickXPos > 50.f) {
 			p[i].canGoInYPipe = sfFalse;
-			nbMap = 11;
+			nbMap = 1;
 			loadMap(1);
 			for (int j = 0; j < 2; j++)
 			{
@@ -337,6 +356,31 @@ void updatePlayer(Window* _window)
 			}
 			greatestViewPos = vector2f(168.5f * BLOCK_SCALE * BLOCK_SIZE, 540.f);
 		}
+
+
+		if (fabsf(p[i].velocity.x) > ACC_WALK) {
+
+			p[i].rect.left = 48;
+		}
+		else if (fabsf(p[i].velocity.x) > 1.f) {
+			p[i].rect.left = 16;
+		}
+		else {
+			p[i].rect.left = 0;
+		}
+
+		if (p[i].state == P_SKID) {
+			p[i].rect.left = 64;
+		}
+
+		if (lastState == P_SKID) {
+			p[i].rect.left = 64;
+		}
+
+		if (p[i].power == P_FIRETHROWER && p[i].firethrowerTimer < 0.2f) {
+			p[i].rect = IntRect(256, 53, 16, 32);
+		}
+
 	}
 
 	// View
@@ -410,15 +454,15 @@ void changePower(int _id)
 	switch (p[_id].power)
 	{
 	case P_SMALL:
-		p[_id].rect = IntRect(0, 32, 18, 16);
+		p[_id].rect = IntRect(0, 32, 16, 16);
 		p[_id].origin = vector2f(8.f, 16.f);
 		break;
 	case P_BIG:
-		p[_id].rect = IntRect(0, 0, 18, 32);
+		p[_id].rect = IntRect(0, 0, 16, 32);
 		p[_id].origin = vector2f(8.f, 32.f);
 		break;
 	case P_FIRETHROWER:
-		p[_id].rect = IntRect(0, 53, 18, 32);
+		p[_id].rect = IntRect(0, 53, 16, 32);
 		p[_id].origin = vector2f(8.f, 32.f);
 		break;
 	default:
@@ -480,4 +524,27 @@ sfBool isPlayerBig(int _id)
 		return sfTrue;
 
 	return sfFalse;
+}
+
+sfVector2f getPlayerPos(int _id)
+{
+	return p[_id].pos;
+}
+
+void setPlayerPos(int _id, sfVector2f _pos)
+{
+	p[_id].pos = _pos;
+}
+
+void setPlayerVelocity(int _id, float _x, float _y)
+{
+	p[_id].velocity = vector2f(_x, _x);
+}
+
+void MakePlayerJump(int _id)
+{
+	p[_id].canJump = sfTrue;
+	p[_id].state = P_IDLE;
+	p[_id].velocity.y = -MAX_JUMP;
+	p[_id].wasReJumping = sfTrue;
 }

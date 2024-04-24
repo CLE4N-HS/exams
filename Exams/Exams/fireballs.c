@@ -49,13 +49,16 @@ void initFireballs()
 void createFireball(sfVector2f _pos, sfBool _leftSide)
 {
 	sfIntRect rect = IntRect(0, 0, 16, 16);
+	sfVector2f pos = vector2f(8.f * BLOCK_SCALE, -20.f * BLOCK_SCALE);
 	sfVector2f velocity = vector2f(800.f, 250.f);
-	if (_leftSide)
+	if (_leftSide) {
+		pos.x *= -1.f;
 		velocity.x *= -1.f;
+	}
 	sfBool isMovingLeft = _leftSide;
 	sfVector2f origin = vector2f(8.f, 8.f);
 
-	addFireball(AddVectors(_pos, AddVectors(vector2f(0.f, -100.f), MultiplyVector(origin, BLOCK_SCALE))), origin, velocity, vector2f(2.f, 2.f), rect, 0.f, isMovingLeft, FlRect(0.f, 0.f, 0.f, 0.f));
+	addFireball(AddVectors(_pos, pos), origin, velocity, vector2f(2.f, 2.f), rect, 0.f, isMovingLeft, FlRect(0.f, 0.f, 0.f, 0.f));
 }
 
 int getNbFireballs()
@@ -91,6 +94,10 @@ void updateFireballs(Window* _window)
 
 		if (isCollision2(GD_FIREBALL->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1))
 			GD_FIREBALL->velocity.y = -500.f;
+		if (isCollision2(GD_FIREBALL->bounds, sfFalse, sfTrue, vector2f(0.f, 0.f), -1)) {
+			fireballList->erase(&fireballList, i);
+			continue;
+		}
 
 		if (GD_FIREBALL->velocity.x < 0.f) {
 			if (isCollision2(GD_FIREBALL->bounds, sfTrue, sfTrue, vector2f(0.f, 0.f), -1)) {

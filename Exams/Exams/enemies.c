@@ -10,8 +10,14 @@
 #define GOOMBAX_SPEED 100.f
 #define GOOMBAY_SPEED 400.f
 
+typedef enum EnemyState {
+	E_ALIVE,
+	E_DEAD
+}EnemyState;
+
 typedef struct Enemies {
 	EnemyType type;
+	EnemyState state;
 	sfVector2f pos;
 	sfVector2f origin;
 	sfVector2f velocity;
@@ -26,11 +32,12 @@ sfSprite* enemiesSprite;
 
 stdList* enemiesList;
 
-void addEnemy(EnemyType _type, sfVector2f _pos, sfVector2f _origin, sfVector2f _velocity, sfVector2f _scale, sfIntRect _rect, float _timer, sfBool _isMovingLeft, sfFloatRect _bounds)
+void addEnemy(EnemyType _type, EnemyState _state, sfVector2f _pos, sfVector2f _origin, sfVector2f _velocity, sfVector2f _scale, sfIntRect _rect, float _timer, sfBool _isMovingLeft, sfFloatRect _bounds)
 {
 	Enemies tmp;
 
 	tmp.type = _type;
+	tmp.state = _state;
 	tmp.pos = _pos;
 	tmp.origin = _origin;
 	tmp.velocity = _velocity;
@@ -60,44 +67,72 @@ void updateEnemies(Window* _window)
 		switch (GD_ENEMY->type)
 		{
 		case E_GOOMBA:
-			if (isCollision2(GD_ENEMY->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1))
-				GD_ENEMY->velocity.y = 0.f;
-			else
-				GD_ENEMY->velocity.y = GOOMBAY_SPEED;
+			GD_ENEMY->timer += dt;
 
-			if (GD_ENEMY->velocity.x < 0.f) {
-				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfTrue, vector2f(-GOOMBAX_SPEED, 0.f), -1)) {
-					GD_ENEMY->velocity.x = GOOMBAX_SPEED;
-				}
-			}
-			else {
-				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfFalse, vector2f(GOOMBAX_SPEED, 0.f), -1)) {
-					GD_ENEMY->velocity.x = -GOOMBAX_SPEED;
-				}
-			}
-
-			GD_ENEMY->pos = AddVectors(GD_ENEMY->pos, MultiplyVector(GD_ENEMY->velocity, dt));
-
-
-			// player Collisions
-			for (int j = 0; j < 2; j++)
+			if (GD_ENEMY->state == E_ALIVE)
 			{
-				if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
-					DamagePlayer(j);
-					printf("damage");
-					break;
+				if (isCollision2(GD_ENEMY->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1)) {
+					GD_ENEMY->velocity.y = 0.f;
+					Animator(&GD_ENEMY->rect, &GD_ENEMY->timer, 2, 1, 0.5f, 0.f);
+				}
+				else
+					GD_ENEMY->velocity.y = GOOMBAY_SPEED;
+
+				if (GD_ENEMY->velocity.x < 0.f) {
+					if (isCollision2(GD_ENEMY->bounds, sfTrue, sfTrue, vector2f(-GOOMBAX_SPEED, 0.f), -1)) {
+						GD_ENEMY->velocity.x = GOOMBAX_SPEED;
+					}
+				}
+				else {
+					if (isCollision2(GD_ENEMY->bounds, sfTrue, sfFalse, vector2f(GOOMBAX_SPEED, 0.f), -1)) {
+						GD_ENEMY->velocity.x = -GOOMBAX_SPEED;
+					}
+				}
+
+				GD_ENEMY->pos = AddVectors(GD_ENEMY->pos, MultiplyVector(GD_ENEMY->velocity, dt));
+
+
+
+				// player Collisions
+				for (int j = 0; j < 2; j++)
+				{
+					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
+						if (getPlayerPos(j).y <= GD_ENEMY->pos.y + GD_ENEMY->bounds.height / 2.f && getPlayerPos(j).y <= GD_ENEMY->pos.y - 10.f) {
+							GD_ENEMY->timer = 0.f;
+							GD_ENEMY->state = E_DEAD;
+							MakePlayerJump(j);
+							//setPlayerVelocity(j, 0.f, -1000.f);
+						}
+						else
+							DamagePlayer(j);
+						break;
+					}
+				}
+
+				// fireballs Collisions
+				if (isFireballInBounds(&GD_ENEMY->bounds)) {
+					GD_ENEMY->timer = 0.f;
+					GD_ENEMY->state = E_DEAD;
 				}
 			}
+			else
+			{
+				GD_ENEMY->rect.left = 32;
 
-			// fireballs Collisions
-			if (isFireballInBounds(&GD_ENEMY->bounds)) {
-				enemiesList->erase(&enemiesList, i);
-				continue;
+				if (GD_ENEMY->timer > 0.5f) {
+					enemiesList->erase(&enemiesList, i);
+					continue;
+				}
 			}
-
 			break;
 		default:
 			break;
+		}
+
+		sfVector2f viewPos = getGreatestViewPos();
+		if (GD_ENEMY->pos.x < viewPos.x - 960.f - 8.f * GD_ENEMY->scale.x || GD_ENEMY->pos.y > 1080.f + 8.f * GD_ENEMY->scale.y) {
+			enemiesList->erase(&enemiesList, i);
+			continue;
 		}
 	}
 }
@@ -137,5 +172,5 @@ void createEnemy(EnemyType _type, sfVector2f _pos)
 		break;
 	}
 
-	addEnemy(_type, AddVectors(_pos, MultiplyVector(origin, BLOCK_SCALE)), origin, velocity, vector2f(BLOCK_SCALE, BLOCK_SCALE), rect, 0.f, isMovingLeft, FlRect(0.f, 0.f, 0.f, 0.f));
+	addEnemy(_type, E_ALIVE, AddVectors(_pos, MultiplyVector(origin, BLOCK_SCALE)), origin, velocity, vector2f(BLOCK_SCALE, BLOCK_SCALE), rect, 0.f, isMovingLeft, FlRect(0.f, 0.f, 0.f, 0.f));
 }

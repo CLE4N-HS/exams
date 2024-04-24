@@ -20,3 +20,7 @@ sfVector2f getGreatestViewPos();
 sfBool isOffView(sfVector2f _pos);
 void setPlayerPossiblePipe(int _id, sfBool _canEnter, sfBool _YPipe);
 sfBool isPlayerBig(int _id);
+sfVector2f getPlayerPos(int _id);
+void setPlayerPos(int _id, sfVector2f _pos);
+void setPlayerVelocity(int _id, float _x, float _y);
+void MakePlayerJump(int _id);
