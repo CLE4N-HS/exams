@@ -105,18 +105,18 @@ void updateItem(Window* _window)
 			else {
 				//if (isGrounded(GD_ITEM->pos, &GD_ITEM->velocity, GD_ITEM->origin))
 				//if (isCollision2(FlRect(GD_ITEM->pos.x, GD_ITEM->pos.y - BLOCK_SCALE * BLOCK_SIZE, GD_ITEM->rect.width * BLOCK_SCALE, GD_ITEM->rect.height * BLOCK_SCALE), sfFalse, sfFalse, vector2f(0.f, 0.f)))
-				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), sfFalse))
+				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1))
 					GD_ITEM->velocity.y = 0.f;
 				else
 					GD_ITEM->velocity.y = 270.f;
 
 				if (GD_ITEM->velocity.x < 0.f) {
-					if (isCollision2(GD_ITEM->bounds, sfTrue, sfTrue, vector2f(-200.f, 0.f), sfFalse)) {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfTrue, vector2f(-200.f, 0.f), -1)) {
 						GD_ITEM->velocity.x = 200.f;
 					}
 				}
 				else {
-					if (isCollision2(GD_ITEM->bounds, sfTrue, sfFalse, vector2f(200.f, 0.f), sfFalse)) {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfFalse, vector2f(200.f, 0.f), -1)) {
 						GD_ITEM->velocity.x = -200.f;
 					}
 				}
@@ -145,7 +145,7 @@ void updateItem(Window* _window)
 				GD_ITEM->pos.y -= 100.f * dt;
 			}
 			else {
-				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), sfFalse))
+				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1))
 					GD_ITEM->velocity.y = 0.f;
 				else
 					GD_ITEM->velocity.y = 270.f;
@@ -174,18 +174,18 @@ void updateItem(Window* _window)
 				GD_ITEM->pos.y -= 100.f * dt;
 			}
 			else {
-				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), sfFalse))
+				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1))
 					GD_ITEM->velocity.y = 0.f;
 				else
 					GD_ITEM->velocity.y = 270.f;
 
 				if (GD_ITEM->velocity.x < 0.f) {
-					if (isCollision2(GD_ITEM->bounds, sfTrue, sfTrue, vector2f(-200.f, 0.f), sfFalse)) {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfTrue, vector2f(-200.f, 0.f), -1)) {
 						GD_ITEM->velocity.x = 200.f;
 					}
 				}
 				else {
-					if (isCollision2(GD_ITEM->bounds, sfTrue, sfFalse, vector2f(200.f, 0.f), sfFalse)) {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfFalse, vector2f(200.f, 0.f), -1)) {
 						GD_ITEM->velocity.x = -200.f;
 					}
 				}
@@ -220,19 +220,19 @@ void updateItem(Window* _window)
 				}
 
 
-				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), sfFalse))
+				if (isCollision2(GD_ITEM->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1))
 					GD_ITEM->velocity.y = -800.f;
 
-				if (isCollision2(GD_ITEM->bounds, sfFalse, sfTrue, vector2f(0.f, 0.f), sfFalse))
+				if (isCollision2(GD_ITEM->bounds, sfFalse, sfTrue, vector2f(0.f, 0.f), -1))
 					GD_ITEM->velocity.y = 800.f;
 
 				if (GD_ITEM->velocity.x < 0.f) {
-					if (isCollision2(GD_ITEM->bounds, sfTrue, sfTrue, vector2f(-200.f, 0.f), sfFalse)) {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfTrue, vector2f(-200.f, 0.f), -1)) {
 						GD_ITEM->velocity.x = 200.f;
 					}
 				}
 				else {
-					if (isCollision2(GD_ITEM->bounds, sfTrue, sfFalse, vector2f(200.f, 0.f), sfFalse)) {
+					if (isCollision2(GD_ITEM->bounds, sfTrue, sfFalse, vector2f(200.f, 0.f), -1)) {
 						GD_ITEM->velocity.x = -200.f;
 					}
 				}

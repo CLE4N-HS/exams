@@ -4,6 +4,7 @@
 #include "gamepadx.h"
 #include "soundManager.h"
 #include "items.h"
+#include "player.h"
 
 sfSprite* mapSprite;
 
@@ -12,6 +13,9 @@ sfTexture* tilesetTexture;
 float changeMapTimer;
 
 sfBool isMapF;
+
+sfBool couldGoInYPipe;
+sfBool couldGoInXPipe;
 
 void initMap()
 {
@@ -295,7 +299,7 @@ sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sf
 
 }
 
-sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector2f _nextVelocity, sfBool _isPlayer)
+sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector2f _nextVelocity, int _playerId)
 {
 	float dt = getDeltaTime();
 	float offset = 1.f;
@@ -401,6 +405,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				case T_DARK_COIN:
 					BecomeDarkSky(blockPos.y, blockPos.x + 1);
 					break;
+				case T_BL_DARK_PIPE:
+					setPlayerPossiblePipe(_playerId, sfTrue, sfFalse);
+					return sfTrue;
+					break;
 				default:
 					return sfTrue;
 					break;
@@ -418,6 +426,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				{
 				case T_DARK_COIN:
 					BecomeDarkSky(blockPos2.y, blockPos2.x + 1);
+					break;
+				case T_BL_DARK_PIPE:
+					setPlayerPossiblePipe(_playerId, sfTrue, sfFalse);
+					return sfTrue;
 					break;
 				default:
 					return sfTrue;
@@ -439,7 +451,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			//tmpRect = FlRect(b[blockPos.y - 1][blockPos.x].pos.x, b[blockPos.y - 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 			if (b[blockPos.y - 1][blockPos.x].isSolid)
 			{
-				if (_isPlayer) {
+				if (_playerId >= 0) {
 					collide = sfTrue;
 					switch (b[blockPos.y - 1][blockPos.x].type)
 					{
@@ -470,7 +482,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			//tmpRect2 = FlRect(b[blockPos2.y - 1][blockPos2.x].pos.x, b[blockPos2.y - 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 			if (b[blockPos2.y - 1][blockPos2.x].isSolid)
 			{
-				if (_isPlayer) {
+				if (_playerId >= 0) {
 					switch (b[blockPos2.y - 1][blockPos2.x].type)
 					{
 					case T_QUESTION:
@@ -504,18 +516,27 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 		else if (!_UpOrLeft && blockPos.y < NB_BLOCKS_Y - 1 && blockPos2.y < NB_BLOCKS_Y - 1)
 		{
 			//return sfFalse;
-			_rect.height += _nextVelocity.y * BLOCK_SCALE;
+			//_rect.height += _nextVelocity.y * BLOCK_SCALE;
+			sfBool leftPipe = sfFalse;
 			if (b[blockPos.y + 1][blockPos.x].isSolid)
 			{
-				switch (b[blockPos.y + 1][blockPos.x].type)
-				{
-				case T_DARK_COIN:
-					BecomeDarkSky(blockPos.y + 1, blockPos.x);
-					break;
-				default:
-					return sfTrue;
-					break;
+				if (_playerId >= 0) {
+					switch (b[blockPos.y + 1][blockPos.x].type)
+					{
+					case T_DARK_COIN:
+						BecomeDarkSky(blockPos.y + 1, blockPos.x);
+						break;
+					case T_UL_PIPE:
+						leftPipe = sfTrue;
+						collide = sfTrue;
+						break;
+					default:
+						return sfTrue;
+						break;
+					}
 				}
+				else
+					return sfTrue;
 				//sfFloatRect blockRect = FlRect(b[blockPos.y + 1][blockPos.x].pos.x, b[blockPos.y + 1][blockPos.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 				//if (sfFloatRect_intersects(&_rect, &blockRect, NULL))
 				//{
@@ -532,15 +553,24 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			}
 			if (b[blockPos2.y + 1][blockPos2.x].isSolid)
 			{
-				switch (b[blockPos2.y + 1][blockPos2.x].type)
-				{
-				case T_DARK_COIN:
-					BecomeDarkSky(blockPos2.y + 1, blockPos2.x);
-					break;
-				default:
-					return sfTrue;
-					break;
+				if (_playerId >= 0) {
+					switch (b[blockPos2.y + 1][blockPos2.x].type)
+					{
+					case T_DARK_COIN:
+						BecomeDarkSky(blockPos2.y + 1, blockPos2.x);
+						break;
+					case T_UR_PIPE:
+						if (leftPipe)
+							setPlayerPossiblePipe(_playerId, sfTrue, sfTrue);
+						return sfTrue;
+						break;
+					default:
+						return sfTrue;
+						break;
+					}
 				}
+				else
+					return sfTrue;
 				//fFloatRect blockRect2 = FlRect(b[blockPos2.y + 1][blockPos2.x].pos.x, b[blockPos2.y + 1][blockPos2.x].pos.y, BLOCK_SIZE * BLOCK_SCALE, BLOCK_SIZE * BLOCK_SCALE);
 				//f (sfFloatRect_intersects(&_rect, &blockRect2, NULL))
 				//
@@ -555,17 +585,20 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				//	}
 				//
 			}
+
+			if (collide)
+				return sfTrue;
 		}
 	}
 
 	return sfFalse;
 }
 
-sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity, sfBool _isPlayer)
+sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity, int _playerId)
 {
 	if (_velocity->x > EPSILON)
 	{
-		if (isCollision2(_rect, sfTrue, sfFalse, *_velocity, _isPlayer))
+		if (isCollision2(_rect, sfTrue, sfFalse, *_velocity, _playerId))
 		{
 			_velocity->x = 0.f;
 			return sfTrue;
@@ -573,7 +606,7 @@ sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity, sfBool _isPlayer)
 	}
 	if (_velocity->x < -EPSILON)
 	{
-		if (isCollision2(_rect, sfTrue, sfTrue, *_velocity, _isPlayer))
+		if (isCollision2(_rect, sfTrue, sfTrue, *_velocity, _playerId))
 		{
 			_velocity->x = 0.f;
 			return sfTrue;
@@ -581,7 +614,7 @@ sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity, sfBool _isPlayer)
 	}
 	if (_velocity->y > EPSILON)
 	{
-		if (isCollision2(_rect, sfFalse, sfFalse, *_velocity, _isPlayer))
+		if (isCollision2(_rect, sfFalse, sfFalse, *_velocity, _playerId))
 		{
 			_velocity->y = 0.f;
 			return sfTrue;
@@ -589,7 +622,7 @@ sfBool isCollision3(sfFloatRect _rect, sfVector2f* _velocity, sfBool _isPlayer)
 	}
 	if (_velocity->y < -EPSILON)
 	{
-		if (isCollision2(_rect, sfFalse, sfTrue, *_velocity, _isPlayer))
+		if (isCollision2(_rect, sfFalse, sfTrue, *_velocity, _playerId))
 		{
 			_velocity->y = 0.f;
 			return sfTrue;

@@ -89,17 +89,17 @@ void updateFireballs(Window* _window)
 			GD_FIREBALL->velocity.y += dt * 2000.f;
 		}
 
-		if (isCollision2(GD_FIREBALL->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), sfFalse))
+		if (isCollision2(GD_FIREBALL->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1))
 			GD_FIREBALL->velocity.y = -500.f;
 
 		if (GD_FIREBALL->velocity.x < 0.f) {
-			if (isCollision2(GD_FIREBALL->bounds, sfTrue, sfTrue, vector2f(0.f, 0.f), sfFalse)) {
+			if (isCollision2(GD_FIREBALL->bounds, sfTrue, sfTrue, vector2f(0.f, 0.f), -1)) {
 				fireballList->erase(&fireballList, i);
 				continue;
 			}
 		}
 		else {
-			if (isCollision2(GD_FIREBALL->bounds, sfTrue, sfFalse, vector2f(0.f, 0.f), sfFalse)) {
+			if (isCollision2(GD_FIREBALL->bounds, sfTrue, sfFalse, vector2f(0.f, 0.f), -1)) {
 				fireballList->erase(&fireballList, i);
 				continue;
 			}

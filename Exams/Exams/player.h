@@ -18,3 +18,4 @@ void setPlayerPower(int _id, playerPower _power);
 void DamagePlayer(int _id);
 sfVector2f getGreatestViewPos();
 sfBool isOffView(sfVector2f _pos);
+void setPlayerPossiblePipe(int _id, sfBool _canEnter, sfBool _YPipe);

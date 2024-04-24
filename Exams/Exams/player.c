@@ -50,6 +50,8 @@ typedef struct Player {
 	playerPower power;
 	float invincibilityTimer;
 	float firethrowerTimer;
+	sfBool canGoInYPipe;
+	sfBool canGoInXPipe;
 }Player;
 Player p[2];
 
@@ -86,6 +88,8 @@ void initPlayer()
 		p[i].power = P_SMALL;
 		p[i].invincibilityTimer = 0.f;
 		p[i].firethrowerTimer = 1.f;
+		p[i].canGoInYPipe = sfFalse;
+		p[i].canGoInXPipe = sfFalse;
 
 	}
 
@@ -101,6 +105,7 @@ void updatePlayer(Window* _window)
 	for (int i = 0; i < 1; i++)
 	{
 		float lStickXPos = getStickPos(i, sfTrue, sfTrue);
+		float lStickYPos = getStickPos(i, sfTrue, sfFalse);
 
 		//sfKeyCode keyLeft;
 		//sfKeyCode keyRight;
@@ -131,6 +136,10 @@ void updatePlayer(Window* _window)
 		//	p[i].velocity.x = Lerp(p[i].velocity.x, 0.f, p[i].releaseTimer);
 		//}
 
+
+		p[i].canGoInYPipe = sfFalse;
+		p[i].canGoInXPipe = sfFalse;
+
 		if (!isButtonPressed(i, A) || isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds))
 			p[i].canJump = sfTrue;
 		else
@@ -146,18 +155,18 @@ void updatePlayer(Window* _window)
 			if (fabsf(p[i].velocity.x) < MIN_WALK) {  // slower than a walk // starting, stopping or turning around
 				p[i].velocity.x = 0;
 				p[i].state = P_IDLE;
-				if (lStickXPos < 0.f/* && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-MIN_WALK, 0.f), sfTrue)) {
+				if (lStickXPos < 0.f/* && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-MIN_WALK, 0.f), i)) {
 					p[i].scale.x = -BLOCK_SCALE;
 					p[i].velocity.x -= MIN_WALK;
 				}
-				if (lStickXPos > 0.f /*&& !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(MIN_WALK, 0.f), sfTrue)) {
+				if (lStickXPos > 0.f /*&& !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(MIN_WALK, 0.f), i)) {
 					p[i].scale.x = BLOCK_SCALE;
 					p[i].velocity.x += MIN_WALK;
 				}
 			}
 			else if (fabsf(p[i].velocity.x) >= MIN_WALK) {  // faster than a walk // accelerating or decelerating
 				if (1) {
-					if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(ACC_RUN * dt, 0.f), sfTrue)) {
+					if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(ACC_RUN * dt, 0.f), i)) {
 						p[i].scale.x = BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
 							p[i].velocity.x += ACC_RUN * dt;
@@ -166,7 +175,7 @@ void updatePlayer(Window* _window)
 							p[i].velocity.x += ACC_WALK * dt;
 						}
 					}
-					else if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-DEC_SKID * dt, 0.f), sfTrue)) {
+					else if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-DEC_SKID * dt, 0.f), i)) {
 						p[i].scale.x = -BLOCK_SCALE;
 						p[i].velocity.x -= DEC_SKID * dt;
 						p[i].state = P_SKID;
@@ -180,7 +189,7 @@ void updatePlayer(Window* _window)
 					}
 				}
 				if (0) {
-					if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f), sfTrue)) {
+					if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f), i)) {
 						p[i].scale.x = -BLOCK_SCALE;
 						if (isButtonPressed(i, B)) {
 							p[i].velocity.x -= ACC_RUN * dt;
@@ -190,7 +199,7 @@ void updatePlayer(Window* _window)
 						}
 
 					}
-					else if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(DEC_SKID * dt, 0.f), sfTrue)) {
+					else if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(DEC_SKID * dt, 0.f), i)) {
 						p[i].scale.x = BLOCK_SCALE;
 						p[i].velocity.x += DEC_SKID * dt;
 						p[i].state = P_SKID;
@@ -234,14 +243,14 @@ void updatePlayer(Window* _window)
 			}
 
 			// horizontal physics
-			if (lStickXPos > 0.f/* && !p[i].game.left*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(ACC_RUN * dt, 0.f), sfTrue)) {
+			if (lStickXPos > 0.f/* && !p[i].game.left*/ && !isCollision2(p[i].bounds, sfTrue, sfFalse, vector2f(ACC_RUN * dt, 0.f), i)) {
 				p[i].scale.x = BLOCK_SCALE;
 				if (fabsf(p[i].velocity.x) > MAX_WALK) {
 					p[i].velocity.x += ACC_RUN * dt;
 				}
 				else p[i].velocity.x += ACC_WALK * dt;
 			}
-			else if (lStickXPos < 0.f/* && !p[i].game.right*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f), sfTrue)) {
+			else if (lStickXPos < 0.f/* && !p[i].game.right*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f), i)) {
 				p[i].scale.x = -BLOCK_SCALE;
 				if (fabsf(p[i].velocity.x) > MAX_WALK) {
 					p[i].velocity.x -= ACC_RUN * dt;
@@ -259,7 +268,7 @@ void updatePlayer(Window* _window)
 			//if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity))
 			p[i].state = P_IDLE;
 
-		if (isCollision3(p[i].bounds, &p[i].velocity, sfTrue)) {}
+		if (isCollision3(p[i].bounds, &p[i].velocity, i)) {}
 
 		// max speed calculation
 		if (p[i].velocity.y >= MAX_FALL) p[i].velocity.y = MAX_FALL;
@@ -302,13 +311,37 @@ void updatePlayer(Window* _window)
 		}
 
 		// View Setup
-		if (p[i].pos.x > firstPlayerPos.x)
+		if (nbMap != 2 && p[i].pos.x > firstPlayerPos.x)
 			firstPlayerPos.x = p[i].pos.x;
+
+		// Pipes
+		if (p[i].canGoInYPipe && lStickYPos < -50.f) {
+			p[i].canGoInYPipe = sfFalse;
+			nbMap = 2;
+			loadMap(2);
+			for (int j = 0; j < 2; j++)
+			{
+				p[j].pos = vector2f(125.f, 100.f);
+				p[j].velocity = VECTOR2F_NULL;
+			}
+			greatestViewPos = vector2f(8.5f * BLOCK_SCALE * BLOCK_SIZE, 540.f);
+		}
+		if (p[i].canGoInXPipe && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds) && lStickXPos > 50.f) {
+			p[i].canGoInYPipe = sfFalse;
+			nbMap = 11;
+			loadMap(1);
+			for (int j = 0; j < 2; j++)
+			{
+				p[j].pos = vector2f(163.5f * BLOCK_SCALE * BLOCK_SIZE, 600.f);
+				p[j].velocity = VECTOR2F_NULL;
+			}
+			greatestViewPos = vector2f(168.f * BLOCK_SCALE * BLOCK_SIZE, 540.f);
+		}
 	}
 
 	// View
-	if (0) { // TODO maxPos
-
+	if (nbMap == 2) { // TODO maxPos
+		SetViewPosition(mainView, vector2f(8.5f * BLOCK_SCALE * BLOCK_SIZE, 540.f));
 	}
 	else {
 		if (firstPlayerPos.x > greatestViewPos.x) {
@@ -431,4 +464,12 @@ sfBool isOffView(sfVector2f _pos)
 {
 	// pas mal
 	return sfFalse;
+}
+
+void setPlayerPossiblePipe(int _id, sfBool _canEnter, sfBool _YPipe)
+{
+	if (_YPipe)
+		p[_id].canGoInYPipe = _canEnter;
+	else
+		p[_id].canGoInXPipe = _canEnter;
 }

@@ -60,18 +60,18 @@ void updateEnemies(Window* _window)
 		switch (GD_ENEMY->type)
 		{
 		case E_GOOMBA:
-			if (isCollision2(GD_ENEMY->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), sfFalse))
+			if (isCollision2(GD_ENEMY->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1))
 				GD_ENEMY->velocity.y = 0.f;
 			else
 				GD_ENEMY->velocity.y = GOOMBAY_SPEED;
 
 			if (GD_ENEMY->velocity.x < 0.f) {
-				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfTrue, vector2f(-GOOMBAX_SPEED, 0.f), sfFalse)) {
+				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfTrue, vector2f(-GOOMBAX_SPEED, 0.f), -1)) {
 					GD_ENEMY->velocity.x = GOOMBAX_SPEED;
 				}
 			}
 			else {
-				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfFalse, vector2f(GOOMBAX_SPEED, 0.f), sfFalse)) {
+				if (isCollision2(GD_ENEMY->bounds, sfTrue, sfFalse, vector2f(GOOMBAX_SPEED, 0.f), -1)) {
 					GD_ENEMY->velocity.x = -GOOMBAX_SPEED;
 				}
 			}
