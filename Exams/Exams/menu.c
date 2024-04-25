@@ -5,6 +5,7 @@
 #include "dialogBox.h"
 #include "fontManager.h"
 #include "game.h"
+#include "hud.h"
 
 sfFont* venture3D;
 
@@ -23,7 +24,7 @@ int index;
 sfEvent event;
 sfKeyCode lastKey;
 sfBool canPressKey;
-
+char buffer[30];
 
 void initMenu(Window* _window)
 {
@@ -189,6 +190,7 @@ void updateMenu(Window* _window)
 
 void displayMenu(Window* _window)
 {
+	sfRenderTexture_setView(_window->renderTexture, sfRenderTexture_getDefaultView(_window->renderTexture));
 	sfSprite_setTexture(menuSprite, GetTexture("menu"), sfTrue);
 	sfSprite_setPosition(menuSprite, vector2f(0.f, 0.f));
 	sfRenderTexture_drawSprite(_window->renderTexture, menuSprite, NULL);
@@ -205,7 +207,7 @@ void displayMenu(Window* _window)
 	sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
 
 	if (nbNamesToChoose > 0) {
-		sfText_setCharacterSize(menuText, 30);
+		sfText_setCharacterSize(menuText, 40);
 		if (nbNamesToChoose == 1 && nbTotalPlayers == 2) sfText_setString(menuText, "Player 2");
 		else sfText_setString(menuText, "Player 1");
 		sfText_setPosition(menuText, vector2f(1160.f, 150.f));
@@ -228,6 +230,28 @@ void displayMenu(Window* _window)
 
 		sfText_setOrigin(menuText, vector2f(0.f, 0.f));
 	}
+	else {
+		sfText_setCharacterSize(menuText, 40);
+		sfText_setString(menuText, "LEADERBOARD :");
+		sfText_setPosition(menuText, vector2f(1160.f, 150.f));
+		sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
+		for (int i = 0; i < 5; i++)
+		{
+			if (ld[i].ldScore >= 0) {
+				sfText_setCharacterSize(menuText, 30);
+				sfText_setString(menuText, ld[i].ldName);
+				sfText_setPosition(menuText, vector2f(1160.f, 300.f + i * 100.f));
+				sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
+
+				sfText_setCharacterSize(menuText, 30);
+				sprintf(buffer, "%06d", ld[i].ldScore);
+				sfText_setString(menuText, buffer);
+				sfText_setPosition(menuText, vector2f(1600.f, 300.f + i * 100.f));
+				sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
+			}
+		}
+	}
+	sfRenderTexture_setView(_window->renderTexture, mainView->view);
 }
 
 void deinitMenu()

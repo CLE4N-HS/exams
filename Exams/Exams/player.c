@@ -6,6 +6,8 @@
 #include "fireballs.h"
 #include "viewManager.h"
 #include "menu.h"
+#include "game.h"
+#include "hud.h"
 
 #define PLAYER_SPEED 1400.f
 #define MAX_PLAYER_SPEED 400.f
@@ -426,7 +428,7 @@ void updatePlayer(Window* _window)
 			}
 
 			if (sfKeyboard_isKeyPressed(sfKeyP)) {
-				p[i].pos.x = FINISH_XPOS - 400.f;
+				p[i].pos.x = FINISH_XPOS - 100.f;
 			}
 
 			if (p[i].pos.x >= FINISH_XPOS) {
@@ -448,7 +450,7 @@ void updatePlayer(Window* _window)
 		if (nbPlayersOnFlag >= nbPlayersOnFlagNeeded) {
 			p[i].color = color(255, 255, 255, 255);
 			if (p[i].finishState == 0) {
-				p[i].velocity.y = 100.f;
+				p[i].velocity.y = 400.f;
 				if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
 					p[i].pos.y += dt * p[i].velocity.y;
 				}
@@ -458,7 +460,7 @@ void updatePlayer(Window* _window)
 			}
 			else if (p[i].finishState == 1) {
 				p[i].rect.left = 16;
-				p[i].velocity = vector2f(100.f, 270.f);
+				p[i].velocity = vector2f(300.f, 270.f);
 				if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
 					p[i].pos.y += p[i].velocity.y * dt;
 				}
@@ -470,7 +472,13 @@ void updatePlayer(Window* _window)
 			}
 			else if (p[i].finishState == 2) {
 				p[i].color.a = 0;
+				saveLeaderboard();
+				changeState(_window, MENU);
 			}
+		}
+
+		if (sfKeyboard_isKeyPressed(sfKeyA)) {
+			hud[i].score++;
 		}
 
 	}
@@ -597,26 +605,22 @@ void DamagePlayer(int _id)
 	if (p[_id].invincibilityTimer > 0.f)
 		return;
 
-	p[_id].invincibilityTimer = 3.f;
 
 	if (p[_id].power > P_DEAD) {
 		p[_id].power--;
+	}
+	if (p[_id].power > P_DEAD) {
+		p[_id].invincibilityTimer = 3.f;
+		changePower(_id);
+	}
+	else {
 		p[_id].bounds = FlRect(0.f, 0.f, 0.f, 0.f);
 	}
-	//else {
-		changePower(_id);
-	//}
 }
 
 sfVector2f getGreatestViewPos()
 {
 	return greatestViewPos;
-}
-
-sfBool isOffView(sfVector2f _pos)
-{
-	// pas mal
-	return sfFalse;
 }
 
 void setPlayerPossiblePipe(int _id, sfBool _canEnter, sfBool _YPipe)
@@ -656,6 +660,7 @@ void MakePlayerJump(int _id)
 	p[_id].state = P_IDLE;
 	p[_id].velocity.y = -MAX_JUMP;
 	p[_id].wasReJumping = sfTrue;
+	p[_id].canJump = sfFalse;
 }
 
 void setPlayerStarPower(int _id)

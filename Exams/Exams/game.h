@@ -2,13 +2,14 @@
 #include "tools.h"
 #include "windowManager.h"
 
-typedef struct Hud {
-	char name[30];
-	int score;
-	int nbCoins;
-	int nbLifes;
-}Hud;
-Hud hud[2];
+
+typedef struct Leaderboard {
+	int ldScore;
+	char ldName[30];
+}Leaderboard;
+Leaderboard ld[5];
+
+float gameTime;
 
 /// <summary>
 /// Initializes everything needed for the Game
@@ -33,3 +34,12 @@ void displayGame(Window* _window);
 /// </summary>
 void deinitGame();
 
+void addCoin();
+
+void addLife();
+
+void saveLeaderboard();
+
+void loadLeaderboard();
+
+void sortLeaderboard();

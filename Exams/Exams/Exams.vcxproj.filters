@@ -102,6 +102,9 @@
     <ClCompile Include="fireballs.c">
       <Filter>Fichiers sources\GAME</Filter>
     </ClCompile>
+    <ClCompile Include="hud.c">
+      <Filter>Fichiers sources\GAME</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomMath.h">
@@ -168,6 +171,9 @@
       <Filter>Fichiers d%27en-tête\GAME</Filter>
     </ClInclude>
     <ClInclude Include="fireballs.h">
+      <Filter>Fichiers d%27en-tête\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="hud.h">
       <Filter>Fichiers d%27en-tête\GAME</Filter>
     </ClInclude>
   </ItemGroup>

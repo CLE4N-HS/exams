@@ -283,17 +283,10 @@ void BecomeHitBlock(int _y, int _x)
 
 sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sfFloatRect _bounds)
 {
-	//sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE)); // offset to not count the alpha 0
-	//sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + (_origin.x - 8.f) * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE));
+	float dt = getDeltaTime();
 
-	sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - 8.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - _bounds.height / BLOCK_SCALE) * BLOCK_SCALE)); // offset to not count the alpha 0
-	sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + 8.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - _bounds.height / BLOCK_SCALE) * BLOCK_SCALE));
-
-	//sfVector2i blockPos = getPlayerBlockPos(vector2f(_pos.x - (_origin.x - 8.f) * BLOCK_SCALE * 2.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE)); // offset to not count the alpha 0
-	//sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_pos.x + (_origin.x - 8.f) * BLOCK_SCALE * 2.f * BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - 16.f) * BLOCK_SCALE));
-	
-	//sfVector2i blockPos = getPlayerBlockPos(vector2f(_bounds.left, _bounds.top + _bounds.height / 2.f));
-	//sfVector2i blockPos2 = getPlayerBlockPos(vector2f(_bounds.left + _bounds.width, _bounds.top + _bounds.height / 2.f));
+	sfVector2i blockPos = getPlayerBlockPos(AddVectors(vector2f(_pos.x - 8.f * BLOCK_SCALE + BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - _bounds.height / BLOCK_SCALE) * BLOCK_SCALE), MultiplyVector(*_velocity, dt))); // offset to not count the alpha 0
+	sfVector2i blockPos2 = getPlayerBlockPos(AddVectors(vector2f(_pos.x + 8.f * BLOCK_SCALE - BLOCK_SCALE, _pos.y + 1.f * BLOCK_SCALE - (_origin.y - _bounds.height / BLOCK_SCALE) * BLOCK_SCALE), MultiplyVector(*_velocity, dt)));
 
 	if (blockPos.y < 0 || blockPos.y >= NB_BLOCKS_Y || blockPos.x < 0 || blockPos.x >= NB_BLOCKS_X || blockPos2.y < 0 || blockPos2.y >= NB_BLOCKS_Y || blockPos2.x < 0 || blockPos2.x >= NB_BLOCKS_X) // out of array
 		return sfFalse;
@@ -308,15 +301,8 @@ sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sf
 	if (b[blockPos.y][blockPos.x].isSolid || b[blockPos2.y][blockPos2.x].isSolid) {
 		if (b[blockPos.y][blockPos.x].type == T_HIDDEN_BLOCK || b[blockPos2.y][blockPos2.x].type == T_HIDDEN_BLOCK)
 			return sfFalse;
+
 		return sfTrue;
-		//_bounds.height += _velocity->y;
-		//sfFloatRect tmRect = FlRect(b[blockPos.y][blockPos.x].pos.x, b[blockPos.y][blockPos.x].pos.y, BLOCK_SCALE * BLOCK_SIZE, BLOCK_SCALE * BLOCK_SIZE);
-		//sfFloatRect tmppRect = FlRect(b[blockPos2.y][blockPos2.x].pos.x, b[blockPos2.y][blockPos2.x].pos.y, BLOCK_SCALE * BLOCK_SIZE, BLOCK_SCALE * BLOCK_SIZE);
-		//
-		//if (sfFloatRect_intersects(&_bounds, &tmRect, NULL) || sfFloatRect_intersects(&_bounds, &tmppRect, NULL)) {
-		//	_velocity->y = 0.f;
-		//	return sfTrue;
-		//}
 	}
 
 	return sfFalse;
@@ -362,8 +348,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 	}
 	else {
 		if (_UpOrLeft) {
-			playerPos = AddVectors(vector2f(_rect.left, _rect.top), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
-			playerPos2 = AddVectors(vector2f(_rect.left + _rect.width, _rect.top), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
+			playerPos = AddVectors(vector2f(_rect.left + BLOCK_SCALE, _rect.top), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
+			playerPos2 = AddVectors(vector2f(_rect.left + _rect.width - BLOCK_SCALE, _rect.top), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
 			playerPos.y += BLOCK_SCALE * BLOCK_SIZE;
 			playerPos2.y += BLOCK_SCALE * BLOCK_SIZE;
 			//_rect.top += _nextVelocity.y * BLOCK_SCALE * dt * offset;
@@ -374,8 +360,8 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 			playerPos3.y += BLOCK_SCALE * BLOCK_SIZE;
 		}
 		else {
-			playerPos = AddVectors(vector2f(_rect.left, _rect.top + _rect.height), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
-			playerPos2 = AddVectors(vector2f(_rect.left + _rect.width, _rect.top + _rect.height), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
+			playerPos = AddVectors(vector2f(_rect.left + BLOCK_SCALE, _rect.top + _rect.height), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
+			playerPos2 = AddVectors(vector2f(_rect.left + _rect.width - BLOCK_SCALE, _rect.top + _rect.height), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
 			playerPos.y -= BLOCK_SCALE * BLOCK_SIZE;
 			playerPos2.y -= BLOCK_SCALE * BLOCK_SIZE;
 			//_rect.height += _nextVelocity.y;
@@ -412,6 +398,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					{
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos.y, blockPos.x - 1);
+						addCoin();
 						break;
 					case T_HIDDEN_BLOCK:
 						break;
@@ -435,6 +422,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					{
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos2.y, blockPos2.x - 1);
+						addCoin();
 						break;
 					case T_HIDDEN_BLOCK:
 						break;
@@ -457,6 +445,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				{
 				case T_DARK_COIN:
 					BecomeDarkSky(blockPos3.y, blockPos3.x - 1);
+					addCoin();
 					break;
 				case T_HIDDEN_BLOCK:
 					break;
@@ -475,6 +464,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					{
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos.y, blockPos.x + 1);
+						addCoin();
 						break;
 					case T_BL_DARK_PIPE:
 						setPlayerPossiblePipe(_playerId, sfTrue, sfFalse);
@@ -509,6 +499,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					{
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos2.y, blockPos2.x + 1);
+						addCoin();
 						break;
 					case T_BL_DARK_PIPE:
 						setPlayerPossiblePipe(_playerId, sfTrue, sfFalse);
@@ -536,6 +527,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 				{
 				case T_DARK_COIN:
 					BecomeDarkSky(blockPos3.y, blockPos3.x + 1);
+					addCoin();
 					break;
 				case T_BL_DARK_PIPE:
 					setPlayerPossiblePipe(_playerId, sfTrue, sfFalse);
@@ -581,13 +573,11 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						break;
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos.y - 1, blockPos.x);
+						addCoin();
 						break;
 					case T_DARK_BLOCK:
 						if (isBig) {
 							BecomeDarkSky(blockPos.y - 1, blockPos.x);
-						}
-						else {
-
 						}
 						collide = sfTrue;
 						break;
@@ -636,13 +626,11 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						break;
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos2.y - 1, blockPos2.x);
+						addCoin();
 						break;
 					case T_DARK_BLOCK:
 						if (isBig) {
 							BecomeDarkSky(blockPos2.y - 1, blockPos2.x);
-						}
-						else {
-
 						}
 						collide = sfTrue;
 						break;
@@ -691,6 +679,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						break;
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos3.y - 1, blockPos3.x);
+						addCoin();
 						break;
 					case T_DARK_BLOCK:
 						if (isBig) {
@@ -731,6 +720,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					{
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos.y + 1, blockPos.x);
+						addCoin();
 						break;
 					case T_UL_PIPE:
 						leftPipe = sfTrue;
@@ -766,6 +756,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					{
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos2.y + 1, blockPos2.x);
+						addCoin();
 						break;
 					case T_UR_PIPE:
 						if (leftPipe)
@@ -802,6 +793,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					{
 					case T_DARK_COIN:
 						BecomeDarkSky(blockPos3.y + 1, blockPos3.x);
+						addCoin();
 						break;
 					case T_UR_PIPE:
 						if (leftPipe)

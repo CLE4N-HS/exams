@@ -83,6 +83,7 @@ void createItem(ItemType _type, sfVector2f _pos)
 		rect = IntRect(0, 64, 16, 16);
 		velocity = vector2f(0.f, -270.f);
 		isMovingLeft = sfFalse;
+		addCoin();
 		break;
 	default:
 		break;

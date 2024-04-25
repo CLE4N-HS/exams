@@ -40,6 +40,7 @@ void stateInit(Window* _window)
 		
 		firstload = sfTrue;
 		isEditor = sfFalse;
+		loadLeaderboard();
 	}
 
 	if (!onePass)

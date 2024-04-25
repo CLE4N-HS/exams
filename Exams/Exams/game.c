@@ -15,18 +15,17 @@
 #include "fontManager.h"
 
 #include <Windows.h>
+#include "hud.h"
 
 float timer;
 
 sfText* gameText;
-char buffer[30];
-
-sfSprite* gameSprite;
 
 int gameScore;
-float gameTime;
 
 int nbPlayerMode;
+
+sfRectangleShape* gameRectangle;
 
 void initGame(Window* _window)
 {
@@ -44,11 +43,10 @@ void initGame(Window* _window)
 	sfText_setColor(gameText, sfWhite);
 	sfText_setCharacterSize(gameText, 30);
 
-	gameSprite = sfSprite_create();
-	sfSprite_setTexture(gameSprite, GetTexture("items"), sfFalse);
-	sfSprite_setTextureRect(gameSprite, IntRect(0, 64, 16, 16));
-	sfSprite_setPosition(gameSprite, vector2f(500.f, 50.f));
-	sfSprite_setScale(gameSprite, vector2f(3.f, 3.f));
+	gameRectangle = sfRectangleShape_create();
+	sfRectangleShape_setPosition(gameRectangle, vector2f(0.f, 0.f));
+	sfRectangleShape_setFillColor(gameRectangle, sfBlack);
+	sfRectangleShape_setSize(gameRectangle, vector2f(1920.f, 1080.f));
 
 	gameScore = 0;
 	gameTime = 400.f;
@@ -73,8 +71,8 @@ void initGame(Window* _window)
 	for (int i = 0; i < 2; i++)
 	{
 		hud[i].score = 0;
-		hud[i].nbCoins = 0;
-		hud[i].nbLifes = 0;
+		hud[i].coins = 0;
+		hud[i].lives = 0;
 	}
 	
 	GamepadDetection();
@@ -147,39 +145,126 @@ void displayGame(Window* _window)
 		displayEnemies(_window);
 		displayPlayer(_window);
 		displayFireballs(_window);
-
-		sfRenderTexture_setView(_window->renderTexture, sfRenderTexture_getDefaultView(_window->renderTexture));
-
-		sprintf(buffer, "%s\n%06d", hud[playerTurn].name, hud[playerTurn].score);
-		sfText_setString(gameText, buffer);
-		sfText_setPosition(gameText, vector2f(100.f, 20.f));
-		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
-
-		sfRenderTexture_drawSprite(_window->renderTexture, gameSprite, NULL);
-
-		sprintf(buffer, "x%02d", hud[playerTurn].nbCoins);
-		sfText_setString(gameText, buffer);
-		sfText_setPosition(gameText, vector2f(570.f, 60.f));
-		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
-
-		sprintf(buffer, "WORLD\n 1-1");
-		sfText_setString(gameText, buffer);
-		sfText_setPosition(gameText, vector2f(1000.f, 20.f));
-		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
-
-		sprintf(buffer, "TIME\n %03.f", gameTime);
-		sfText_setString(gameText, buffer);
-		sfText_setPosition(gameText, vector2f(1500.f, 20.f));
-		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
-
-
-		sfRenderTexture_setView(_window->renderTexture, mainView->view);
+		displayHud(_window);
 	}
 
+}
+
+void addCoin()
+{
+	hud[playerTurn].coins++;
+	if (hud[playerTurn].coins > 99) {
+		addLife();
+		hud[playerTurn].coins = 0;
+	}
+}
+
+void addLife()
+{
+	if (hud[playerTurn].lives < 99)
+		hud[playerTurn].lives;
 }
 
 void deinitGame()
 {
 	deinitPause();
 	RemoveAllTextureButALL();
+}
+
+void sortLeaderboard()
+{
+	// create a copy of the leaderboard
+	int tmpCurrentldScore = hud[playerTurn].score;
+	char tmpCurrentldName[30];
+	strcpy(tmpCurrentldName, hud[playerTurn].name);
+	Leaderboard tmpLd[5];
+
+	for (int i = 0; i < 5; i++)
+	{
+		tmpLd[i].ldScore = ld[i].ldScore;
+		strcpy(tmpLd[i].ldName, ld[i].ldName);
+	}
+
+	// sort the copy
+	if (tmpCurrentldScore >= tmpLd[4].ldScore) {
+		tmpLd[4].ldScore = tmpCurrentldScore;
+		strcpy(tmpLd[4].ldName, tmpCurrentldName);
+	}
+	if (tmpCurrentldScore >= tmpLd[3].ldScore) {
+		int tmpldScore3 = tmpLd[3].ldScore;
+		char tmpldName4[30];
+		strcpy(tmpldName4, tmpLd[3].ldName);
+		tmpLd[3].ldScore = tmpCurrentldScore;
+		tmpLd[4].ldScore = tmpldScore3;
+		strcpy(tmpLd[3].ldName, tmpCurrentldName);
+		strcpy(tmpLd[4].ldName, tmpldName4);
+	}
+	if (tmpCurrentldScore >= tmpLd[2].ldScore) {
+		int tmpldScore2 = tmpLd[2].ldScore;
+		char tmpldName2[30];
+		strcpy(tmpldName2, tmpLd[2].ldName);
+		tmpLd[2].ldScore = tmpCurrentldScore;
+		tmpLd[3].ldScore = tmpldScore2;
+		strcpy(tmpLd[2].ldName, tmpCurrentldName);
+		strcpy(tmpLd[3].ldName, tmpldName2);
+	}
+	if (tmpCurrentldScore >= tmpLd[1].ldScore) {
+		int tmpldScore1 = tmpLd[1].ldScore;
+		char tmpldName1[30];
+		strcpy(tmpldName1, tmpLd[1].ldName);
+		tmpLd[1].ldScore = tmpCurrentldScore;
+		tmpLd[2].ldScore = tmpldScore1;
+		strcpy(tmpLd[1].ldName, tmpCurrentldName);
+		strcpy(tmpLd[2].ldName, tmpldName1);
+	}
+	if (tmpCurrentldScore >= tmpLd[0].ldScore) {
+		int tmpldScore0 = tmpLd[0].ldScore;
+		char tmpldName0[30];
+		strcpy(tmpldName0, tmpLd[0].ldName);
+		tmpLd[0].ldScore = tmpCurrentldScore;
+		tmpLd[1].ldScore = tmpldScore0;
+		strcpy(tmpLd[0].ldName, tmpCurrentldName);
+		strcpy(tmpLd[1].ldName, tmpldName0);
+	}
+
+	// transfer the copy into the real Leaderboard
+	for (int i = 0; i < 5; i++)
+	{
+		ld[i].ldScore = tmpLd[i].ldScore;
+		strcpy(ld[i].ldName, tmpLd[i].ldName);
+
+	}
+}
+
+void saveLeaderboard()
+{
+	sortLeaderboard();
+
+	// store it in a file
+	FILE* file;
+	file = fopen(SAVE_PATH"leaderboard.bin", "wb");
+	fwrite(&ld, sizeof(struct Leaderboard), 5, file);
+	fclose(file);
+}
+
+void loadLeaderboard()
+{
+	FILE* file;
+	file = fopen(SAVE_PATH"leaderboard.bin", "rb");
+	if (file == NULL) {
+
+		for (int i = 0; i < 5; i++)
+		{
+			ld[i].ldScore = -1;
+			strcpy(ld[i].ldName, "???");
+		}
+
+		file = fopen(SAVE_PATH"leaderboard.bin", "wb");
+		fwrite(&ld, sizeof(struct Leaderboard), 5, file);
+		file = fclose(file);
+
+		return;
+	}
+	fread(&ld, sizeof(struct Hud), 5, file);
+	fclose(file);
 }
