@@ -5,6 +5,7 @@
 #include "map.h"
 #include "player.h"
 #include "fireballs.h"
+#include "score.h"
 
 #define GD_ENEMY STD_LIST_GETDATA(enemiesList, Enemies, i)
 #define GD_ENEMYJ STD_LIST_GETDATA(enemiesList, Enemies, j)
@@ -33,13 +34,14 @@ typedef struct Enemies {
 	sfFloatRect bounds;
 	sfBool canMove;
 	float noHitTimer;
+	sfBool shouldErase;
 }Enemies;
 
 sfSprite* enemiesSprite;
 
 stdList* enemiesList;
 
-void addEnemy(EnemyType _type, EnemyState _state, sfVector2f _pos, sfVector2f _origin, sfVector2f _velocity, sfVector2f _scale, sfIntRect _rect, float _timer, sfBool _isMovingLeft, sfFloatRect _bounds, sfBool _canMove, float _noHitTimer)
+void addEnemy(EnemyType _type, EnemyState _state, sfVector2f _pos, sfVector2f _origin, sfVector2f _velocity, sfVector2f _scale, sfIntRect _rect, float _timer, sfBool _isMovingLeft, sfFloatRect _bounds, sfBool _canMove, float _noHitTimer, sfBool _shouldErase)
 {
 	Enemies tmp;
 
@@ -55,6 +57,7 @@ void addEnemy(EnemyType _type, EnemyState _state, sfVector2f _pos, sfVector2f _o
 	tmp.bounds = _bounds;
 	tmp.canMove = _canMove;
 	tmp.noHitTimer = _noHitTimer;
+	tmp.shouldErase = _shouldErase;
 
 	STD_LIST_PUSHBACK(enemiesList, tmp);
 }
@@ -73,6 +76,10 @@ void updateEnemies(Window* _window)
 
 	for (int i = 0; i < enemiesList->size(enemiesList); i++)
 	{
+		if (GD_ENEMY->shouldErase) {
+			enemiesList->erase(&enemiesList, i);
+			continue;
+		}
 		sfVector2f viewPos = getGreatestViewPos();
 		//if (GD_ENEMY->pos.x > viewPos.x + 960.f + 8.f * GD_ENEMY->scale.x) {
 		//	continue;
@@ -124,15 +131,6 @@ void updateEnemies(Window* _window)
 				for (int j = 0; j < enemiesList->size(enemiesList); j++)
 				{
 					if (i != j && sfFloatRect_intersects(&GD_ENEMY->bounds, &GD_ENEMYJ->bounds, NULL)) {
-						//if (GD_ENEMY->velocity.x < 0.f) {
-						//	GD_ENEMY->velocity.x = GOOMBAX_SPEED;
-						//	GD_ENEMY->pos.x += GOOMBAX_SPEED * dt;
-						//}
-						//else {
-						//	GD_ENEMY->velocity.x = -GOOMBAX_SPEED;
-						//	GD_ENEMY->pos.x += -GOOMBAX_SPEED * dt;
-						//}
-
 						if (GD_ENEMYJ->velocity.x < 0.f) {
 							if (GD_ENEMYJ->type == E_KOOPA && GD_ENEMYJ->state == E_DEAD)
 								GD_ENEMYJ->velocity.x = SHELLX_SPEED;
@@ -158,6 +156,7 @@ void updateEnemies(Window* _window)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
 						if (PlayerHasStar(j)) {
+							createScore(100, GD_ENEMY->pos);
 							enemiesList->erase(&enemiesList, i);
 							shouldContinue = sfTrue;
 							break;
@@ -165,6 +164,7 @@ void updateEnemies(Window* _window)
 						else {
 							if (getPlayerPos(j).y <= GD_ENEMY->pos.y + GD_ENEMY->bounds.height / 2.f && getPlayerPos(j).y <= GD_ENEMY->pos.y - 10.f) {
 								GD_ENEMY->timer = 0.f;
+								createScore(100, GD_ENEMY->pos);
 								GD_ENEMY->state = E_DEAD;
 								MakePlayerJump(j);
 								break;
@@ -180,6 +180,7 @@ void updateEnemies(Window* _window)
 
 				// fireballs Collisions
 				if (isFireballInBounds(&GD_ENEMY->bounds)) {
+					createScore(100, GD_ENEMY->pos);
 					enemiesList->erase(&enemiesList, i);
 					continue;
 					//GD_ENEMY->timer = 0.f;
@@ -358,8 +359,9 @@ void updateEnemies(Window* _window)
 					for (int j = 0; j < enemiesList->size(enemiesList); j++)
 					{
 						if (i != j && sfFloatRect_intersects(&GD_ENEMY->bounds, &GD_ENEMYJ->bounds, NULL)) {
-							enemiesList->erase(&enemiesList, j);
-							continue;
+							GD_ENEMYJ->shouldErase = sfTrue;
+							//enemiesList->erase(&enemiesList, j);
+							//continue;
 						}
 					}
 
@@ -410,7 +412,7 @@ void createEnemy(EnemyType _type, sfVector2f _pos)
 		break;
 	}
 
-	addEnemy(_type, E_ALIVE, AddVectors(_pos, MultiplyVector(origin, BLOCK_SCALE)), origin, velocity, vector2f(BLOCK_SCALE, BLOCK_SCALE), rect, 0.f, isMovingLeft, FlRect(0.f, 0.f, 0.f, 0.f), sfFalse, 0.f);
+	addEnemy(_type, E_ALIVE, AddVectors(_pos, MultiplyVector(origin, BLOCK_SCALE)), origin, velocity, vector2f(BLOCK_SCALE, BLOCK_SCALE), rect, 0.f, isMovingLeft, FlRect(0.f, 0.f, 0.f, 0.f), sfFalse, 0.f, sfFalse);
 }
 
 void loadAllMapOneEnnemies()

@@ -71,8 +71,6 @@ void updateMenu(Window* _window)
 				if (sfKeyboard_isKeyPressed(i)) {
 					wantedKey = i;
 					nbKeyPressed++;
-
-					menuTimer = 0.f;
 				}
 			}
 			if (sfKeyboard_isKeyPressed(sfKeyNum8) && canPressKey && index > 1) {
@@ -161,24 +159,17 @@ void updateMenu(Window* _window)
 			case 0:
 				isEditor = sfFalse;
 				nbNamesToChoose = 1;
-				menuTimer = -1.0f;
+				menuTimer = 0.f;
 				nbTotalPlayers = 1;
-				//changeState(_window, GAME);
 				break;
 			case 1:
 				isEditor = sfFalse;
 				nbNamesToChoose = 2;
-				menuTimer = -1.0f;
+				menuTimer = 0.f;
 				nbTotalPlayers = 2;
-				//changeState(_window, GAME);
 				break;
 			case 2:
 				_window->isDone = sfTrue;
-				//toggleOptions();
-				break;
-			case 3:
-				//_window->isDone = sfTrue;
-				//CreateDialogBox(ALERT, "Do you really want to quit ?", QUIT_TO_DESKTOP_DB);
 				break;
 			default:
 				break;
@@ -215,7 +206,7 @@ void displayMenu(Window* _window)
 
 		sfText_setCharacterSize(menuText, 30);
 		sfText_setLineSpacing(menuText, 2.f);
-		sfText_setString(menuText, "ENTER YOUR NAME :\n'A -> Z' + '_'\n(back to erase)\nEnter to confirm");
+		sfText_setString(menuText, "ENTER YOUR NAME :\n'A -> Z' + '_'\n(back to erase)\nenter to confirm");
 		sfText_setPosition(menuText, vector2f(1160.f, 300.f));
 		sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
 
@@ -223,12 +214,8 @@ void displayMenu(Window* _window)
 
 		sfText_setCharacterSize(menuText, 50);
 		sfText_setString(menuText, nameChoice);
-		sfText_setPosition(menuText, vector2f(1300.f, 600.f));
-		sfFloatRect tmpRect = sfText_getLocalBounds(menuText);
-		sfText_setOrigin(menuText, TEXT_STRING_ORIGIN);
+		sfText_setPosition(menuText, vector2f(1160.f, 600.f));
 		sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
-
-		sfText_setOrigin(menuText, vector2f(0.f, 0.f));
 	}
 	else {
 		sfText_setCharacterSize(menuText, 40);
@@ -252,6 +239,8 @@ void displayMenu(Window* _window)
 		}
 	}
 	sfRenderTexture_setView(_window->renderTexture, mainView->view);
+
+	displayHud(_window);
 }
 
 void deinitMenu()

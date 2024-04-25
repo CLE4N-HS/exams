@@ -6,6 +6,9 @@
 #include "items.h"
 #include "player.h"
 #include "enemies.h"
+#include "fireballs.h"
+#include "game.h"
+#include "score.h"
 
 sfSprite* mapSprite;
 
@@ -242,12 +245,12 @@ void loadMap(int _nbMap)
 		break;
 	}
 
+	eraseAllFireballs();
+	eraseAllEnemies();
+	eraseAllItems();
+	eraseAllScore();
 	if (nbMap == 1) {
-		eraseAllEnemies();
 		loadAllMapOneEnnemies();
-	}
-	else if (nbMap == 2) {
-		eraseAllEnemies();
 	}
 }
 

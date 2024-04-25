@@ -12,6 +12,7 @@
 #include "viewManager.h"
 #include "editor.h"
 #include "map.h"
+#include "hud.h"
 
 
 void stateInit(Window* _window)
@@ -40,6 +41,7 @@ void stateInit(Window* _window)
 		
 		firstload = sfTrue;
 		isEditor = sfFalse;
+		initHud();
 		loadLeaderboard();
 	}
 

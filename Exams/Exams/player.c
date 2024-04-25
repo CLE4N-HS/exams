@@ -8,6 +8,8 @@
 #include "menu.h"
 #include "game.h"
 #include "hud.h"
+#include "items.h"
+#include "enemies.h"
 
 #define PLAYER_SPEED 1400.f
 #define MAX_PLAYER_SPEED 400.f
@@ -18,8 +20,8 @@
 #define ACC_WALK 133.59375f
 #define ACC_RUN 200.390625f
 #define DEC_REL /*182.8125f*/ 1182.8125f
-#define DEC_SKID 365.625f
-#define MIN_SKID 33.75f
+#define DEC_SKID /*365.625f*/ 1365.625f
+#define MIN_SKID /*33.75f*/ 133.75f
 
 #define STOP_FALL 1575.f
 #define WALK_FALL 1800.f
@@ -68,6 +70,7 @@ typedef struct Player {
 	float deathTimer;
 	sfBool isFlying;
 	sfBool canPressA;
+	float flagTimer;
 }Player;
 Player p[2];
 
@@ -90,47 +93,27 @@ void initPlayer()
 
 	for (int i = 0; i < 2; i++)
 	{
-		p[i].rect = IntRect(0, 32, 16, 16);
-		p[i].origin = vector2f(8.f, 16.f);
-		p[i].scale = vector2f(BLOCK_SCALE, BLOCK_SCALE);
-		p[i].pos = vector2f(3.f * BLOCK_SCALE * BLOCK_SIZE, 13.f * BLOCK_SCALE * BLOCK_SIZE);
-		p[i].velocity = VECTOR2F_NULL;
-		p[i].releaseTimer = 0.f;
-		p[i].state = P_IDLE;
-		p[i].fallAcc = 562.5f;
-		p[i].bounds = FlRect(0.f, 0.f, 0.f, 0.f);
-		p[i].canJump = sfTrue;
-		p[i].nextPos = p[i].pos;
-		p[i].power = P_SMALL;
-		p[i].invincibilityTimer = 0.f;
-		p[i].firethrowerTimer = 1.f;
-		p[i].canGoInYPipe = sfFalse;
-		p[i].canGoInXPipe = sfFalse;
-		p[i].wasReJumping = sfFalse;
-		p[i].color = color(255, 255, 255, 255);
-		p[i].starTimer = 0.f;
-		p[i].isAtFlag = sfFalse;
-		p[i].finishState = 0;
-		p[i].deathTimer = 0.f;
-		p[i].isFlying = sfFalse;
-		p[i].canPressA = sfTrue;
-
+		resetPlayer(i);
 	}
 
 	greatestViewPos = vector2f(960.f, 540.f);
 
 	playerTurn = 0;
+	wantedPlayerTurn = 0;
 
 }
 
 void updatePlayer(Window* _window)
 {
+	if (startTimer > 0.f)
+		return;
+
 	float dt = getDeltaTime();
 
 	sfVector2f firstPlayerPos = vector2f(960.f, 540.f);
 
 	int nbPlayersOnFlag = 0;
-	int nbPlayersOnFlagNeeded = 0; // TODO nbplayer dynamic
+	int nbPlayersOnFlagNeeded = 0;
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -138,12 +121,16 @@ void updatePlayer(Window* _window)
 			continue;
 
 
-		float lStickXPos = getStickPos(i, sfTrue, sfTrue);
-		float lStickYPos = getStickPos(i, sfTrue, sfFalse);
+		float lStickXPos = getStickPos(0, sfTrue, sfTrue);
+		float lStickYPos = getStickPos(0, sfTrue, sfFalse);
 
 		nbPlayersOnFlagNeeded++;
 
 		if (!p[i].isAtFlag) {
+
+			if (gameTime <= 0.4f) {
+				p[i].power = P_DEAD;
+			}
 
 			if (p[i].power <= P_DEAD) {
 				p[i].deathTimer += dt;
@@ -160,11 +147,33 @@ void updatePlayer(Window* _window)
 					}
 				}
 				else {
-					p[i].deathTimer = 0.f;
-					p[i].invincibilityTimer = 0.f;
+					startTimer = 6.f;
+					hud[i].lives--;
+					eraseAllFireballs();
+					eraseAllItems();
+					eraseAllEnemies();
+					resetPlayer(i);
 
-					p[i].power = P_SMALL;
-					p[i].pos.y = 100.f;
+					if (nbTotalPlayers == 2 && i == 0) {
+						wantedPlayerTurn = 1;
+						playerTurn = 0;
+					}
+					else {
+						wantedPlayerTurn = 0;
+						playerTurn = 1;
+					}
+
+					if (hud[0].lives <= 0) {
+						hud[0].hasGameOver = sfTrue;
+						wantedPlayerTurn = 1;
+						playerTurn = 0;
+					}
+					if (hud[1].lives <= 0) {
+						hud[1].hasGameOver = sfTrue;
+						wantedPlayerTurn = 0;
+						playerTurn = 1;
+					}
+					greatestViewPos = vector2f(960.f, 540.f);
 				}
 				continue;
 			}
@@ -178,11 +187,17 @@ void updatePlayer(Window* _window)
 				p[i].isFlying = sfFalse;
 			}
 
+			if (p[i].pos.y > 1080.f + p[i].rect.height * BLOCK_SCALE) {
+				p[i].power = P_DEAD;
+				p[i].pos.y = 1400.f;
+				continue;
+			}
+
 			if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
 				p[i].isFlying = sfTrue;
 			}
 
-			if (!isButtonPressed(i, A) && (p[i].isFlying || p[i].canPressA))
+			if (!isButtonPressed(0, A) && (p[i].isFlying || p[i].canPressA))
 				p[i].canJump = sfTrue;
 
 			if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
@@ -214,7 +229,7 @@ void updatePlayer(Window* _window)
 					if (lStickXPos >= 0.f) {
 						if (lStickXPos > 0.f/* && !p[i].game.left && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(ACC_RUN * dt, 0.f), i)) {
 							p[i].scale.x = BLOCK_SCALE;
-							if (isButtonPressed(i, B)) {
+							if (isButtonPressed(0, B)) {
 								p[i].velocity.x += ACC_RUN * dt;
 							}
 							else {
@@ -238,7 +253,7 @@ void updatePlayer(Window* _window)
 					else {
 						if (lStickXPos < 0.f/* && !p[i].game.right && !p[i].game.down*/ && !isCollision2(p[i].bounds, sfTrue, sfTrue, vector2f(-ACC_RUN * dt, 0.f), i)) {
 							p[i].scale.x = -BLOCK_SCALE;
-							if (isButtonPressed(i, B)) {
+							if (isButtonPressed(0, B)) {
 								p[i].velocity.x -= ACC_RUN * dt;
 							}
 							else {
@@ -259,7 +274,7 @@ void updatePlayer(Window* _window)
 
 				p[i].velocity.y += p[i].fallAcc * dt;
 
-				if (p[i].canJump && isButtonPressed(i, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) { // jump
+				if (p[i].canJump && isButtonPressed(0, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) { // jump
 					//if (p[i].canJump && isButtonPressed(i, A) && isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity, i)) { // jump
 					if (fabsf(p[i].velocity.x) < 16.f) {
 						p[i].velocity.y = -240.f;
@@ -283,7 +298,7 @@ void updatePlayer(Window* _window)
 			else {
 				// air physics
 				// vertical physics
-				if (p[i].velocity.y < 0 && isButtonPressed(i, A)) { // holding A while jumping jumps higher
+				if (p[i].velocity.y < 0 && isButtonPressed(0, A)) { // holding A while jumping jumps higher
 					if (p[i].fallAcc == STOP_FALL) p[i].velocity.y -= (STOP_FALL - STOP_FALL_A) * dt;
 					if (p[i].fallAcc == WALK_FALL) p[i].velocity.y -= (WALK_FALL - WALK_FALL_A) * dt;
 					if (p[i].fallAcc == RUN_FALL) p[i].velocity.y -= (RUN_FALL - RUN_FALL_A) * dt;
@@ -328,8 +343,8 @@ void updatePlayer(Window* _window)
 
 			if (p[i].velocity.x >= MAX_RUN) p[i].velocity.x = MAX_RUN;
 			if (p[i].velocity.x <= -MAX_RUN) p[i].velocity.x = -MAX_RUN;
-			if (p[i].velocity.x >= MAX_WALK && !isButtonPressed(i, B)) p[i].velocity.x = MAX_WALK;
-			if (p[i].velocity.x <= -MAX_WALK && !isButtonPressed(i, B)) p[i].velocity.x = -MAX_WALK;
+			if (p[i].velocity.x >= MAX_WALK && !isButtonPressed(0, B)) p[i].velocity.x = MAX_WALK;
+			if (p[i].velocity.x <= -MAX_WALK && !isButtonPressed(0, B)) p[i].velocity.x = -MAX_WALK;
 
 
 			//p[i].velocity.x = MAX(p[i].velocity.x, -MAX_PLAYER_SPEED);
@@ -352,7 +367,7 @@ void updatePlayer(Window* _window)
 			// Fireballs
 			if (p[i].power == P_FIRETHROWER) {
 				p[i].firethrowerTimer += dt;
-				if (isButtonPressed(i, B) && p[i].firethrowerTimer > 0.4f && fabsf(p[i].velocity.x) < 10.f/* && getNbFireballs() < 2*/) { // if debug
+				if (isButtonPressed(0, B) && p[i].firethrowerTimer > 0.4f && fabsf(p[i].velocity.x) < 10.f/* && getNbFireballs() < 2*/) { // if debug
 					p[i].firethrowerTimer = 0.f;
 					sfBool isLeftSide = sfFalse;
 					if (p[i].scale.x < 0.f)
@@ -423,11 +438,15 @@ void updatePlayer(Window* _window)
 				p[i].rect.left = 64;
 			}
 
+			if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
+				p[i].rect.left = 80;
+			}
+
 			if (p[i].power == P_FIRETHROWER && p[i].firethrowerTimer < 0.2f) {
 				p[i].rect = IntRect(256, 53, 16, 32);
 			}
 
-			if (sfKeyboard_isKeyPressed(sfKeyP)) {
+			if (sfKeyboard_isKeyPressed(sfKeyP)) { // TODO remove debug
 				p[i].pos.x = FINISH_XPOS - 100.f;
 			}
 
@@ -448,8 +467,11 @@ void updatePlayer(Window* _window)
 
 		// Finish anim
 		if (nbPlayersOnFlag >= nbPlayersOnFlagNeeded) {
+			isAtFinish = sfTrue;
+			p[i].scale.x = BLOCK_SCALE;
 			p[i].color = color(255, 255, 255, 255);
 			if (p[i].finishState == 0) {
+				p[i].pos.x = 14278.f;
 				p[i].velocity.y = 400.f;
 				if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
 					p[i].pos.y += dt * p[i].velocity.y;
@@ -459,6 +481,15 @@ void updatePlayer(Window* _window)
 				}
 			}
 			else if (p[i].finishState == 1) {
+				p[i].flagTimer += dt;
+				p[i].scale.x = -BLOCK_SCALE;
+				p[i].pos.x = 14315.f;
+					if (p[i].flagTimer > 0.5f) {
+						p[i].flagTimer = 0.f;
+						p[i].finishState = 2;
+					}
+			}
+			else if (p[i].finishState == 2) {
 				p[i].rect.left = 16;
 				p[i].velocity = vector2f(300.f, 270.f);
 				if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
@@ -467,13 +498,81 @@ void updatePlayer(Window* _window)
 				p[i].pos.x += p[i].velocity.x * dt;
 
 				if (p[i].pos.x > 14725.f) {
-					p[i].finishState = 2;
+					p[i].finishState = 3;
 				}
 			}
-			else if (p[i].finishState == 2) {
+
+			else if (p[i].finishState == 3) {
 				p[i].color.a = 0;
-				saveLeaderboard();
-				changeState(_window, MENU);
+				p[i].scale.x = BLOCK_SCALE;
+				p[i].flagTimer += dt;
+				if (p[i].flagTimer >= 0.001f) {
+					if (gameTime > 1.f) {
+						gameTime -= 1.f;
+						p[i].flagTimer = 0.f;
+						hud[i].score += 50;
+					}
+					else {
+						gameTime = 0.f;
+						p[i].flagTimer = 0.f;
+						p[i].finishState = 4;
+					}
+					hud[i].score = min(hud[i].score, 999999);
+				}
+			}
+			else if (p[i].finishState == 4) {
+				p[i].color.a = 0;
+				p[i].flagTimer += dt;
+				if (p[i].flagTimer > 1.f) {
+					p[i].flagTimer = 0.f;
+					saveLeaderboard();
+					if (nbTotalPlayers > 1) {
+						greatestViewPos = vector2f(960.f, 540.f);
+
+						hud[i].lives = 0;
+						hud[i].hasGameOver = sfTrue;
+						hud[i].neverShowAgain = sfTrue;
+						startTimer = 6.f;
+
+						if (nbTotalPlayers == 2 && i == 0) {
+							wantedPlayerTurn = 1;
+							playerTurn = 0;
+						}
+						else {
+							wantedPlayerTurn = 0;
+							playerTurn = 1;
+						}
+
+						if (hud[0].lives <= 0) {
+							hud[0].hasGameOver = sfTrue;
+							wantedPlayerTurn = 1;
+							playerTurn = 0;
+						}
+						if (hud[1].lives <= 0) {
+							hud[1].hasGameOver = sfTrue;
+							wantedPlayerTurn = 0;
+							playerTurn = 1;
+						}
+
+						int shouldGoToMenu = 0;
+						for (int nbr = 0; nbr < nbTotalPlayers; nbr++)
+						{
+							if (hud[nbr].neverShowAgain)
+								shouldGoToMenu++;
+						}
+						if (shouldGoToMenu >= nbTotalPlayers) {
+							changeState(_window, MENU);
+						}
+
+						eraseAllFireballs();
+						eraseAllItems();
+						eraseAllEnemies();
+						resetPlayer(i);
+					}
+					else {
+						changeState(_window, MENU);
+					}
+				}
 			}
 		}
 
@@ -485,7 +584,7 @@ void updatePlayer(Window* _window)
 
 
 	// View
-	if (nbMap == 2) { // TODO maxPos
+	if (nbMap == 2) {
 		SetViewPosition(mainView, vector2f(8.5f * BLOCK_SCALE * BLOCK_SIZE, 540.f));
 	}
 	else {
@@ -501,12 +600,16 @@ void updatePlayer(Window* _window)
 
 void displayPlayer(Window* _window)
 {
+	if (startTimer > 0.f)
+		return;
+
 	for (int i = 0; i < 2; i++)
 	{
 		if (i != playerTurn)
 			continue;
 
-		sfSprite_setTextureRect(playerSprite, p[i].rect);
+		if (i == 1) sfSprite_setTextureRect(playerSprite, IntRect(p[i].rect.left, p[i].rect.top + 108, p[i].rect.width, p[i].rect.height));
+		else sfSprite_setTextureRect(playerSprite, p[i].rect);
 		sfSprite_setOrigin(playerSprite, p[i].origin);
 		sfSprite_setPosition(playerSprite, p[i].pos);
 		sfSprite_setScale(playerSprite, p[i].scale);
@@ -607,7 +710,12 @@ void DamagePlayer(int _id)
 
 
 	if (p[_id].power > P_DEAD) {
-		p[_id].power--;
+		if (p[_id].power > P_SMALL) {
+			p[_id].power = P_SMALL;
+		}
+		else {
+			p[_id].power = P_DEAD;
+		}
 	}
 	if (p[_id].power > P_DEAD) {
 		p[_id].invincibilityTimer = 3.f;
@@ -674,4 +782,43 @@ sfBool PlayerHasStar(int _id)
 		return sfTrue;
 
 	return sfFalse;
+}
+
+void resetPlayer(int _id)
+{
+	p[_id].rect = IntRect(0, 32, 16, 16);
+	p[_id].origin = vector2f(8.f, 16.f);
+	p[_id].scale = vector2f(BLOCK_SCALE, BLOCK_SCALE);
+	p[_id].pos = vector2f(3.f * BLOCK_SCALE * BLOCK_SIZE, 13.f * BLOCK_SCALE * BLOCK_SIZE);
+	p[_id].velocity = VECTOR2F_NULL;
+	p[_id].releaseTimer = 0.f;
+	p[_id].state = P_IDLE;
+	p[_id].fallAcc = 562.5f;
+	p[_id].bounds = FlRect(0.f, 0.f, 0.f, 0.f);
+	p[_id].canJump = sfTrue;
+	p[_id].nextPos = p[_id].pos;
+	p[_id].power = P_SMALL;
+	p[_id].invincibilityTimer = 0.f;
+	p[_id].firethrowerTimer = 1.f;
+	p[_id].canGoInYPipe = sfFalse;
+	p[_id].canGoInXPipe = sfFalse;
+	p[_id].wasReJumping = sfFalse;
+	p[_id].color = color(255, 255, 255, 255);
+	p[_id].starTimer = 0.f;
+	p[_id].isAtFlag = sfFalse;
+	p[_id].finishState = 0;
+	p[_id].deathTimer = 0.f;
+	p[_id].isFlying = sfFalse;
+	p[_id].canPressA = sfTrue;
+	p[_id].flagTimer = 0.f;
+
+	isAtFinish = sfFalse;
+}
+
+sfBool isPlayerAlive(int _id)
+{
+	if (p[_id].power <= P_DEAD)
+		return sfFalse;
+
+	return sfTrue;
 }

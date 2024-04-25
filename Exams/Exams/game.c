@@ -13,6 +13,8 @@
 #include "enemies.h"
 #include "fireballs.h"
 #include "fontManager.h"
+#include "menu.h"
+#include "score.h"
 
 #include <Windows.h>
 #include "hud.h"
@@ -20,12 +22,7 @@
 float timer;
 
 sfText* gameText;
-
-int gameScore;
-
-int nbPlayerMode;
-
-sfRectangleShape* gameRectangle;
+sfBool firstGame;
 
 void initGame(Window* _window)
 {
@@ -43,36 +40,28 @@ void initGame(Window* _window)
 	sfText_setColor(gameText, sfWhite);
 	sfText_setCharacterSize(gameText, 30);
 
-	gameRectangle = sfRectangleShape_create();
-	sfRectangleShape_setPosition(gameRectangle, vector2f(0.f, 0.f));
-	sfRectangleShape_setFillColor(gameRectangle, sfBlack);
-	sfRectangleShape_setSize(gameRectangle, vector2f(1920.f, 1080.f));
 
-	gameScore = 0;
+
 	gameTime = 400.f;
+	startTimer = 6.f;
+	firstGame = sfTrue;
 
-	if (isEditor) {
-	}
-	else {
-		initEnemies();
-	}
+	initEnemies();
+	initItems();
+	initFireballs();
+	initScore();
 	
 	initMap();
-	if (isEditor) {
-		initEditor();
-	}
-	else {
-		initPlayer();
-		initItems();
-		//initEnemies();
-		initFireballs();
-	}
+
+	initPlayer();
 
 	for (int i = 0; i < 2; i++)
 	{
 		hud[i].score = 0;
 		hud[i].coins = 0;
-		hud[i].lives = 0;
+		hud[i].lives = 2;
+		hud[i].hasGameOver = sfFalse;
+		hud[i].neverShowAgain = sfFalse;
 	}
 	
 	GamepadDetection();
@@ -108,45 +97,62 @@ void updateGame(Window* _window)
 	timerr += dt;
 
 	if (isButtonPressed(0, X) && timerr > 0.5f) { // TODO remove
-		createEnemy(E_GOOMBA, vector2f(getPlayerPos(0).x + 500.f, 200.f));
-		createItem(I_FIREFLOWER, vector2f(getPlayerPos(0).x, getPlayerPos(0).y - 100.f));
+		createEnemy(E_GOOMBA, vector2f(getPlayerPos(playerTurn).x + 500.f, 200.f));
+		createItem(I_FIREFLOWER, vector2f(getPlayerPos(playerTurn).x, getPlayerPos(playerTurn).y - 100.f));
 		timerr = 0.f;
 	}
 	if (isButtonPressed(0, Y) && timerr > 0.5f) { // TODO remove
-		createEnemy(E_KOOPA, vector2f(getPlayerPos(0).x + 500.f, 200.f));
+		createEnemy(E_KOOPA, vector2f(getPlayerPos(playerTurn).x + 500.f, 200.f));
 		timerr = 0.f;
 	}
 
-	gameTime -= dt * 2.2f;
-	gameTime = max(gameTime, 0.f);
-	
-	updateMap(_window);
-	if (isEditor) {
-		updateEditor(_window);
-	}
-	else {
-		updatePlayer(_window);
-		updateItem(_window);
-		updateEnemies(_window);
-		updateFireballs(_window);
+	if (startTimer <= 0.f && !isAtFinish && isPlayerAlive(playerTurn)) {
+		gameTime -= dt * 2.2f;
+		gameTime = max(gameTime, 0.f);
 	}
 
-	gameScore = min(gameScore, 999999);
+
+	startTimer -= dt;
+	if (startTimer <= 0.f && (wantedPlayerTurn != playerTurn || firstGame)) {
+		firstGame = sfFalse;
+		loadMap(1);
+
+		resetPlayer(wantedPlayerTurn);
+		gameTime = 10.f;
+		playerTurn = wantedPlayerTurn;
+	}
+	
+	updateMap(_window);
+	updatePlayer(_window);
+	updateItem(_window);
+	updateEnemies(_window);
+	updateFireballs(_window);
+	updateScore(_window);
+
+	int shouldRetrunToMenu = 0;
+	for (int nb = 0; nb < nbTotalPlayers; nb++)
+	{
+		if (hud[nb].neverShowAgain)
+			shouldRetrunToMenu++;
+	}
+	if (shouldRetrunToMenu >= nbTotalPlayers) {
+		changeState(_window, MENU);
+	}
+
 }
 
 void displayGame(Window* _window)
 {
-	displayMap(_window);
-	if (isEditor) {
-		displayEditor(_window);
-	}
-	else {
+	if (startTimer <= 0.f) {
+		displayMap(_window);
 		displayItem(_window);
 		displayEnemies(_window);
 		displayPlayer(_window);
 		displayFireballs(_window);
-		displayHud(_window);
+		displayScore(_window);
 	}
+
+	displayHud(_window);
 
 }
 
@@ -162,7 +168,7 @@ void addCoin()
 void addLife()
 {
 	if (hud[playerTurn].lives < 99)
-		hud[playerTurn].lives;
+		hud[playerTurn].lives++;
 }
 
 void deinitGame()

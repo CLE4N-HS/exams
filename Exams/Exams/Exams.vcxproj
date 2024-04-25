@@ -151,6 +151,7 @@
     <ClCompile Include="pause.c" />
     <ClCompile Include="player.c" />
     <ClCompile Include="ressourcesManager.c" />
+    <ClCompile Include="score.c" />
     <ClCompile Include="soundManager.c" />
     <ClCompile Include="stateManager.c" />
     <ClCompile Include="textureManager.c" />
@@ -176,6 +177,7 @@
     <ClInclude Include="pause.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="ressourcesManager.h" />
+    <ClInclude Include="score.h" />
     <ClInclude Include="soundManager.h" />
     <ClInclude Include="stateManager.h" />
     <ClInclude Include="textureManager.h" />

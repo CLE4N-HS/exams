@@ -3,6 +3,8 @@
 #include "stateManager.h"
 
 int playerTurn;
+int wantedPlayerTurn;
+sfBool isAtFinish;
 
 typedef enum playerPower {
 	P_DEAD,
@@ -27,4 +29,5 @@ void setPlayerVelocity(int _id, float _x, float _y);
 void MakePlayerJump(int _id);
 void setPlayerStarPower(int _id);
 sfBool PlayerHasStar(int _id);
-void addCoin();
+void resetPlayer(int _id);
+sfBool isPlayerAlive(int _id);

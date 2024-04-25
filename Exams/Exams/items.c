@@ -4,6 +4,8 @@
 #include "CustomMath.h"
 #include "map.h"
 #include "player.h"
+#include "game.h"
+#include "hud.h"
 
 #define GD_ITEM STD_LIST_GETDATA(itemList, Items, i)
 #define GD_ITEMJ STD_LIST_GETDATA(itemList, Items, j)
@@ -84,6 +86,7 @@ void createItem(ItemType _type, sfVector2f _pos)
 		velocity = vector2f(0.f, -270.f);
 		isMovingLeft = sfFalse;
 		addCoin();
+		hud[playerTurn].score += 200;
 		break;
 	default:
 		break;
@@ -220,7 +223,7 @@ void updateItem(Window* _window)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
 						itemList->erase(&itemList, i);
-						// oneUp
+						addLife();
 						shouldContinue = sfTrue;
 						break;
 					}
@@ -315,4 +318,9 @@ void displayItem(Window* _window)
 
 		GD_ITEM->bounds = sfSprite_getGlobalBounds(itemSprite);
 	}
+}
+
+void eraseAllItems()
+{
+	itemList->clear(&itemList);
 }

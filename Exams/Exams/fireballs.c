@@ -137,3 +137,8 @@ void displayFireballs(Window* _window)
 		GD_FIREBALL->bounds = sfSprite_getGlobalBounds(fireballSprite);
 	}
 }
+
+void eraseAllFireballs()
+{
+	fireballList->clear(&fireballList);
+}

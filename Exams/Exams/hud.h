@@ -7,6 +7,8 @@ typedef struct Hud {
 	int score;
 	int coins;
 	int lives;
+	sfBool hasGameOver;
+	sfBool neverShowAgain;
 }Hud;
 Hud hud[2];
 

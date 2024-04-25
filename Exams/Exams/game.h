@@ -10,6 +10,7 @@ typedef struct Leaderboard {
 Leaderboard ld[5];
 
 float gameTime;
+float startTimer;
 
 /// <summary>
 /// Initializes everything needed for the Game

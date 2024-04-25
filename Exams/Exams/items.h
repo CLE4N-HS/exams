@@ -16,3 +16,4 @@ void displayItem(Window* _window);
 
 void createItem(ItemType _type, sfVector2f _pos);
 ItemType getCorrectItem(int _x, int _y, sfBool _isBig);
+void eraseAllItems();
