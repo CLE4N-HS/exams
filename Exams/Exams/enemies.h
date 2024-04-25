@@ -12,3 +12,6 @@ void updateEnemies(Window* _window);
 void displayEnemies(Window* _window);
 
 void createEnemy(EnemyType _type, sfVector2f _pos);
+void loadAllMapOneEnnemies();
+void eraseAllEnemies();
+

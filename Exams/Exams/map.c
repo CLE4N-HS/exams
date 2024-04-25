@@ -5,6 +5,7 @@
 #include "soundManager.h"
 #include "items.h"
 #include "player.h"
+#include "enemies.h"
 
 sfSprite* mapSprite;
 
@@ -240,6 +241,14 @@ void loadMap(int _nbMap)
 	default:
 		break;
 	}
+
+	if (nbMap == 1) {
+		eraseAllEnemies();
+		loadAllMapOneEnnemies();
+	}
+	else if (nbMap == 2) {
+		eraseAllEnemies();
+	}
 }
 
 sfVector2i getPlayerBlockPos(sfVector2f _pos)
@@ -297,15 +306,17 @@ sfBool isGrounded(sfVector2f _pos, sfVector2f* _velocity, sfVector2f _origin, sf
 
 
 	if (b[blockPos.y][blockPos.x].isSolid || b[blockPos2.y][blockPos2.x].isSolid) {
+		if (b[blockPos.y][blockPos.x].type == T_HIDDEN_BLOCK || b[blockPos2.y][blockPos2.x].type == T_HIDDEN_BLOCK)
+			return sfFalse;
 		return sfTrue;
-		_bounds.height += _velocity->y;
-		sfFloatRect tmRect = FlRect(b[blockPos.y][blockPos.x].pos.x, b[blockPos.y][blockPos.x].pos.y, BLOCK_SCALE * BLOCK_SIZE, BLOCK_SCALE * BLOCK_SIZE);
-		sfFloatRect tmppRect = FlRect(b[blockPos2.y][blockPos2.x].pos.x, b[blockPos2.y][blockPos2.x].pos.y, BLOCK_SCALE * BLOCK_SIZE, BLOCK_SCALE * BLOCK_SIZE);
-
-		if (sfFloatRect_intersects(&_bounds, &tmRect, NULL) || sfFloatRect_intersects(&_bounds, &tmppRect, NULL)) {
-			_velocity->y = 0.f;
-			return sfTrue;
-		}
+		//_bounds.height += _velocity->y;
+		//sfFloatRect tmRect = FlRect(b[blockPos.y][blockPos.x].pos.x, b[blockPos.y][blockPos.x].pos.y, BLOCK_SCALE * BLOCK_SIZE, BLOCK_SCALE * BLOCK_SIZE);
+		//sfFloatRect tmppRect = FlRect(b[blockPos2.y][blockPos2.x].pos.x, b[blockPos2.y][blockPos2.x].pos.y, BLOCK_SCALE * BLOCK_SIZE, BLOCK_SCALE * BLOCK_SIZE);
+		//
+		//if (sfFloatRect_intersects(&_bounds, &tmRect, NULL) || sfFloatRect_intersects(&_bounds, &tmppRect, NULL)) {
+		//	_velocity->y = 0.f;
+		//	return sfTrue;
+		//}
 	}
 
 	return sfFalse;

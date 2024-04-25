@@ -3,6 +3,7 @@
 #include "gamepad.h"
 #include "viewManager.h"
 #include "dialogBox.h"
+#include "fontManager.h"
 
 sfFont* venture3D;
 
@@ -12,7 +13,7 @@ sfText* Options;
 sfText* Quit;
 
 sfTexture* texture;
-sfSprite* sprite;
+sfSprite* menuSprite;
 
 int menuSelection;
 
@@ -20,8 +21,11 @@ int menuSelection;
 void initMenu(Window* _window)
 {
 	Texture_Onload(MENU);
+	Font_Onload(MENU);
 
-	venture3D = sfFont_createFromFile("../Ressources/Fonts/3Dventure.ttf");
+	menuSprite = sfSprite_create();
+
+	venture3D = getDefaultFont();
 
 	SetViewPosition(mainView, vector2f(mainView->defaultVideoMode.x / 2.0f, mainView->defaultVideoMode.y / 2.0f));
 
@@ -40,7 +44,6 @@ void initMenu(Window* _window)
 	sfText_setCharacterSize(Play, 72);
 	sfText_setCharacterSize(Editor, 72);
 	sfText_setCharacterSize(Options, 72);
-	sfText_setCharacterSize(Quit, 72);
 	sfText_setPosition(Play, vector2f(mainView->PosView.x + 100.0f ,mainView->PosView.y - 100.0f));
 	sfText_setPosition(Editor, vector2f(mainView->PosView.x + 200.0f, mainView->PosView.y - 0.0f));
 	sfText_setPosition(Options, vector2f(mainView->PosView.x + 300.0f, mainView->PosView.y + 100.0f));
@@ -55,104 +58,23 @@ void updateMenu(Window* _window)
 	static float timer = 0.0f;
 	timer += getDeltaTime();
 
-	switch (menuSelection)
-	{
-	case 0:
-		sfText_setColor(Play, sfRed);
-		sfText_setColor(Editor, sfWhite);
-		sfText_setColor(Options, sfWhite);
-		sfText_setColor(Quit, sfWhite);
-		break;
-	case 1:
-		sfText_setColor(Play, sfWhite);
-		sfText_setColor(Editor, sfRed);
-		sfText_setColor(Options, sfWhite);
-		sfText_setColor(Quit, sfWhite);
-		break;
-	case 2:
-		sfText_setColor(Play, sfWhite);
-		sfText_setColor(Editor, sfWhite);
-		sfText_setColor(Options, sfRed);
-		sfText_setColor(Quit, sfWhite);
-		break;
-	case 3:
-		sfText_setColor(Play, sfWhite);
-		sfText_setColor(Editor, sfWhite);
-		sfText_setColor(Options, sfWhite);
-		sfText_setColor(Quit, sfRed);
-		break;
-	default:
-		break;
-	}
+	float joystickYPos = getStickPos(0, sfTrue, sfFalse);
 
-	for (int i = 0; i < /*8*/nbPlayer; i++)
-	{
-		if (Gamepad_isButtonPressed(i, CROIX) && timer > 0.2f)
-		{
-			switch (menuSelection)
-			{
-			case 0:
-				changeState(_window, GAME);
-				break;
-			case 1:
-				changeState(_window, EDITOR);
-				break;
-			case 2:
-				toggleOptions();
-				break;
-			case 3:
-				_window->isDone = sfTrue;
-				break;
-			default:
-				break;
-			}
-			timer = 0.0f;
-		}
-		if (Gamepad_isJoystickMoved(i, CROSSY) > 0 && timer > 0.2f)
-		{
-			menuSelection--;
-			if (menuSelection < 0)
-				menuSelection = 3;
-			timer = 0.0f;
-		}
-		if (Gamepad_isJoystickMoved(i, CROSSY) < 0 && timer > 0.2f)
-		{
-			menuSelection++;
-			if (menuSelection > 3)
-				menuSelection = 0;
-			timer = 0.0f;
-		}
-		if (Gamepad_isJoystickMoved(i, STICKLY) < 0 && timer > 0.5f)
-		{
-			menuSelection--;
-			if (menuSelection < 0)
-				menuSelection = 3;
-			timer = 0.0f;
-		}
-		if (Gamepad_isJoystickMoved(i, STICKLY) > 0 && timer > 0.5f)
-		{
-			menuSelection++;
-			if (menuSelection > 3)
-				menuSelection = 0;
-			timer = 0.0f;
-		}
-	}
-
-	if (sfKeyboard_isKeyPressed(sfKeyUp) && timer > 0.2f)
+	if ((joystickYPos > 30.f || sfKeyboard_isKeyPressed(sfKeyUp)) && timer > 0.2f)
 	{
 		menuSelection--;
 		if (menuSelection < 0)
-			menuSelection = 3;
+			menuSelection = 2;
 		timer = 0.0f;
 	}
-	if (sfKeyboard_isKeyPressed(sfKeyDown) && timer > 0.2f)
+	if ((joystickYPos < -30.f || sfKeyboard_isKeyPressed(sfKeyDown)) && timer > 0.2f)
 	{
 		menuSelection++;
-		if (menuSelection > 3)
+		if (menuSelection > 2)
 			menuSelection = 0;
 		timer = 0.0f;
 	}
-	if (sfKeyboard_isKeyPressed(sfKeyEnter) && timer > 0.2f)
+	if ((isButtonPressed(0, A) || sfKeyboard_isKeyPressed(sfKeyEnter)) && timer > 0.2f)
 	{
 		switch (menuSelection)
 		{
@@ -165,11 +87,12 @@ void updateMenu(Window* _window)
 			changeState(_window, GAME);
 			break;
 		case 2:
-			toggleOptions();
+			_window->isDone = sfTrue;
+			//toggleOptions();
 			break;
 		case 3:
 			//_window->isDone = sfTrue;
-			CreateDialogBox(ALERT, "Do you really want to quit ?", QUIT_TO_DESKTOP_DB);
+			//CreateDialogBox(ALERT, "Do you really want to quit ?", QUIT_TO_DESKTOP_DB);
 			break;
 		default:
 			break;
@@ -186,12 +109,24 @@ void displayMenu(Window* _window)
 	sfRenderTexture_drawText(_window->renderTexture, Editor, NULL);
 	sfRenderTexture_drawText(_window->renderTexture, Options, NULL);
 	sfRenderTexture_drawText(_window->renderTexture, Quit, NULL);
+
+	sfSprite_setTexture(menuSprite, GetTexture("menu"), sfTrue);
+	sfSprite_setPosition(menuSprite, vector2f(0.f, 0.f));
+	sfRenderTexture_drawSprite(_window->renderTexture, menuSprite, NULL);
+
+	sfSprite_setTexture(menuSprite, GetTexture("select"), sfTrue);
+	sfSprite_setPosition(menuSprite, vector2f(317.f, 641.f + 70.f * menuSelection));
+	sfRenderTexture_drawSprite(_window->renderTexture, menuSprite, NULL);
+
+	sfText_setCharacterSize(Quit, 34);
+	sfText_setPosition(Quit, vector2f(550.f, 790.f));
+	sfRenderTexture_drawText(_window->renderTexture, Quit, NULL);
 }
 
 void deinitMenu()
 {
 	
-	sfFont_destroy(venture3D);
+	//sfFont_destroy(venture3D);
 	RemoveAllTextureButALL();
 	sfText_destroy(Play);
 	sfText_destroy(Editor);

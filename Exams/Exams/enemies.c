@@ -31,13 +31,15 @@ typedef struct Enemies {
 	float timer;
 	sfBool isMovingLeft;
 	sfFloatRect bounds;
+	sfBool canMove;
+	float noHitTimer;
 }Enemies;
 
 sfSprite* enemiesSprite;
 
 stdList* enemiesList;
 
-void addEnemy(EnemyType _type, EnemyState _state, sfVector2f _pos, sfVector2f _origin, sfVector2f _velocity, sfVector2f _scale, sfIntRect _rect, float _timer, sfBool _isMovingLeft, sfFloatRect _bounds)
+void addEnemy(EnemyType _type, EnemyState _state, sfVector2f _pos, sfVector2f _origin, sfVector2f _velocity, sfVector2f _scale, sfIntRect _rect, float _timer, sfBool _isMovingLeft, sfFloatRect _bounds, sfBool _canMove, float _noHitTimer)
 {
 	Enemies tmp;
 
@@ -51,6 +53,8 @@ void addEnemy(EnemyType _type, EnemyState _state, sfVector2f _pos, sfVector2f _o
 	tmp.timer = _timer;
 	tmp.isMovingLeft = _isMovingLeft;
 	tmp.bounds = _bounds;
+	tmp.canMove = _canMove;
+	tmp.noHitTimer = _noHitTimer;
 
 	STD_LIST_PUSHBACK(enemiesList, tmp);
 }
@@ -70,6 +74,9 @@ void updateEnemies(Window* _window)
 	for (int i = 0; i < enemiesList->size(enemiesList); i++)
 	{
 		sfVector2f viewPos = getGreatestViewPos();
+		//if (GD_ENEMY->pos.x > viewPos.x + 960.f + 8.f * GD_ENEMY->scale.x) {
+		//	continue;
+		//}
 		if (GD_ENEMY->pos.x < viewPos.x - 960.f - 8.f * GD_ENEMY->scale.x || GD_ENEMY->pos.y > 1080.f + 8.f * GD_ENEMY->scale.y) {
 			enemiesList->erase(&enemiesList, i);
 			continue;
@@ -104,8 +111,14 @@ void updateEnemies(Window* _window)
 						GD_ENEMY->velocity.x = -GOOMBAX_SPEED;
 					}
 				}
-
-				GD_ENEMY->pos = AddVectors(GD_ENEMY->pos, MultiplyVector(GD_ENEMY->velocity, dt));
+				
+				if (!GD_ENEMY->canMove && GD_ENEMY->pos.x > viewPos.x + 960.f /*+ 8.f * GD_ENEMY->scale.x*/ ) {
+					//continue;
+				}
+				else {
+					GD_ENEMY->canMove = sfTrue;
+					GD_ENEMY->pos = AddVectors(GD_ENEMY->pos, MultiplyVector(GD_ENEMY->velocity, dt));
+				}
 
 				// between them collisions
 				for (int j = 0; j < enemiesList->size(enemiesList); j++)
@@ -121,11 +134,17 @@ void updateEnemies(Window* _window)
 						//}
 
 						if (GD_ENEMYJ->velocity.x < 0.f) {
-							GD_ENEMYJ->velocity.x = GOOMBAX_SPEED;
+							if (GD_ENEMYJ->type == E_KOOPA && GD_ENEMYJ->state == E_DEAD)
+								GD_ENEMYJ->velocity.x = SHELLX_SPEED;
+							else
+								GD_ENEMYJ->velocity.x = GOOMBAX_SPEED;
 							GD_ENEMYJ->pos.x += GOOMBAX_SPEED * dt;
 						}
 						else {
-							GD_ENEMYJ->velocity.x = -GOOMBAX_SPEED;
+							if (GD_ENEMYJ->type == E_KOOPA && GD_ENEMYJ->state == E_DEAD)
+								GD_ENEMYJ->velocity.x = -SHELLX_SPEED;
+							else
+								GD_ENEMYJ->velocity.x = -GOOMBAX_SPEED;
 							GD_ENEMYJ->pos.x += -GOOMBAX_SPEED * dt;
 						}
 					}
@@ -162,6 +181,7 @@ void updateEnemies(Window* _window)
 				// fireballs Collisions
 				if (isFireballInBounds(&GD_ENEMY->bounds)) {
 					enemiesList->erase(&enemiesList, i);
+					continue;
 					//GD_ENEMY->timer = 0.f;
 					//GD_ENEMY->state = E_DEAD;
 				}
@@ -215,11 +235,18 @@ void updateEnemies(Window* _window)
 						//}
 
 						if (GD_ENEMYJ->velocity.x < 0.f) {
-							GD_ENEMYJ->velocity.x = GOOMBAX_SPEED;
+							if (GD_ENEMYJ->type == E_KOOPA && GD_ENEMYJ->state == E_DEAD)
+								GD_ENEMYJ->velocity.x = SHELLX_SPEED;
+							else
+								GD_ENEMYJ->velocity.x = GOOMBAX_SPEED;
+
 							GD_ENEMYJ->pos.x += GOOMBAX_SPEED * dt;
 						}
 						else {
-							GD_ENEMYJ->velocity.x = -GOOMBAX_SPEED;
+							if (GD_ENEMYJ->type == E_KOOPA && GD_ENEMYJ->state == E_DEAD)
+								GD_ENEMYJ->velocity.x = -SHELLX_SPEED;
+							else
+								GD_ENEMYJ->velocity.x = -GOOMBAX_SPEED;
 							GD_ENEMYJ->pos.x += -GOOMBAX_SPEED * dt;
 						}
 					}
@@ -257,6 +284,7 @@ void updateEnemies(Window* _window)
 				// fireballs Collisions
 				if (isFireballInBounds(&GD_ENEMY->bounds)) {
 					enemiesList->erase(&enemiesList, i);
+					continue;
 					//GD_ENEMY->timer = 0.f;
 					//GD_ENEMY->state = E_DEAD;
 				}
@@ -264,6 +292,7 @@ void updateEnemies(Window* _window)
 			else
 			{
 				GD_ENEMY->rect.left = 32;
+				GD_ENEMY->noHitTimer -= dt;
 
 				if (isCollision2(GD_ENEMY->bounds, sfFalse, sfFalse, vector2f(0.f, 0.f), -1)) {
 					GD_ENEMY->velocity.y = 0.f;
@@ -294,12 +323,14 @@ void updateEnemies(Window* _window)
 									if (fabsf(GD_ENEMY->velocity.x) > GOOMBAX_SPEED - 10.f) { // TODO not hitting player
 										DamagePlayer(j);
 									}
-									else {
+									else if (GD_ENEMY->noHitTimer <= 0.1f) {
 										if (getPlayerPos(j).x > GD_ENEMY->pos.x) {
 											GD_ENEMY->velocity.x = -SHELLX_SPEED;
+											GD_ENEMY->noHitTimer = 0.4f;
 										}
 										else {
 											GD_ENEMY->velocity.x = SHELLX_SPEED;
+											GD_ENEMY->noHitTimer = 0.4f;
 										}
 									}
 								}
@@ -379,5 +410,37 @@ void createEnemy(EnemyType _type, sfVector2f _pos)
 		break;
 	}
 
-	addEnemy(_type, E_ALIVE, AddVectors(_pos, MultiplyVector(origin, BLOCK_SCALE)), origin, velocity, vector2f(BLOCK_SCALE, BLOCK_SCALE), rect, 0.f, isMovingLeft, FlRect(0.f, 0.f, 0.f, 0.f));
+	addEnemy(_type, E_ALIVE, AddVectors(_pos, MultiplyVector(origin, BLOCK_SCALE)), origin, velocity, vector2f(BLOCK_SCALE, BLOCK_SCALE), rect, 0.f, isMovingLeft, FlRect(0.f, 0.f, 0.f, 0.f), sfFalse, 0.f);
+}
+
+void loadAllMapOneEnnemies()
+{
+	createEnemy(E_GOOMBA, vector2f(22.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(40.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(51.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	//createEnemy(E_GOOMBA, vector2f(52.5f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(53.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(80.f * BLOCK_SCALE * BLOCK_SIZE, 4.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(82.5f * BLOCK_SCALE * BLOCK_SIZE, 4.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(97.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	//createEnemy(E_GOOMBA, vector2f(98.5f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(99.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_KOOPA, vector2f(107.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - (10.f * BLOCK_SCALE * BLOCK_SIZE) - 2.f));
+	createEnemy(E_GOOMBA, vector2f(114.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	//createEnemy(E_GOOMBA, vector2f(115.5f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(116.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(124.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	//createEnemy(E_GOOMBA, vector2f(125.5f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(126.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(128.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	//createEnemy(E_GOOMBA, vector2f(129.5f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(130.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(174.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	//createEnemy(E_GOOMBA, vector2f(175.5f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+	createEnemy(E_GOOMBA, vector2f(176.f * BLOCK_SCALE * BLOCK_SIZE, 12.f * BLOCK_SCALE * BLOCK_SIZE - 2.f));
+}
+
+void eraseAllEnemies()
+{
+	enemiesList->clear(&enemiesList);
 }

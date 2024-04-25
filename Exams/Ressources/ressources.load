@@ -3,6 +3,8 @@ animation loadingAnim ../Ressources/Textures/loading.anim
 font marioFont ../Ressources/Fonts/marioFont.ttf
 [end]
 [menu]
+single menu ../Ressources/Textures/menu.png
+single select ../Ressources/Textures/select.png
 [end]
 [game]
 single tileset ../Ressources/Textures/tileset.png

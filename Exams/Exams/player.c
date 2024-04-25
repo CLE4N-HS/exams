@@ -62,6 +62,8 @@ typedef struct Player {
 	float starTimer;
 	sfBool isAtFlag;
 	int finishState;
+	float deathTimer;
+	int nbCoins;
 }Player;
 Player p[2];
 
@@ -87,7 +89,7 @@ void initPlayer()
 		p[i].rect = IntRect(0, 32, 16, 16);
 		p[i].origin = vector2f(8.f, 16.f);
 		p[i].scale = vector2f(BLOCK_SCALE, BLOCK_SCALE);
-		p[i].pos = vector2f(100.f, 200.f);
+		p[i].pos = vector2f(3.f * BLOCK_SCALE * BLOCK_SIZE, 13.f * BLOCK_SCALE * BLOCK_SIZE);
 		p[i].velocity = VECTOR2F_NULL;
 		p[i].releaseTimer = 0.f;
 		p[i].state = P_IDLE;
@@ -105,6 +107,8 @@ void initPlayer()
 		p[i].starTimer = 0.f;
 		p[i].isAtFlag = sfFalse;
 		p[i].finishState = 0;
+		p[i].deathTimer = 0.f;
+		p[i].nbCoins = 0;
 
 	}
 
@@ -129,6 +133,29 @@ void updatePlayer(Window* _window)
 
 		if (!p[i].isAtFlag) {
 
+			if (p[i].power <= P_DEAD) {
+				p[i].deathTimer += dt;
+				p[i].rect.left = 96;
+				if (p[i].pos.y < 1300.f) {
+					if (p[i].deathTimer < 0.5f) {
+
+					}
+					else if (p[i].deathTimer < 1.f) {
+						p[i].pos.y -= sinf(p[i].deathTimer) * dt * 800.f;
+					}
+					else {
+						p[i].pos.y += p[i].deathTimer /** p[i].deathTimer*/ * dt * 300.f;
+					}
+				}
+				else {
+					p[i].deathTimer = 0.f;
+					p[i].invincibilityTimer = 0.f;
+
+					p[i].power = P_SMALL;
+					p[i].pos.y = 100.f;
+				}
+				continue;
+			}
 
 			playerState lastState = p[i].state;
 
@@ -370,14 +397,6 @@ void updatePlayer(Window* _window)
 				p[i].rect.left = 0;
 			}
 
-			if (p[i].state == P_SKID) {
-				p[i].rect.left = 64;
-			}
-
-			if (lastState == P_SKID) {
-				p[i].rect.left = 64;
-			}
-
 			if ((lStickXPos > 0.f && p[i].velocity.x < 0.f) || (lStickXPos < 0.f && p[i].velocity.x > 0.f)) {
 				p[i].rect.left = 64;
 			}
@@ -397,7 +416,7 @@ void updatePlayer(Window* _window)
 		else {
 			nbPlayersOnFlag++;
 
-			p[i].rect.left = 112;
+			p[i].rect.left = 128;
 
 			if (p[i].finishState < 1) {
 				p[i].pos.x = 14278.f;
@@ -462,7 +481,8 @@ void displayPlayer(Window* _window)
 		sfSprite_setColor(playerSprite, p[i].color);
 		sfRenderTexture_drawSprite(_window->renderTexture, playerSprite, NULL);
 
-		p[i].bounds = sfSprite_getGlobalBounds(playerSprite);
+		if (p[i].power <= P_DEAD) p[i].bounds = FlRect(0.f, 0.f, 0.f, 0.f);
+		else p[i].bounds = sfSprite_getGlobalBounds(playerSprite);
 
 
 
@@ -529,9 +549,18 @@ void changePower(int _id)
 
 void setPlayerPower(int _id, playerPower _power)
 {
+	printf("%d\n", p[_id].power);
 	if (_power <= p[_id].power)
 		return;
+	if (p[_id].power >= P_FIRETHROWER)
+		return;
 
+	//if (p[_id].power == P_SMALL) {
+	//	p[_id].power = P_BIG;
+	//}
+	//if (p[_id].power == P_BIG) {
+	//	p[_id].power = P_FIRETHROWER
+	//}
 
 
 	//p[_id].power = _power;
@@ -547,16 +576,13 @@ void DamagePlayer(int _id)
 
 	p[_id].invincibilityTimer = 3.f;
 
-	if (p[_id].power > P_DEAD)
+	if (p[_id].power > P_DEAD) {
 		p[_id].power--;
-
-	if (p[_id].power <= P_DEAD) {
-		// dead
-		printf("dead");
+		p[_id].bounds = FlRect(0.f, 0.f, 0.f, 0.f);
 	}
-	else {
+	//else {
 		changePower(_id);
-	}
+	//}
 }
 
 sfVector2f getGreatestViewPos()

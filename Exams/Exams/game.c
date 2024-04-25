@@ -39,7 +39,8 @@ void initGame(Window* _window)
 	timer = 0.f;
 
 	gameText = sfText_create();
-	sfText_setFont(gameText, GetFont("marioFont"));
+	//sfText_setFont(gameText, GetFont("marioFont"));
+	sfText_setFont(gameText, getDefaultFont());
 	sfText_setColor(gameText, sfWhite);
 	sfText_setCharacterSize(gameText, 30);
 
@@ -51,6 +52,12 @@ void initGame(Window* _window)
 
 	gameScore = 0;
 	gameTime = 400.f;
+
+	if (isEditor) {
+	}
+	else {
+		initEnemies();
+	}
 	
 	initMap();
 	if (isEditor) {
@@ -59,7 +66,7 @@ void initGame(Window* _window)
 	else {
 		initPlayer();
 		initItems();
-		initEnemies();
+		//initEnemies();
 		initFireballs();
 	}
 	
@@ -97,6 +104,7 @@ void updateGame(Window* _window)
 
 	if (isButtonPressed(0, X) && timerr > 0.5f) { // TODO remove
 		createEnemy(E_GOOMBA, vector2f(getPlayerPos(0).x + 500.f, 200.f));
+		createItem(I_FIREFLOWER, vector2f(getPlayerPos(0).x, getPlayerPos(0).y - 100.f));
 		timerr = 0.f;
 	}
 	if (isButtonPressed(0, Y) && timerr > 0.5f) { // TODO remove
