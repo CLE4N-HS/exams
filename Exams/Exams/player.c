@@ -5,6 +5,7 @@
 #include "gamepadx.h"
 #include "fireballs.h"
 #include "viewManager.h"
+#include "menu.h"
 
 #define PLAYER_SPEED 1400.f
 #define MAX_PLAYER_SPEED 400.f
@@ -63,7 +64,8 @@ typedef struct Player {
 	sfBool isAtFlag;
 	int finishState;
 	float deathTimer;
-	int nbCoins;
+	sfBool isFlying;
+	sfBool canPressA;
 }Player;
 Player p[2];
 
@@ -95,7 +97,7 @@ void initPlayer()
 		p[i].state = P_IDLE;
 		p[i].fallAcc = 562.5f;
 		p[i].bounds = FlRect(0.f, 0.f, 0.f, 0.f);
-		p[i].canJump = sfFalse;
+		p[i].canJump = sfTrue;
 		p[i].nextPos = p[i].pos;
 		p[i].power = P_SMALL;
 		p[i].invincibilityTimer = 0.f;
@@ -108,11 +110,15 @@ void initPlayer()
 		p[i].isAtFlag = sfFalse;
 		p[i].finishState = 0;
 		p[i].deathTimer = 0.f;
-		p[i].nbCoins = 0;
+		p[i].isFlying = sfFalse;
+		p[i].canPressA = sfTrue;
 
 	}
 
 	greatestViewPos = vector2f(960.f, 540.f);
+
+	playerTurn = 0;
+
 }
 
 void updatePlayer(Window* _window)
@@ -124,8 +130,12 @@ void updatePlayer(Window* _window)
 	int nbPlayersOnFlag = 0;
 	int nbPlayersOnFlagNeeded = 0; // TODO nbplayer dynamic
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2; i++)
 	{
+		if (i != playerTurn)
+			continue;
+
+
 		float lStickXPos = getStickPos(i, sfTrue, sfTrue);
 		float lStickYPos = getStickPos(i, sfTrue, sfFalse);
 
@@ -162,10 +172,20 @@ void updatePlayer(Window* _window)
 			p[i].canGoInYPipe = sfFalse;
 			p[i].canGoInXPipe = sfFalse;
 
-			if (!isButtonPressed(i, A) || isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds))
+			if (!p[i].canJump) {
+				p[i].isFlying = sfFalse;
+			}
+
+			if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
+				p[i].isFlying = sfTrue;
+			}
+
+			if (!isButtonPressed(i, A) && (p[i].isFlying || p[i].canPressA))
 				p[i].canJump = sfTrue;
-			else
-				//p[i].canJump = sfFalse;
+
+			if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
+				p[i].canPressA = sfTrue;
+			}
 
 			//if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
 				if (isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity, i)) {
@@ -426,6 +446,7 @@ void updatePlayer(Window* _window)
 
 		// Finish anim
 		if (nbPlayersOnFlag >= nbPlayersOnFlagNeeded) {
+			p[i].color = color(255, 255, 255, 255);
 			if (p[i].finishState == 0) {
 				p[i].velocity.y = 100.f;
 				if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
@@ -474,6 +495,9 @@ void displayPlayer(Window* _window)
 {
 	for (int i = 0; i < 2; i++)
 	{
+		if (i != playerTurn)
+			continue;
+
 		sfSprite_setTextureRect(playerSprite, p[i].rect);
 		sfSprite_setOrigin(playerSprite, p[i].origin);
 		sfSprite_setPosition(playerSprite, p[i].pos);
@@ -549,7 +573,6 @@ void changePower(int _id)
 
 void setPlayerPower(int _id, playerPower _power)
 {
-	printf("%d\n", p[_id].power);
 	if (_power <= p[_id].power)
 		return;
 	if (p[_id].power >= P_FIRETHROWER)

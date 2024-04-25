@@ -34,7 +34,6 @@ void stateInit(Window* _window)
 		musicVolume = 50.0f;
 		timeScale = 1.f;
 		w.state = sfTrue;
-		fontScore = sfFont_createFromFile("../Ressources/Fonts/full_Pack_2025.ttf");
 
 		PlayASound("test", sfTrue);
 		nbPlayer = NbConnectedControllers();

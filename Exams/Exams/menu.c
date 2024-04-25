@@ -4,18 +4,25 @@
 #include "viewManager.h"
 #include "dialogBox.h"
 #include "fontManager.h"
+#include "game.h"
 
 sfFont* venture3D;
 
-sfText* Play;
-sfText* Editor;
-sfText* Options;
-sfText* Quit;
+sfText* menuText;
 
 sfTexture* texture;
 sfSprite* menuSprite;
 
 int menuSelection;
+
+int nbNamesToChoose;
+
+float menuTimer;
+char nameChoice[30];
+int index;
+sfEvent event;
+sfKeyCode lastKey;
+sfBool canPressKey;
 
 
 void initMenu(Window* _window)
@@ -29,87 +36,159 @@ void initMenu(Window* _window)
 
 	SetViewPosition(mainView, vector2f(mainView->defaultVideoMode.x / 2.0f, mainView->defaultVideoMode.y / 2.0f));
 
-	Play = sfText_create();
-	Editor = sfText_create();
-	Options = sfText_create();
-	Quit = sfText_create();
-	sfText_setFont(Play, venture3D);
-	sfText_setFont(Editor, venture3D);
-	sfText_setFont(Options, venture3D);
-	sfText_setFont(Quit, venture3D);
-	sfText_setString(Play, "Play");
-	sfText_setString(Editor, "Editor");
-	sfText_setString(Options, "Options");
-	sfText_setString(Quit, "Quit");
-	sfText_setCharacterSize(Play, 72);
-	sfText_setCharacterSize(Editor, 72);
-	sfText_setCharacterSize(Options, 72);
-	sfText_setPosition(Play, vector2f(mainView->PosView.x + 100.0f ,mainView->PosView.y - 100.0f));
-	sfText_setPosition(Editor, vector2f(mainView->PosView.x + 200.0f, mainView->PosView.y - 0.0f));
-	sfText_setPosition(Options, vector2f(mainView->PosView.x + 300.0f, mainView->PosView.y + 100.0f));
-	sfText_setPosition(Quit, vector2f(mainView->PosView.x + 200.0f, mainView->PosView.y + 200.0f));
+	menuText = sfText_create();
+	sfText_setFont(menuText, venture3D);
 
 	GamepadDetection();
 	menuSelection = 0;
+	nbNamesToChoose = 0;
+	menuTimer = 0.f;
+	index = 0;
+	lastKey = -1;
+	canPressKey = sfTrue;
 }
 
 void updateMenu(Window* _window)
 {
-	static float timer = 0.0f;
-	timer += getDeltaTime();
+	float dt = getDeltaTime();
+	menuTimer += dt;
 
-	float joystickYPos = getStickPos(0, sfTrue, sfFalse);
-
-	if ((joystickYPos > 30.f || sfKeyboard_isKeyPressed(sfKeyUp)) && timer > 0.2f)
-	{
-		menuSelection--;
-		if (menuSelection < 0)
-			menuSelection = 2;
-		timer = 0.0f;
-	}
-	if ((joystickYPos < -30.f || sfKeyboard_isKeyPressed(sfKeyDown)) && timer > 0.2f)
-	{
-		menuSelection++;
-		if (menuSelection > 2)
-			menuSelection = 0;
-		timer = 0.0f;
-	}
-	if ((isButtonPressed(0, A) || sfKeyboard_isKeyPressed(sfKeyEnter)) && timer > 0.2f)
-	{
-		switch (menuSelection)
-		{
-		case 0:
-			isEditor = sfFalse;
-			changeState(_window, GAME);
-			break;
-		case 1:
-			isEditor = sfTrue;
-			changeState(_window, GAME);
-			break;
-		case 2:
-			_window->isDone = sfTrue;
-			//toggleOptions();
-			break;
-		case 3:
-			//_window->isDone = sfTrue;
-			//CreateDialogBox(ALERT, "Do you really want to quit ?", QUIT_TO_DESKTOP_DB);
-			break;
-		default:
-			break;
+	if (nbNamesToChoose > 0) {
+		
+		if (sfKeyboard_isKeyPressed(sfKeyEscape)) {
+			nbNamesToChoose = 0;
 		}
-		timer = 0.0f;	
+
+		if (!sfKeyboard_isKeyPressed(lastKey)) {
+			canPressKey = sfTrue;
+		}
+		int wantedKey = -1;
+		int nbKeyPressed = 0;
+		if (index < 11) {
+			for (int i = 0; i < 26; i++)
+			{
+				if (sfKeyboard_isKeyPressed(i)) {
+					wantedKey = i;
+					nbKeyPressed++;
+
+					menuTimer = 0.f;
+				}
+			}
+			if (sfKeyboard_isKeyPressed(sfKeyNum8) && canPressKey && index > 1) {
+				lastKey = sfKeyNum8;
+				canPressKey = sfFalse;
+				if (nameChoice[index - 1] != '_') {
+					nameChoice[index] = '_';
+					index++;
+				}
+			}
+		}
+		if (index < 12 && index > 0 && canPressKey) {
+			if (sfKeyboard_isKeyPressed(sfKeyBackspace)) {
+				lastKey = sfKeyBackspace;
+				canPressKey = sfFalse;
+				nameChoice[index - 1] = '\0';
+				if (index > 0)
+					index--;
+			}
+		}
+		if (wantedKey >= 0 && nbKeyPressed == 1 && canPressKey) {
+			lastKey = wantedKey;
+			nameChoice[index] = 'A' + wantedKey;
+			index++;
+			canPressKey = sfFalse;
+		}
+		if (sfKeyboard_isKeyPressed(sfKeyEnter) && index > 0) {
+			lastKey = sfKeyEnter;
+			canPressKey = sfFalse;
+
+			if (nbTotalPlayers == 2) {
+
+				if (nbNamesToChoose == 2) {
+					for (int i = 0; i < 30; i++)
+					{
+						hud[0].name[i] = nameChoice[i];
+						nameChoice[i] = '\0';
+					}
+				}
+				else if (nbNamesToChoose == 1) {
+					for (int i = 0; i < 30; i++)
+					{
+						hud[1].name[i] = nameChoice[i];
+						nameChoice[i] = '\0';
+					}
+				}
+			}
+			else if (nbTotalPlayers == 1) {
+				for (int i = 0; i < 30; i++)
+				{
+					hud[0].name[i] = nameChoice[i];
+					nameChoice[i] = '\0';
+				}
+			}
+
+			index = 0;
+
+			nbNamesToChoose--;
+
+			if (nbNamesToChoose <= 0) {
+				changeState(_window, GAME);
+			}
+		}
+	}
+	else {
+		float joystickYPos = getStickPos(0, sfTrue, sfFalse);
+
+		if ((joystickYPos > 30.f || sfKeyboard_isKeyPressed(sfKeyUp)) && menuTimer > 0.2f)
+		{
+			menuSelection--;
+			if (menuSelection < 0)
+				menuSelection = 2;
+			menuTimer = 0.0f;
+		}
+		if ((joystickYPos < -30.f || sfKeyboard_isKeyPressed(sfKeyDown)) && menuTimer > 0.2f)
+		{
+			menuSelection++;
+			if (menuSelection > 2)
+				menuSelection = 0;
+			menuTimer = 0.0f;
+		}
+		if ((isButtonPressed(0, A) || sfKeyboard_isKeyPressed(sfKeyEnter)) && menuTimer > 0.2f)
+		{
+			switch (menuSelection)
+			{
+			case 0:
+				isEditor = sfFalse;
+				nbNamesToChoose = 1;
+				menuTimer = -1.0f;
+				nbTotalPlayers = 1;
+				//changeState(_window, GAME);
+				break;
+			case 1:
+				isEditor = sfFalse;
+				nbNamesToChoose = 2;
+				menuTimer = -1.0f;
+				nbTotalPlayers = 2;
+				//changeState(_window, GAME);
+				break;
+			case 2:
+				_window->isDone = sfTrue;
+				//toggleOptions();
+				break;
+			case 3:
+				//_window->isDone = sfTrue;
+				//CreateDialogBox(ALERT, "Do you really want to quit ?", QUIT_TO_DESKTOP_DB);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 }
 
 void displayMenu(Window* _window)
 {
-	
-	sfRenderTexture_drawText(_window->renderTexture, Play, NULL);
-	sfRenderTexture_drawText(_window->renderTexture, Editor, NULL);
-	sfRenderTexture_drawText(_window->renderTexture, Options, NULL);
-	sfRenderTexture_drawText(_window->renderTexture, Quit, NULL);
-
 	sfSprite_setTexture(menuSprite, GetTexture("menu"), sfTrue);
 	sfSprite_setPosition(menuSprite, vector2f(0.f, 0.f));
 	sfRenderTexture_drawSprite(_window->renderTexture, menuSprite, NULL);
@@ -118,9 +197,37 @@ void displayMenu(Window* _window)
 	sfSprite_setPosition(menuSprite, vector2f(317.f, 641.f + 70.f * menuSelection));
 	sfRenderTexture_drawSprite(_window->renderTexture, menuSprite, NULL);
 
-	sfText_setCharacterSize(Quit, 34);
-	sfText_setPosition(Quit, vector2f(550.f, 790.f));
-	sfRenderTexture_drawText(_window->renderTexture, Quit, NULL);
+	sfText_setFillColor(menuText, sfWhite);
+	sfText_setOrigin(menuText, vector2f(0.f, 0.f));
+	sfText_setCharacterSize(menuText, 34);
+	sfText_setString(menuText, "Quit");
+	sfText_setPosition(menuText, vector2f(550.f, 790.f));
+	sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
+
+	if (nbNamesToChoose > 0) {
+		sfText_setCharacterSize(menuText, 30);
+		if (nbNamesToChoose == 1 && nbTotalPlayers == 2) sfText_setString(menuText, "Player 2");
+		else sfText_setString(menuText, "Player 1");
+		sfText_setPosition(menuText, vector2f(1160.f, 150.f));
+		sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
+
+		sfText_setCharacterSize(menuText, 30);
+		sfText_setLineSpacing(menuText, 2.f);
+		sfText_setString(menuText, "ENTER YOUR NAME :\n'A -> Z' + '_'\n(back to erase)\nEnter to confirm");
+		sfText_setPosition(menuText, vector2f(1160.f, 300.f));
+		sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
+
+		sfText_setLineSpacing(menuText, 1.f);
+
+		sfText_setCharacterSize(menuText, 50);
+		sfText_setString(menuText, nameChoice);
+		sfText_setPosition(menuText, vector2f(1300.f, 600.f));
+		sfFloatRect tmpRect = sfText_getLocalBounds(menuText);
+		sfText_setOrigin(menuText, TEXT_STRING_ORIGIN);
+		sfRenderTexture_drawText(_window->renderTexture, menuText, NULL);
+
+		sfText_setOrigin(menuText, vector2f(0.f, 0.f));
+	}
 }
 
 void deinitMenu()
@@ -128,8 +235,5 @@ void deinitMenu()
 	
 	//sfFont_destroy(venture3D);
 	RemoveAllTextureButALL();
-	sfText_destroy(Play);
-	sfText_destroy(Editor);
-	sfText_destroy(Options);
-	sfText_destroy(Quit);
+	sfText_destroy(menuText);
 }

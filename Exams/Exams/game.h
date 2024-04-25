@@ -2,6 +2,14 @@
 #include "tools.h"
 #include "windowManager.h"
 
+typedef struct Hud {
+	char name[30];
+	int score;
+	int nbCoins;
+	int nbLifes;
+}Hud;
+Hud hud[2];
+
 /// <summary>
 /// Initializes everything needed for the Game
 /// </summary>

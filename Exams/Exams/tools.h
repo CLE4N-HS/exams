@@ -13,6 +13,9 @@
 #define MAP_PATH "..\\Ressources\\Maps\\"
 #define TILESET_PATH "..\\Ressources\\Tilesets\\"
 
+#define TEXT_ORIGIN vector2f(tmpRect.width / 2.f, tmpRect.height) // center the size
+#define TEXT_STRING_ORIGIN vector2f(tmpRect.width / 2.f, 0.f) // center the string
+
 typedef struct vector4f vector4f;
 struct vector4f
 {

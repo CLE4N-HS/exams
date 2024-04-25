@@ -3,7 +3,7 @@
 #include "stateManager.h"
 #include "windowManager.h"
 
-sfFont* fontScore;
+int nbTotalPlayers;
 
 /// <summary>
 /// Initializes everything needed for the Menu

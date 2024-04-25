@@ -47,7 +47,7 @@ void initGame(Window* _window)
 	gameSprite = sfSprite_create();
 	sfSprite_setTexture(gameSprite, GetTexture("items"), sfFalse);
 	sfSprite_setTextureRect(gameSprite, IntRect(0, 64, 16, 16));
-	sfSprite_setPosition(gameSprite, vector2f(500.f, 80.f));
+	sfSprite_setPosition(gameSprite, vector2f(500.f, 50.f));
 	sfSprite_setScale(gameSprite, vector2f(3.f, 3.f));
 
 	gameScore = 0;
@@ -68,6 +68,13 @@ void initGame(Window* _window)
 		initItems();
 		//initEnemies();
 		initFireballs();
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		hud[i].score = 0;
+		hud[i].nbCoins = 0;
+		hud[i].nbLifes = 0;
 	}
 	
 	GamepadDetection();
@@ -143,16 +150,16 @@ void displayGame(Window* _window)
 
 		sfRenderTexture_setView(_window->renderTexture, sfRenderTexture_getDefaultView(_window->renderTexture));
 
-		sprintf(buffer, "MARIO\n%06d", gameScore);
+		sprintf(buffer, "%s\n%06d", hud[playerTurn].name, hud[playerTurn].score);
 		sfText_setString(gameText, buffer);
 		sfText_setPosition(gameText, vector2f(100.f, 20.f));
 		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
 
 		sfRenderTexture_drawSprite(_window->renderTexture, gameSprite, NULL);
 
-		sprintf(buffer, "x\n");
+		sprintf(buffer, "x%02d", hud[playerTurn].nbCoins);
 		sfText_setString(gameText, buffer);
-		sfText_setPosition(gameText, vector2f(500.f, 20.f));
+		sfText_setPosition(gameText, vector2f(570.f, 60.f));
 		sfRenderTexture_drawText(_window->renderTexture, gameText, NULL);
 
 		sprintf(buffer, "WORLD\n 1-1");

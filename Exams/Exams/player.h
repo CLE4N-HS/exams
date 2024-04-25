@@ -2,6 +2,8 @@
 #include "tools.h"
 #include "stateManager.h"
 
+int playerTurn;
+
 typedef enum playerPower {
 	P_DEAD,
 	P_SMALL,
