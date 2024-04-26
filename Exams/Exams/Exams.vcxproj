@@ -73,6 +73,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -122,20 +125,21 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\CSFML\include;..\CSTL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\CSFML\lib\msvc;..\CSTL\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>csfml-graphics.lib;csfml-system.lib;csfml-window.lib;csfml-audio.lib;CSTL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="customMath.c" />
-    <ClCompile Include="dialogBox.c" />
-    <ClCompile Include="editor.c" />
     <ClCompile Include="enemies.c" />
     <ClCompile Include="fireballs.c" />
     <ClCompile Include="fontManager.c" />
@@ -147,8 +151,6 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="map.c" />
     <ClCompile Include="menu.c" />
-    <ClCompile Include="options.c" />
-    <ClCompile Include="pause.c" />
     <ClCompile Include="player.c" />
     <ClCompile Include="ressourcesManager.c" />
     <ClCompile Include="score.c" />
@@ -161,8 +163,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomMath.h" />
-    <ClInclude Include="dialogBox.h" />
-    <ClInclude Include="editor.h" />
     <ClInclude Include="enemies.h" />
     <ClInclude Include="fireballs.h" />
     <ClInclude Include="fontManager.h" />
@@ -173,8 +173,6 @@
     <ClInclude Include="items.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="menu.h" />
-    <ClInclude Include="options.h" />
-    <ClInclude Include="pause.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="ressourcesManager.h" />
     <ClInclude Include="score.h" />

@@ -1,5 +1,4 @@
 #include "map.h"
-#include "editor.h"
 #include "CustomMath.h"
 #include "gamepadx.h"
 #include "soundManager.h"
@@ -11,6 +10,7 @@
 #include "score.h"
 #include "hud.h"
 #include "viewManager.h"
+#include "textureManager.h"
 
 #define UP_BLOCK_TIMER 0.2f
 
@@ -156,97 +156,6 @@ void loadMap(int _nbMap)
 		if (file == NULL) {
 			defaultMap();
 			file = fopen(SAVE_PATH"map2.bin", "wb");
-			fwrite(b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		else {
-			fread(&b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		break;
-	case 3:
-		file = fopen(SAVE_PATH"map3.bin", "rb");
-		if (file == NULL) {
-			defaultMap();
-			file = fopen(SAVE_PATH"map3.bin", "wb");
-			fwrite(b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		else {
-			fread(&b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		break;
-	case 4:
-		file = fopen(SAVE_PATH"map4.bin", "rb");
-		if (file == NULL) {
-			defaultMap();
-			file = fopen(SAVE_PATH"map4.bin", "wb");
-			fwrite(b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		else {
-			fread(&b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		break;
-	case 5:
-		file = fopen(SAVE_PATH"map5.bin", "rb");
-		if (file == NULL) {
-			defaultMap();
-			file = fopen(SAVE_PATH"map5.bin", "wb");
-			fwrite(b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		else {
-			fread(&b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		break;
-	case 6:
-		file = fopen(SAVE_PATH"map6.bin", "rb");
-		if (file == NULL) {
-			defaultMap();
-			file = fopen(SAVE_PATH"map6.bin", "wb");
-			fwrite(b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		else {
-			fread(&b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		break;
-	case 7:
-		file = fopen(SAVE_PATH"map7.bin", "rb");
-		if (file == NULL) {
-			defaultMap();
-			file = fopen(SAVE_PATH"map7.bin", "wb");
-			fwrite(b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		else {
-			fread(&b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		break;
-	case 8:
-		file = fopen(SAVE_PATH"map8.bin", "rb");
-		if (file == NULL) {
-			defaultMap();
-			file = fopen(SAVE_PATH"map8.bin", "wb");
-			fwrite(b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		else {
-			fread(&b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
-			fclose(file);
-		}
-		break;
-	case 9:
-		file = fopen(SAVE_PATH"map9.bin", "rb");
-		if (file == NULL) {
-			defaultMap();
-			file = fopen(SAVE_PATH"map9.bin", "wb");
 			fwrite(b, sizeof(Blocks), NB_BLOCKS_X * NB_BLOCKS_Y, file);
 			fclose(file);
 		}

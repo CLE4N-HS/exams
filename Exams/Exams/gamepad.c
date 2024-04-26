@@ -1,6 +1,5 @@
 #include "Gamepad.h"
 #include "stateManager.h"
-#include "dialogBox.h"
 
 #define IS_BUTTON (_stick == LB_XBOX || _stick == RB_XBOX) || _stick >= STICKLX_XBOX && _stick < TRIGGER_R2_XBOX
 

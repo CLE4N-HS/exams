@@ -26,9 +26,6 @@ watcher w;
 static State state = MENU;
 
 static sfBool onePass = sfFalse;
-static sfBool isPaused = sfFalse;
-static sfBool isOption = sfFalse;
-sfBool isEditor;
 sfBool isDebug;
 
 sfThread* loadingThread;
@@ -73,13 +70,3 @@ void stateDeinit(Window* _window);
 void changeState(Window* _window, State _state);
 
 State getState();
-
-/// <summary>
-/// Pauses the game, or restarts the game if it was already paused
-/// </summary>
-void togglePause();
-
-/// <summary>
-/// Activates the options, or deactivates them if they were already present
-/// </summary>
-void toggleOptions();

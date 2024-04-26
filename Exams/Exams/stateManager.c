@@ -3,14 +3,10 @@
 #include "textureManager.h"
 #include "soundManager.h"
 #include "fontManager.h"
-#include "pause.h"
 #include "menu.h"
 #include "game.h"
-#include "dialogBox.h"
 #include "gamepad.h"
-#include "options.h"
 #include "viewManager.h"
-#include "editor.h"
 #include "map.h"
 #include "hud.h"
 
@@ -38,7 +34,6 @@ void stateInit(Window* _window)
 		nbPlayer = NbConnectedControllers();
 		
 		firstload = sfTrue;
-		isEditor = sfTrue;
 		initHud();
 		loadLeaderboard();
 
@@ -47,7 +42,6 @@ void stateInit(Window* _window)
 
 	if (!onePass)
 	{
-		isDialogBox = sfFalse;
 		onePass = sfTrue;
 		if (state == INTRO)
 		{
@@ -56,7 +50,6 @@ void stateInit(Window* _window)
 		if (state == MENU)
 		{
 			initMenu(_window);
-			initOptions(_window);
 		}
 		if (state == GAME)
 		{
@@ -64,8 +57,6 @@ void stateInit(Window* _window)
 			w.state = sfFalse;
 			loadingThread = sfThread_create(&initGame, _window);
 			sfThread_launch(loadingThread);
-			initPause(_window);
-			initOptions(_window);
 		}
 		if (state == END)
 		{
@@ -100,68 +91,27 @@ void stateEventUpdate(Window* _window, sfEvent* _event)
 
 void stateUpdate(Window* _window)
 {
-	// to remove debug
-	if (sfMouse_isButtonPressed(sfMouseMiddle)) {
+	if (sfMouse_isButtonPressed(sfMouseMiddle) && isDebug) {
 		_window->isDone = sfTrue;
 	}
 	if (w.state)
 	{
-		if (!isDialogBox)
+		if (state == INTRO)
 		{
-			if (state == INTRO)
-			{
 
-			}
-			else if (state == MENU)
-			{
-				if (isOption)
-					updateOptions(_window);
-				else
-					updateMenu(_window);
-			}
-			else if (state == GAME)
-			{
-				if (isPaused)
-				{
-					if (isOption)
-						updateOptions(_window);
-					else
-					updatePause(_window);	
-				}	
-				else
-					updateGame(_window);
-			}
-			else if (state == END)
-			{
-
-			}
 		}
-		else
+		else if (state == MENU)
 		{
-			dialogBoxUpdate(_window);
+			updateMenu(_window);
 		}
-	}
-	else if (!w.state)
-	{
-		//static sfIntRect AnimRect = { 0, 0, 128, 128 };
-		//static int frame = 0;
-		//static float timer = 0.0f;
-		//timer += getDeltaTime();
+		else if (state == GAME)
+		{
+			updateGame(_window);
+		}
+		else if (state == END)
+		{
 
-		sfMutex_lock(w.mutex);
-		//sfSprite_setOrigin(spLoading, vector2f(64.0f, 64.0f));
-		//sfSprite_setPosition(spLoading, vector2f(mainView->PosView.x, mainView->PosView.y));
-		//sfSprite_setTextureRect(spLoading, AnimRect);
-		//if (timer > 0.1f)
-		//{
-		//	frame++;
-		//	if (frame > 8)
-		//		frame = 0;
-		//	AnimRect.left = frame * 128;
-		//	
-		//	timer = 0.0f;
-		//}
-		sfMutex_unlock(w.mutex);
+		}
 	}
 }
 
@@ -176,43 +126,15 @@ void stateDisplay(Window* _window)
 		if (state == MENU)
 		{
 			displayMenu(_window);
-			if (isOption)
-			{
-				displayOptions(_window);
-			}
-			if (isDialogBox)
-			{
-				dialogBoxDisplay(_window);
-			}
 		}
 		if (state == GAME)
 		{
 			displayGame(_window);
-			if (isPaused)
-			{
-				displayPause(_window);
-				if (isOption)
-				{
-					displayOptions(_window);
-				}
-			}
-			if (isDialogBox)
-			{
-				dialogBoxDisplay(_window);
-			}
 		}
 		if (state == END)
 		{
 
 		}
-	}
-	else if (!w.state)
-	{
-		sfMutex_lock(w.mutex);
-			
-		//sfRenderTexture_drawSprite(_window->renderTexture, spLoading, NULL);
-		
-		sfMutex_unlock(w.mutex);
 	}
 }
 
@@ -220,7 +142,7 @@ void stateDeinit(Window* _window)
 {
 	RemoveAllTextureButALL();
 	RemoveAllSoundsButALL();
-	RemoveAllSoundsButALL();
+	RemoveAllFontsButALL();
 	if (state == INTRO)
 	{
 
@@ -228,12 +150,10 @@ void stateDeinit(Window* _window)
 	if (state == MENU)
 	{
 		deinitMenu();
-		deinitOptions();
 	}
 	if (state == GAME)
 	{
 		deinitGame();
-		deinitOptions();
 	}
 	if (state == END)
 	{
@@ -253,14 +173,4 @@ void changeState(Window* _window, State _state)
 State getState()
 {
 	return state;
-}
-
-void togglePause()
-{
-	isPaused = !isPaused;
-}
-
-void toggleOptions()
-{
-	isOption = !isOption;
 }

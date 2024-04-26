@@ -39,9 +39,6 @@
     <ClCompile Include="customMath.c">
       <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
-    <ClCompile Include="dialogBox.c">
-      <Filter>Fichiers sources\ENGINE</Filter>
-    </ClCompile>
     <ClCompile Include="fontManager.c">
       <Filter>Fichiers sources\ENGINE</Filter>
     </ClCompile>
@@ -58,12 +55,6 @@
       <Filter>Fichiers sources\GAME</Filter>
     </ClCompile>
     <ClCompile Include="menu.c">
-      <Filter>Fichiers sources\MENU</Filter>
-    </ClCompile>
-    <ClCompile Include="options.c">
-      <Filter>Fichiers sources\MENU</Filter>
-    </ClCompile>
-    <ClCompile Include="pause.c">
       <Filter>Fichiers sources\MENU</Filter>
     </ClCompile>
     <ClCompile Include="ressourcesManager.c">
@@ -86,9 +77,6 @@
     </ClCompile>
     <ClCompile Include="viewManager.c">
       <Filter>Fichiers sources\ENGINE</Filter>
-    </ClCompile>
-    <ClCompile Include="editor.c">
-      <Filter>Fichiers sources\GAME</Filter>
     </ClCompile>
     <ClCompile Include="player.c">
       <Filter>Fichiers sources\GAME</Filter>
@@ -113,9 +101,6 @@
     <ClInclude Include="CustomMath.h">
       <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
-    <ClInclude Include="dialogBox.h">
-      <Filter>Fichiers d%27en-tête\ENGINE</Filter>
-    </ClInclude>
     <ClInclude Include="fontManager.h">
       <Filter>Fichiers d%27en-tête\ENGINE</Filter>
     </ClInclude>
@@ -126,12 +111,6 @@
       <Filter>Fichiers d%27en-tête\GAME</Filter>
     </ClInclude>
     <ClInclude Include="menu.h">
-      <Filter>Fichiers d%27en-tête\MENU</Filter>
-    </ClInclude>
-    <ClInclude Include="options.h">
-      <Filter>Fichiers d%27en-tête\MENU</Filter>
-    </ClInclude>
-    <ClInclude Include="pause.h">
       <Filter>Fichiers d%27en-tête\MENU</Filter>
     </ClInclude>
     <ClInclude Include="gamepad.h">
@@ -160,9 +139,6 @@
     </ClInclude>
     <ClInclude Include="windowManager.h">
       <Filter>Fichiers d%27en-tête\ENGINE</Filter>
-    </ClInclude>
-    <ClInclude Include="editor.h">
-      <Filter>Fichiers d%27en-tête\GAME</Filter>
     </ClInclude>
     <ClInclude Include="player.h">
       <Filter>Fichiers d%27en-tête\GAME</Filter>

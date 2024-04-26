@@ -9,6 +9,8 @@
 #define NB_BLOCKS_X 212
 #define NB_BLOCKS_Y 15
 
+#define SAVE_PATH "../Ressources/Saves/"
+
 int nbMap;
 
 typedef enum {

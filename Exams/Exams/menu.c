@@ -2,7 +2,6 @@
 #include "textureManager.h"
 #include "gamepad.h"
 #include "viewManager.h"
-#include "dialogBox.h"
 #include "fontManager.h"
 #include "game.h"
 #include "hud.h"
@@ -157,13 +156,11 @@ void updateMenu(Window* _window)
 			switch (menuSelection)
 			{
 			case 0:
-				isEditor = sfFalse;
 				nbNamesToChoose = 1;
 				menuTimer = 0.f;
 				nbTotalPlayers = 1;
 				break;
 			case 1:
-				isEditor = sfTrue;
 				nbNamesToChoose = 2;
 				menuTimer = 0.f;
 				nbTotalPlayers = 2;
@@ -247,6 +244,5 @@ void deinitMenu()
 {
 	
 	//sfFont_destroy(venture3D);
-	RemoveAllTextureButALL();
 	sfText_destroy(menuText);
 }

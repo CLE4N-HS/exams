@@ -5,9 +5,7 @@
 #include "viewManager.h"
 #include "stateManager.h"
 #include "Gamepad.h"
-#include "pause.h"
 #include "map.h"
-#include "editor.h"
 #include "player.h"
 #include "items.h"
 #include "enemies.h"
@@ -83,19 +81,8 @@ void updateGame(Window* _window)
 {
 	timer += getDeltaTime();
 	
-	for (int i = 0; i < /*8*/nbPlayer; i++)
-	{
-		if (Gamepad_isButtonPressed(i, OPTION) && timer > 0.2f)
-		{
-			togglePause();
-			timer = 0.0f;
-		}
-	}
-
-	if (isKeyboardOrControllerButtonPressed(sfKeyEscape, SELECT_XBOX) && timer > 0.2f)
-	{
-		togglePause();
-		timer = 0.0f;
+	if (sfKeyboard_isKeyPressed(sfKeyEscape) || isButtonPressed(0, START)) {
+		changeState(_window, MENU);
 	}
 
 	float dt = getDeltaTime();
@@ -217,7 +204,6 @@ void addLife()
 
 void deinitGame()
 {
-	deinitPause();
 	RemoveAllTextureButALL();
 }
 
