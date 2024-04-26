@@ -7,6 +7,7 @@
 #include "game.h"
 #include "hud.h"
 #include "score.h"
+#include "soundManager.h"
 
 #define GD_ITEM STD_LIST_GETDATA(itemList, Items, i)
 #define GD_ITEMJ STD_LIST_GETDATA(itemList, Items, j)
@@ -67,20 +68,24 @@ void createItem(ItemType _type, sfVector2f _pos)
 		rect = IntRect(0, 0, 16, 16);
 		velocity = vector2f(200.f, MUSHROOM_YSPEED);
 		isMovingLeft = sfFalse;
+		PlayASound("powerupSFX", sfFalse);
 		break;
 	case I_FIREFLOWER:
 		rect = IntRect(0, 16, 16, 16);
 		velocity = VECTOR2F_NULL;
+		PlayASound("powerupSFX", sfFalse);
 		break;
 	case I_ONEUP:
 		rect = IntRect(0, 32, 16, 16);
 		velocity = vector2f(200.f, MUSHROOM_YSPEED);
 		isMovingLeft = sfFalse;
+		PlayASound("powerupSFX", sfFalse);
 		break;
 	case I_STAR:
 		rect = IntRect(0, 48, 16, 16);
 		velocity = vector2f(200.f, -STAR_YSPEED);
 		isMovingLeft = sfFalse;
+		PlayASound("powerupSFX", sfFalse);
 		break;
 	case I_COIN:
 		rect = IntRect(0, 64, 16, 16);
@@ -155,6 +160,7 @@ void updateItem(Window* _window)
 				for (int j = 0; j < 2; j++)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						PlayASound("collectPowerupSFX", sfFalse);
 						createScore(1000, GD_ITEM->pos);
 						itemList->erase(&itemList, i);
 						setPlayerPower(j, P_BIG);
@@ -185,6 +191,7 @@ void updateItem(Window* _window)
 				for (int j = 0; j < 2; j++)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						PlayASound("collectPowerupSFX", sfFalse);
 						createScore(1000, GD_ITEM->pos);
 						itemList->erase(&itemList, i);
 						setPlayerPower(j, P_FIRETHROWER);
@@ -274,6 +281,7 @@ void updateItem(Window* _window)
 				for (int j = 0; j < 2; j++)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						PlayASound("collectPowerupSFX", sfFalse);
 						createScore(1000, GD_ITEM->pos);
 						itemList->erase(&itemList, i);
 						setPlayerStarPower(j);

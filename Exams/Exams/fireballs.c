@@ -5,6 +5,7 @@
 #include "map.h"
 #include "player.h"
 #include "fireballs.h"
+#include "soundManager.h"
 
 #define GD_FIREBALL STD_LIST_GETDATA(fireballList, Fireballs, i)
 
@@ -48,6 +49,7 @@ void initFireballs()
 
 void createFireball(sfVector2f _pos, sfBool _leftSide)
 {
+	PlayASound("fireballSFX", sfFalse);
 	sfIntRect rect = IntRect(0, 0, 16, 16);
 	sfVector2f pos = vector2f(8.f * BLOCK_SCALE, -20.f * BLOCK_SCALE);
 	sfVector2f velocity = vector2f(800.f, 250.f);

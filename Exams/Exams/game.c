@@ -23,6 +23,7 @@ float timer;
 
 sfText* gameText;
 sfBool firstGame;
+sfBool hasTimeWarning;
 
 void initGame(Window* _window)
 {
@@ -45,6 +46,7 @@ void initGame(Window* _window)
 	gameTime = 400.f;
 	startTimer = 6.f;
 	firstGame = sfTrue;
+	hasTimeWarning = sfFalse;
 
 	initEnemies();
 	initItems();
@@ -62,6 +64,7 @@ void initGame(Window* _window)
 		hud[i].lives = 3;
 		hud[i].hasGameOver = sfFalse;
 		hud[i].neverShowAgain = sfFalse;
+		hud[i].canPlayGameOverMusic = sfTrue;
 	}
 	
 	GamepadDetection();
@@ -110,16 +113,26 @@ void updateGame(Window* _window)
 		gameTime -= dt * 2.2f;
 		gameTime = max(gameTime, 0.f);
 	}
+	if (gameTime < 101.f && !hasTimeWarning && !isAtFinish && startTimer <= 0.f) {
+		hasTimeWarning = sfTrue;
+		PlayASound("timeWarningMusic", sfFalse);
+	}
 
 
 	startTimer -= dt;
+	if (startTimer > 0.f) {
+		StopASound("gameMusic");
+	}
 	if (startTimer <= 0.f && (wantedPlayerTurn != playerTurn || firstGame)) {
 		firstGame = sfFalse;
+		nbMap = 1;
 		loadMap(1);
 
 		resetPlayer(wantedPlayerTurn);
 		gameTime = 400.f;
 		playerTurn = wantedPlayerTurn;
+		PlayASound("gameMusic", sfTrue);
+		hasTimeWarning = sfFalse;
 	}
 	
 	updateMap(_window);
@@ -159,6 +172,7 @@ void displayGame(Window* _window)
 void addCoin()
 {
 	hud[playerTurn].coins++;
+	PlayASound("coinSFX", sfFalse);
 	if (hud[playerTurn].coins > 99) {
 		addLife();
 		hud[playerTurn].coins = 0;
@@ -169,6 +183,7 @@ void addLife()
 {
 	if (hud[playerTurn].lives < 99)
 		hud[playerTurn].lives++;
+	PlayASound("oneUpSFX", sfFalse);
 }
 
 void deinitGame()

@@ -6,6 +6,7 @@
 #include "player.h"
 #include "fireballs.h"
 #include "score.h"
+#include "soundManager.h"
 
 #define GD_ENEMY STD_LIST_GETDATA(enemiesList, Enemies, i)
 #define GD_ENEMYJ STD_LIST_GETDATA(enemiesList, Enemies, j)
@@ -78,6 +79,7 @@ void updateEnemies(Window* _window)
 	{
 		if (GD_ENEMY->shouldErase) {
 			createScore(100, GD_ENEMY->pos);
+			PlayASound("kickSFX", sfFalse);
 			enemiesList->erase(&enemiesList, i);
 			continue;
 		}
@@ -157,6 +159,7 @@ void updateEnemies(Window* _window)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
 						if (PlayerHasStar(j)) {
+							PlayASound("kickSFX", sfFalse);
 							createScore(100, GD_ENEMY->pos);
 							enemiesList->erase(&enemiesList, i);
 							shouldContinue = sfTrue;
@@ -165,6 +168,7 @@ void updateEnemies(Window* _window)
 						else {
 							if (getPlayerPos(j).y <= GD_ENEMY->pos.y + GD_ENEMY->bounds.height / 2.f && getPlayerPos(j).y <= GD_ENEMY->pos.y - 10.f) {
 								GD_ENEMY->timer = 0.f;
+								PlayASound("stompSFX", sfFalse);
 								createScore(100, GD_ENEMY->pos);
 								GD_ENEMY->state = E_DEAD;
 								MakePlayerJump(j);
@@ -182,6 +186,7 @@ void updateEnemies(Window* _window)
 				// fireballs Collisions
 				if (isFireballInBounds(&GD_ENEMY->bounds)) {
 					createScore(100, GD_ENEMY->pos);
+					PlayASound("kickSFX", sfFalse);
 					enemiesList->erase(&enemiesList, i);
 					continue;
 					//GD_ENEMY->timer = 0.f;
@@ -253,6 +258,7 @@ void updateEnemies(Window* _window)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
 						if (PlayerHasStar(j)) {
+							PlayASound("kickSFX", sfFalse);
 							createScore(200, GD_ENEMY->pos);
 							enemiesList->erase(&enemiesList, i);
 							shouldContinue = sfTrue;
@@ -261,6 +267,7 @@ void updateEnemies(Window* _window)
 						else {
 							if (getPlayerPos(j).y <= GD_ENEMY->pos.y + GD_ENEMY->bounds.height / 2.f && getPlayerPos(j).y <= GD_ENEMY->pos.y - 10.f) {
 								GD_ENEMY->timer = 0.f;
+								PlayASound("stompSFX", sfFalse);
 								createScore(100, GD_ENEMY->pos);
 								GD_ENEMY->state = E_DEAD;
 								GD_ENEMY->velocity = vector2f(0.f, SHELLY_SPEED);
@@ -279,6 +286,7 @@ void updateEnemies(Window* _window)
 				// fireballs Collisions
 				if (isFireballInBounds(&GD_ENEMY->bounds)) {
 					createScore(200, GD_ENEMY->pos);
+					PlayASound("kickSFX", sfFalse);
 					enemiesList->erase(&enemiesList, i);
 					continue;
 					//GD_ENEMY->timer = 0.f;
@@ -304,6 +312,7 @@ void updateEnemies(Window* _window)
 						if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
 							if (PlayerHasStar(j)) {
 								createScore(200, GD_ENEMY->pos);
+								PlayASound("kickSFX", sfFalse);
 								enemiesList->erase(&enemiesList, i);
 								shouldContinue = sfTrue;
 								break;
@@ -313,6 +322,7 @@ void updateEnemies(Window* _window)
 									GD_ENEMY->timer = 0.f;
 									createScore(100, GD_ENEMY->pos);
 									GD_ENEMY->state = E_DEAD;
+									PlayASound("stompSFX", sfFalse);
 									MakePlayerJump(j);
 									break;
 								}
@@ -323,10 +333,12 @@ void updateEnemies(Window* _window)
 									}
 									else if (GD_ENEMY->noHitTimer <= 0.1f) {
 										if (getPlayerPos(j).x > GD_ENEMY->pos.x) {
+											PlayASound("kickSFX", sfFalse);
 											GD_ENEMY->velocity.x = -SHELLX_SPEED;
 											GD_ENEMY->noHitTimer = 0.4f;
 										}
 										else {
+											PlayASound("kickSFX", sfFalse);
 											GD_ENEMY->velocity.x = SHELLX_SPEED;
 											GD_ENEMY->noHitTimer = 0.4f;
 										}
@@ -342,17 +354,20 @@ void updateEnemies(Window* _window)
 					if (GD_ENEMY->velocity.x < 0.f) {
 						if (isCollision2(GD_ENEMY->bounds, sfTrue, sfTrue, vector2f(SHELLX_SPEED, 0.f), -1)) {
 							GD_ENEMY->velocity.x = SHELLX_SPEED;
+							PlayASound("bumpSFX", sfFalse);
 						}
 					}
 					else {
 						if (isCollision2(GD_ENEMY->bounds, sfTrue, sfFalse, vector2f(-SHELLX_SPEED, 0.f), -1)) {
 							GD_ENEMY->velocity.x = -SHELLX_SPEED;
+							PlayASound("bumpSFX", sfFalse);
 						}
 					}
 
 					// fireballs Collisions
 					if (isFireballInBounds(&GD_ENEMY->bounds)) {
 						createScore(200, GD_ENEMY->pos);
+						PlayASound("kickSFX", sfFalse);
 						enemiesList->erase(&enemiesList, i);
 						continue;
 					}

@@ -9,6 +9,7 @@ typedef struct Hud {
 	int lives;
 	sfBool hasGameOver;
 	sfBool neverShowAgain;
+	sfBool canPlayGameOverMusic;
 }Hud;
 Hud hud[2];
 

@@ -75,7 +75,6 @@ void displayMap(Window* _window)
 		{
 			if (j == 9 && i == 94 && specialBlocTimer > 0.5f && specialBlocTimer < SPECIAL_BLOC_RESET_TIMER - 0.5f) {
 				specialBlocTimer -= dt * 5.f;
-				printf("%f\n", specialBlocTimer);
 			}
 
 			if (b[j][i].timer > 0.f) { // should be in update but it's more optimized this way
@@ -568,6 +567,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						else if (isBig && !isHittingSpecialBloc) {
 							BecomeBlueSky(blockPos.y - 1, blockPos.x);
 							hud[playerTurn].score += 50;
+							PlayASound("breakBlocSFX", sfFalse);
 						}
 						if (!isBig)
 							b[blockPos.y - 1][blockPos.x].timer = UP_BLOCK_TIMER;
@@ -588,6 +588,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						if (isBig) {
 							BecomeDarkSky(blockPos.y - 1, blockPos.x);
 							hud[playerTurn].score += 50;
+							PlayASound("breakBlocSFX", sfFalse);
 						}
 						if (!isBig)
 							b[blockPos.y - 1][blockPos.x].timer = UP_BLOCK_TIMER;
@@ -629,6 +630,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						else if (isBig && !isHittingSpecialBloc) {
 							BecomeBlueSky(blockPos2.y - 1, blockPos2.x);
 							hud[playerTurn].score += 50;
+							PlayASound("breakBlocSFX", sfFalse);
 						}
 						if (!isBig)
 							b[blockPos2.y - 1][blockPos2.x].timer = UP_BLOCK_TIMER;
@@ -649,6 +651,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						if (isBig) {
 							BecomeDarkSky(blockPos2.y - 1, blockPos2.x);
 							hud[playerTurn].score += 50;
+							PlayASound("breakBlocSFX", sfFalse);
 						}
 						if (!isBig)
 							b[blockPos2.y - 1][blockPos2.x].timer = UP_BLOCK_TIMER;
@@ -690,6 +693,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						else if (isBig && !isHittingSpecialBloc) {
 							BecomeBlueSky(blockPos3.y - 1, blockPos3.x);
 							hud[playerTurn].score += 50;
+							PlayASound("breakBlocSFX", sfFalse);
 						}
 						if (!isBig)
 							b[blockPos3.y - 1][blockPos3.x].timer = UP_BLOCK_TIMER;
@@ -710,6 +714,7 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 						if (isBig) {
 							BecomeDarkSky(blockPos3.y - 1, blockPos3.x);
 							hud[playerTurn].score += 50;
+							PlayASound("breakBlocSFX", sfFalse);
 						}
 						if (!isBig)
 							b[blockPos3.y - 1][blockPos3.x].timer = UP_BLOCK_TIMER;

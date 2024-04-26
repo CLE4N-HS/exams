@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 #endif // !DEBUG
 
 	sfVector2i defaultVideoMode = { 1920,1080 };
-	Window* mainWindow = windowSetup("CSFML la Base!!!", defaultVideoMode);
+	Window* mainWindow = windowSetup("Super Mario Bros NES", defaultVideoMode);
 	initTools();
 
 	while (!IsDone(mainWindow))

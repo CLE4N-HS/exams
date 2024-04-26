@@ -2,6 +2,7 @@
 animation loadingAnim ../Ressources/Textures/loading.anim
 font marioFont ../Ressources/Fonts/marioFont.ttf
 single items ../Ressources/Textures/items.png
+music clearStageMusic ../Ressources/Musics/clearStageMusic.wav
 [end]
 [menu]
 single menu ../Ressources/Textures/menu.png
@@ -13,4 +14,21 @@ single mario ../Ressources/Textures/mario.png
 single enemies ../Ressources/Textures/enemies.png
 single fireball ../Ressources/Textures/fireball.png
 single ref ../Ressources/Textures/ref.png
+soundfx breakBlocSFX ../Ressources/SoundsFx/break.wav
+soundfx coinSFX ../Ressources/SoundsFx/coinSFX.ogg
+soundfx collectPowerupSFX ../Ressources/SoundsFx/collectPowerupSFX.ogg
+soundfx fireballSFX ../Ressources/SoundsFx/fireballSFX.ogg
+soundfx jumpSFX ../Ressources/SoundsFx/jumpSFX.ogg
+soundfx bigJumpSFX ../Ressources/SoundsFx/bigJumpSFX.wav
+soundfx oneUpSFX ../Ressources/SoundsFx/oneUpSFX.ogg
+soundfx powerupSFX ../Ressources/SoundsFx/powerupSFX.ogg
+soundfx flagpoleSFX ../Ressources/SoundsFx/flagpoleSFX.wav
+soundfx pipeSFX ../Ressources/SoundsFx/pipeSFX.wav
+soundfx bumpSFX ../Ressources/SoundsFx/bumpSFX.wav
+soundfx kickSFX ../Ressources/SoundsFx/kickSFX.wav
+soundfx stompSFX ../Ressources/SoundsFx/stompSFX.wav
+music gameMusic ../Ressources/Musics/gameMusic.ogg
+music dieMusic ../Ressources/Musics/dieMusic.wav
+music gameOverMusic ../Ressources/Musics/gameOverMusic.wav
+music timeWarningMusic ../Ressources/Musics/timeWarningMusic.wav
 [end]

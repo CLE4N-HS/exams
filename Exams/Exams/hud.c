@@ -4,6 +4,7 @@
 #include "player.h"
 #include "textureManager.h"
 #include "menu.h"
+#include "soundManager.h"
 
 char buffer[30];
 
@@ -48,6 +49,11 @@ void displayHud(Window* _window)
 		sfFloatRect tmpRect = FlRect(0.f, 0.f, 0.f, 0.f);
 		if (hud[rightPlayer].lives <= 0) {
 			hud[rightPlayer].hasGameOver = sfTrue;
+
+			if (hud[rightPlayer].canPlayGameOverMusic) {
+				hud[rightPlayer].canPlayGameOverMusic = sfFalse;
+				PlayASound("gameOverMusic", sfFalse);
+			}
 			//rightPlayer = playerTurn;
 
 			sprintf(buffer, "%s", hud[rightPlayer].name);

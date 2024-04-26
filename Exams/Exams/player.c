@@ -11,6 +11,7 @@
 #include "items.h"
 #include "enemies.h"
 #include "score.h"
+#include "soundManager.h"
 
 #define PLAYER_SPEED 1400.f
 #define MAX_PLAYER_SPEED 400.f
@@ -73,6 +74,10 @@ typedef struct Player {
 	sfBool canPressA;
 	float flagTimer;
 	sfBool flagScore;
+	sfBool canPlayDieMusic;
+	sfBool canPlayClearStageMusic;
+	sfBool canPlayFlagPoleSFX;
+	sfBool canPlayJumpSFX;
 }Player;
 Player p[2];
 
@@ -135,8 +140,15 @@ void updatePlayer(Window* _window)
 			}
 
 			if (p[i].power <= P_DEAD) {
+				
+				if (p[i].canPlayDieMusic) {
+					p[i].canPlayDieMusic = sfFalse;
+					StopASound("gameMusic");
+					PlayASound("dieMusic", sfFalse);
+				}
+
 				p[i].deathTimer += dt;
-				p[i].rect.left = 96;
+				p[i].rect = IntRect(96, 32, 16, 16);
 				if (p[i].pos.y < 1300.f) {
 					if (p[i].deathTimer < 0.5f) {
 
@@ -204,6 +216,7 @@ void updatePlayer(Window* _window)
 
 			if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
 				p[i].canPressA = sfTrue;
+				p[i].canPlayJumpSFX = sfTrue;
 			}
 
 			//if (isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
@@ -278,6 +291,14 @@ void updatePlayer(Window* _window)
 
 				if (p[i].canJump && isButtonPressed(0, A) && isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) { // jump
 					//if (p[i].canJump && isButtonPressed(i, A) && isCollision2(p[i].bounds, sfFalse, sfFalse, p[i].velocity, i)) { // jump
+					if (p[i].canPlayJumpSFX) {
+						if (p[i].power >= P_BIG)
+							PlayASound("bigJumpSFX", sfFalse);
+						else
+							PlayASound("jumpSFX", sfFalse);
+						p[i].canPlayJumpSFX = sfFalse;
+					}
+
 					if (fabsf(p[i].velocity.x) < 16.f) {
 						p[i].velocity.y = -240.f;
 						p[i].fallAcc = STOP_FALL;
@@ -405,6 +426,7 @@ void updatePlayer(Window* _window)
 				p[i].canGoInYPipe = sfFalse;
 				nbMap = 2;
 				loadMap(2);
+				PlayASound("pipeSFX", sfFalse);
 				for (int j = 0; j < 2; j++)
 				{
 					p[j].pos = vector2f(2.f * BLOCK_SCALE * BLOCK_SIZE + p[i].origin.x * BLOCK_SCALE, 3.f * BLOCK_SCALE * BLOCK_SIZE);
@@ -416,6 +438,7 @@ void updatePlayer(Window* _window)
 				p[i].canGoInYPipe = sfFalse;
 				nbMap = 1;
 				loadMap(1);
+				PlayASound("pipeSFX", sfFalse);
 				for (int j = 0; j < 2; j++)
 				{
 					p[j].pos = vector2f(163.5f * BLOCK_SCALE * BLOCK_SIZE + p[i].origin.x * BLOCK_SCALE, 11.f * BLOCK_SCALE * BLOCK_SIZE);
@@ -469,6 +492,13 @@ void updatePlayer(Window* _window)
 
 		// Finish anim
 		if (nbPlayersOnFlag >= nbPlayersOnFlagNeeded) {
+
+			if (p[i].canPlayFlagPoleSFX) {
+				p[i].canPlayFlagPoleSFX = sfFalse;
+				StopASound("gameMusic");
+				PlayASound("flagpoleSFX", sfFalse);
+			}
+			
 			isAtFinish = sfTrue;
 			p[i].scale.x = BLOCK_SCALE;
 			p[i].color = color(255, 255, 255, 255);
@@ -502,6 +532,12 @@ void updatePlayer(Window* _window)
 					}
 			}
 			else if (p[i].finishState == 2) {
+
+				if (p[i].canPlayClearStageMusic) {
+					p[i].canPlayClearStageMusic = sfFalse;
+					PlayASound("clearStageMusic", sfFalse);
+				}
+
 				p[i].rect.left = 16;
 				p[i].velocity = vector2f(300.f, 270.f);
 				if (!isGrounded(p[i].pos, &p[i].velocity, p[i].origin, p[i].bounds)) {
@@ -731,6 +767,7 @@ void DamagePlayer(int _id)
 	}
 	if (p[_id].power > P_DEAD) {
 		p[_id].invincibilityTimer = 3.f;
+		PlayASound("pipeSFX", sfFalse);
 		changePower(_id);
 	}
 	else {
@@ -824,6 +861,10 @@ void resetPlayer(int _id)
 	p[_id].canPressA = sfTrue;
 	p[_id].flagTimer = 0.f;
 	p[_id].flagScore = sfTrue;
+	p[_id].canPlayDieMusic = sfTrue;
+	p[_id].canPlayClearStageMusic = sfTrue;
+	p[_id].canPlayFlagPoleSFX = sfTrue;
+	p[_id].canPlayJumpSFX = sfTrue;
 
 	isAtFinish = sfFalse;
 }

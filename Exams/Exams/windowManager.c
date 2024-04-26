@@ -75,6 +75,7 @@ void windowCreate(Window* This)
 
 	This->renderWindow = sfRenderWindow_create(This->videoMode, This->windowTitle, style, NULL);
 	sfRenderWindow_setFramerateLimit(This->renderWindow, 120);
+	sfRenderWindow_setMouseCursorVisible(This->renderWindow, !This->isFullscreen);
 }
 
 void ToggleFullscreen(Window* This)
