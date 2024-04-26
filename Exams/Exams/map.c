@@ -14,6 +14,8 @@
 
 #define UP_BLOCK_TIMER 0.2f
 
+#define SPECIAL_BLOC_RESET_TIMER 28.f
+
 sfSprite* mapSprite;
 
 sfTexture* tilesetTexture;
@@ -26,6 +28,8 @@ sfBool isMapF;
 
 sfBool couldGoInYPipe;
 sfBool couldGoInXPipe;
+
+float specialBlocTimer;
 
 void initMap()
 {
@@ -59,7 +63,7 @@ void displayMap(Window* _window)
 {
 	float dt = getDeltaTime();
 
-	sfRenderTexture_setView(_window->renderTexture, sfRenderTexture_getDefaultView(_window->renderTexture));
+	sfRenderTexture_setView(_window->renderTexture, sfRenderTexture_getDefaultView(_window->renderTexture)); // blue or black background
 	if (nbMap == 2) sfRectangleShape_setFillColor(mapRectangle, sfBlack);
 	else sfRectangleShape_setFillColor(mapRectangle, color(92, 148, 252, 255));
 	sfRenderTexture_drawRectangleShape(_window->renderTexture, mapRectangle, NULL);
@@ -69,13 +73,16 @@ void displayMap(Window* _window)
 	{
 		for (int i = 0; i < NB_BLOCKS_X; i++)
 		{
+			if (j == 9 && i == 94 && specialBlocTimer > 0.5f && specialBlocTimer < SPECIAL_BLOC_RESET_TIMER - 0.5f) {
+				specialBlocTimer -= dt * 5.f;
+				printf("%f\n", specialBlocTimer);
+			}
+
 			if (b[j][i].timer > 0.f) { // should be in update but it's more optimized this way
 				if (b[j][i].timer >= 0.1f)
 					b[j][i].pos.y -= 120.f * dt;
-					//b[j][i].pos.y -= sinf(b[j][i].timer) * 100.f;
 				else
 					b[j][i].pos.y += 120.f * dt;
-					//b[j][i].pos.y += sinf(b[j][i].timer) * 100.f;
 				b[j][i].timer -= dt;
 				max(b[j][i].timer, 0.f);
 			}
@@ -259,6 +266,7 @@ void loadMap(int _nbMap)
 	eraseAllScore();
 	if (nbMap == 1) {
 		loadAllMapOneEnnemies();
+		specialBlocTimer = SPECIAL_BLOC_RESET_TIMER;
 	}
 }
 
@@ -334,6 +342,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 	}
 
 	if (_XAxis) {
+		if (_playerId >= 0) {
+			_rect.height -= BLOCK_SCALE;
+			_rect.top -= BLOCK_SCALE;
+		}
 		if (_UpOrLeft) {
 			playerPos = AddVectors(vector2f(_rect.left, _rect.top + BLOCK_SCALE), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
 			playerPos2 = AddVectors(vector2f(_rect.left, _rect.top + _rect.height - BLOCK_SCALE * 2.f), MultiplyVector(_nextVelocity, BLOCK_SCALE * dt * offset));
@@ -533,21 +545,27 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 	{
 		if (_UpOrLeft && blockPos.y > 0 && blockPos2.y > 0)
 		{
+			sfBool isHittingSpecialBloc = sfFalse;
 			if (b[blockPos.y - 1][blockPos.x].isSolid)
 			{
 				if (_playerId >= 0) {
 					switch (b[blockPos.y - 1][blockPos.x].type)
 					{
 					case T_BLOCK:
-						if (blockPos.y - 1 == 9 && blockPos.x == 94) {
-							BecomeHitBlock(blockPos.y - 1, blockPos.x);
+						if (blockPos.y - 1 == 9 && blockPos.x == 94 && !isHittingSpecialBloc) {
+							isHittingSpecialBloc = sfTrue;
+							if (specialBlocTimer < 1.f)
+								BecomeHitBlock(blockPos.y - 1, blockPos.x);
+							else
+								b[blockPos.y - 1][blockPos.x].timer = UP_BLOCK_TIMER;
 							createItem(I_COIN, b[blockPos.y - 1][blockPos.x].pos);
+							specialBlocTimer -= 1.f;
 						}
 						else if (blockPos.y - 1 == 9 && blockPos.x == 101) {
 							BecomeHitBlock(blockPos.y - 1, blockPos.x);
 							createItem(I_STAR, b[blockPos.y - 1][blockPos.x].pos);
 						}
-						else if (isBig) {
+						else if (isBig && !isHittingSpecialBloc) {
 							BecomeBlueSky(blockPos.y - 1, blockPos.x);
 							hud[playerTurn].score += 50;
 						}
@@ -595,15 +613,20 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					switch (b[blockPos2.y - 1][blockPos2.x].type)
 					{
 					case T_BLOCK:
-						if (blockPos2.y - 1 == 9 && blockPos2.x == 94) {
-							BecomeHitBlock(blockPos2.y - 1, blockPos2.x);
+						if (blockPos2.y - 1 == 9 && blockPos2.x == 94 && !isHittingSpecialBloc) {
+							isHittingSpecialBloc = sfTrue;
+							if (specialBlocTimer < 1.f)
+								BecomeHitBlock(blockPos2.y - 1, blockPos2.x);
+							else
+								b[blockPos2.y - 1][blockPos2.x].timer = UP_BLOCK_TIMER;
 							createItem(I_COIN, b[blockPos2.y - 1][blockPos2.x].pos);
+							specialBlocTimer -= 1.f;
 						}
 						else if (blockPos2.y - 1 == 9 && blockPos2.x == 101) {
 							BecomeHitBlock(blockPos2.y - 1, blockPos2.x);
 							createItem(I_STAR, b[blockPos2.y - 1][blockPos2.x].pos);
 						}
-						else if (isBig) {
+						else if (isBig && !isHittingSpecialBloc) {
 							BecomeBlueSky(blockPos2.y - 1, blockPos2.x);
 							hud[playerTurn].score += 50;
 						}
@@ -651,15 +674,20 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 					switch (b[blockPos3.y - 1][blockPos3.x].type)
 					{
 					case T_BLOCK:
-						if (blockPos3.y - 1 == 9 && blockPos3.x == 94) {
-							BecomeHitBlock(blockPos3.y - 1, blockPos3.x);
+						if (blockPos3.y - 1 == 9 && blockPos3.x == 94 && !isHittingSpecialBloc) {
+							isHittingSpecialBloc = sfTrue;
+							if (specialBlocTimer < 1.f)
+								BecomeHitBlock(blockPos3.y - 1, blockPos3.x);
+							else
+								b[blockPos3.y - 1][blockPos3.x].timer = UP_BLOCK_TIMER;
 							createItem(I_COIN, b[blockPos3.y - 1][blockPos3.x].pos);
+							specialBlocTimer -= 1.f;
 						}
 						else if (blockPos3.y - 1 == 9 && blockPos3.x == 101) {
 							BecomeHitBlock(blockPos3.y - 1, blockPos3.x);
 							createItem(I_STAR, b[blockPos3.y - 1][blockPos3.x].pos);
 						}
-						else if (isBig) {
+						else if (isBig && !isHittingSpecialBloc) {
 							BecomeBlueSky(blockPos3.y - 1, blockPos3.x);
 							hud[playerTurn].score += 50;
 						}
