@@ -130,6 +130,21 @@ float getStickPos(t_joyNum _id, sfBool _leftStick, sfBool _XAxis)
 
     XInputGetState(_id, &state);
 
+    if (_leftStick) {
+        if (_XAxis) {
+            if (isButtonPressed(_id, DPAD_LEFT))
+                return -100.f;
+            if (isButtonPressed(_id, DPAD_RIGHT))
+                return 100.f;
+        }
+        else {
+            if (isButtonPressed(_id, DPAD_DOWN))
+                return -100.f;
+            if (isButtonPressed(_id, DPAD_UP))
+                return 100.f;
+        }
+
+    }
     // Verifie la "DEAD ZONE"
     // Stick Gauche
     if ((state.Gamepad.sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&

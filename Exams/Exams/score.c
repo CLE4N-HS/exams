@@ -3,6 +3,8 @@
 #include "viewManager.h"
 #include "CustomMath.h"
 #include "map.h"
+#include "hud.h"
+#include "player.h"
 
 #define GD_SCORE STD_LIST_GETDATA(scoreList, Score, i)
 
@@ -41,6 +43,10 @@ void initScore()
 void createScore(int _score, sfVector2f _pos)
 {
 	sfVector2f pos = AddVectors(_pos, vector2f(-GetViewPosition(mainView).x + 960.f, -BLOCK_SCALE * BLOCK_SIZE));
+
+	if (_score >= 0)
+		hud[playerTurn].score += _score;
+
 	addScore(_score, pos, 0.f);
 }
 
@@ -67,8 +73,11 @@ void displayScore(Window* _window)
 
 	for (int i = 0; i < scoreList->size(scoreList); i++)
 	{
-		sprintf(buffer, "%d", GD_SCORE->scoreValue);
-		sfText_setString(scoreText, buffer);
+		if (GD_SCORE->scoreValue == -1) sfText_setString(scoreText, "1UP");
+		else {
+			sprintf(buffer, "%d", GD_SCORE->scoreValue);
+			sfText_setString(scoreText, buffer);
+		}
 		sfText_setPosition(scoreText, GD_SCORE->pos);
 		sfFloatRect tmpRect;
 		tmpRect = sfText_getLocalBounds(scoreText);

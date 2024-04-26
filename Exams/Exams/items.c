@@ -6,6 +6,7 @@
 #include "player.h"
 #include "game.h"
 #include "hud.h"
+#include "score.h"
 
 #define GD_ITEM STD_LIST_GETDATA(itemList, Items, i)
 #define GD_ITEMJ STD_LIST_GETDATA(itemList, Items, j)
@@ -85,6 +86,7 @@ void createItem(ItemType _type, sfVector2f _pos)
 		rect = IntRect(0, 64, 16, 16);
 		velocity = vector2f(0.f, -270.f);
 		isMovingLeft = sfFalse;
+		createScore(200, AddVectors(_pos, MultiplyVector(origin, BLOCK_SCALE)));
 		addCoin();
 		hud[playerTurn].score += 200;
 		break;
@@ -153,6 +155,7 @@ void updateItem(Window* _window)
 				for (int j = 0; j < 2; j++)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						createScore(1000, GD_ITEM->pos);
 						itemList->erase(&itemList, i);
 						setPlayerPower(j, P_BIG);
 						shouldContinue = sfTrue;
@@ -182,6 +185,7 @@ void updateItem(Window* _window)
 				for (int j = 0; j < 2; j++)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						createScore(1000, GD_ITEM->pos);
 						itemList->erase(&itemList, i);
 						setPlayerPower(j, P_FIRETHROWER);
 						shouldContinue = sfTrue;
@@ -222,6 +226,7 @@ void updateItem(Window* _window)
 				for (int j = 0; j < 2; j++)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						createScore(-1, GD_ITEM->pos);
 						itemList->erase(&itemList, i);
 						addLife();
 						shouldContinue = sfTrue;
@@ -269,6 +274,7 @@ void updateItem(Window* _window)
 				for (int j = 0; j < 2; j++)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
+						createScore(1000, GD_ITEM->pos);
 						itemList->erase(&itemList, i);
 						setPlayerStarPower(j);
 						shouldContinue = sfTrue;

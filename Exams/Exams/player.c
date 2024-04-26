@@ -10,6 +10,7 @@
 #include "hud.h"
 #include "items.h"
 #include "enemies.h"
+#include "score.h"
 
 #define PLAYER_SPEED 1400.f
 #define MAX_PLAYER_SPEED 400.f
@@ -71,6 +72,7 @@ typedef struct Player {
 	sfBool isFlying;
 	sfBool canPressA;
 	float flagTimer;
+	sfBool flagScore;
 }Player;
 Player p[2];
 
@@ -470,6 +472,16 @@ void updatePlayer(Window* _window)
 			isAtFinish = sfTrue;
 			p[i].scale.x = BLOCK_SCALE;
 			p[i].color = color(255, 255, 255, 255);
+
+			if (p[i].flagScore) {
+				p[i].flagScore = sfFalse;
+				if (p[i].pos.y <= 4.f * BLOCK_SCALE * BLOCK_SIZE) createScore(5000, AddVectors(p[i].pos, vector2f(100.f, 0.f)));
+				else if (p[i].pos.y <= 6.5f * BLOCK_SCALE * BLOCK_SIZE) createScore(2000, AddVectors(p[i].pos, vector2f(100.f, 0.f)));
+				else if (p[i].pos.y <= 8.5f * BLOCK_SCALE * BLOCK_SIZE) createScore(800, AddVectors(p[i].pos, vector2f(100.f, 0.f)));
+				else if (p[i].pos.y <= 11.f * BLOCK_SCALE * BLOCK_SIZE) createScore(400, AddVectors(p[i].pos, vector2f(100.f, 0.f)));
+				else createScore(100, AddVectors(p[i].pos, vector2f(100.f, 0.f)));
+			}
+
 			if (p[i].finishState == 0) {
 				p[i].pos.x = 14278.f;
 				p[i].velocity.y = 400.f;
@@ -811,6 +823,7 @@ void resetPlayer(int _id)
 	p[_id].isFlying = sfFalse;
 	p[_id].canPressA = sfTrue;
 	p[_id].flagTimer = 0.f;
+	p[_id].flagScore = sfTrue;
 
 	isAtFinish = sfFalse;
 }

@@ -77,6 +77,7 @@ void updateEnemies(Window* _window)
 	for (int i = 0; i < enemiesList->size(enemiesList); i++)
 	{
 		if (GD_ENEMY->shouldErase) {
+			createScore(100, GD_ENEMY->pos);
 			enemiesList->erase(&enemiesList, i);
 			continue;
 		}
@@ -226,15 +227,6 @@ void updateEnemies(Window* _window)
 				for (int j = 0; j < enemiesList->size(enemiesList); j++)
 				{
 					if (i != j && sfFloatRect_intersects(&GD_ENEMY->bounds, &GD_ENEMYJ->bounds, NULL)) {
-						//if (GD_ENEMY->velocity.x < 0.f) {
-						//	GD_ENEMY->velocity.x = GOOMBAX_SPEED;
-						//	GD_ENEMY->pos.x += GOOMBAX_SPEED * dt;
-						//}
-						//else {
-						//	GD_ENEMY->velocity.x = -GOOMBAX_SPEED;
-						//	GD_ENEMY->pos.x += -GOOMBAX_SPEED * dt;
-						//}
-
 						if (GD_ENEMYJ->velocity.x < 0.f) {
 							if (GD_ENEMYJ->type == E_KOOPA && GD_ENEMYJ->state == E_DEAD)
 								GD_ENEMYJ->velocity.x = SHELLX_SPEED;
@@ -261,6 +253,7 @@ void updateEnemies(Window* _window)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
 						if (PlayerHasStar(j)) {
+							createScore(200, GD_ENEMY->pos);
 							enemiesList->erase(&enemiesList, i);
 							shouldContinue = sfTrue;
 							break;
@@ -268,6 +261,7 @@ void updateEnemies(Window* _window)
 						else {
 							if (getPlayerPos(j).y <= GD_ENEMY->pos.y + GD_ENEMY->bounds.height / 2.f && getPlayerPos(j).y <= GD_ENEMY->pos.y - 10.f) {
 								GD_ENEMY->timer = 0.f;
+								createScore(100, GD_ENEMY->pos);
 								GD_ENEMY->state = E_DEAD;
 								GD_ENEMY->velocity = vector2f(0.f, SHELLY_SPEED);
 								MakePlayerJump(j);
@@ -284,6 +278,7 @@ void updateEnemies(Window* _window)
 
 				// fireballs Collisions
 				if (isFireballInBounds(&GD_ENEMY->bounds)) {
+					createScore(200, GD_ENEMY->pos);
 					enemiesList->erase(&enemiesList, i);
 					continue;
 					//GD_ENEMY->timer = 0.f;
@@ -308,6 +303,7 @@ void updateEnemies(Window* _window)
 					{
 						if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ENEMY->bounds, NULL)) {
 							if (PlayerHasStar(j)) {
+								createScore(200, GD_ENEMY->pos);
 								enemiesList->erase(&enemiesList, i);
 								shouldContinue = sfTrue;
 								break;
@@ -315,6 +311,7 @@ void updateEnemies(Window* _window)
 							else {
 								if (getPlayerPos(j).y <= GD_ENEMY->pos.y + GD_ENEMY->bounds.height / 2.f && getPlayerPos(j).y <= GD_ENEMY->pos.y - 10.f) {
 									GD_ENEMY->timer = 0.f;
+									createScore(100, GD_ENEMY->pos);
 									GD_ENEMY->state = E_DEAD;
 									MakePlayerJump(j);
 									break;
@@ -351,6 +348,13 @@ void updateEnemies(Window* _window)
 						if (isCollision2(GD_ENEMY->bounds, sfTrue, sfFalse, vector2f(-SHELLX_SPEED, 0.f), -1)) {
 							GD_ENEMY->velocity.x = -SHELLX_SPEED;
 						}
+					}
+
+					// fireballs Collisions
+					if (isFireballInBounds(&GD_ENEMY->bounds)) {
+						createScore(200, GD_ENEMY->pos);
+						enemiesList->erase(&enemiesList, i);
+						continue;
 					}
 
 					GD_ENEMY->pos = AddVectors(GD_ENEMY->pos, MultiplyVector(GD_ENEMY->velocity, dt));

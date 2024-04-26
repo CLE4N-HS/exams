@@ -59,7 +59,7 @@ void initGame(Window* _window)
 	{
 		hud[i].score = 0;
 		hud[i].coins = 0;
-		hud[i].lives = 2;
+		hud[i].lives = 3;
 		hud[i].hasGameOver = sfFalse;
 		hud[i].neverShowAgain = sfFalse;
 	}
@@ -118,7 +118,7 @@ void updateGame(Window* _window)
 		loadMap(1);
 
 		resetPlayer(wantedPlayerTurn);
-		gameTime = 10.f;
+		gameTime = 400.f;
 		playerTurn = wantedPlayerTurn;
 	}
 	
