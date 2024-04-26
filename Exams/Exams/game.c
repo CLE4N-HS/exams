@@ -25,6 +25,8 @@ sfText* gameText;
 sfBool firstGame;
 sfBool hasTimeWarning;
 
+sfBool canPressKey;
+
 void initGame(Window* _window)
 {
 	Texture_Onload(GAME);
@@ -47,6 +49,9 @@ void initGame(Window* _window)
 	startTimer = 6.f;
 	firstGame = sfTrue;
 	hasTimeWarning = sfFalse;
+	canPressKey = sfTrue;
+
+	initEditor();
 
 	initEnemies();
 	initItems();
@@ -99,29 +104,45 @@ void updateGame(Window* _window)
 	static float timerr = 0.f;
 	timerr += dt;
 
-	if (isButtonPressed(0, X) && timerr > 0.5f) { // TODO remove
-		createEnemy(E_GOOMBA, vector2f(getPlayerPos(playerTurn).x + 500.f, 200.f));
-		createItem(I_FIREFLOWER, vector2f(getPlayerPos(playerTurn).x, getPlayerPos(playerTurn).y - 100.f));
-		timerr = 0.f;
-	}
-	if (isButtonPressed(0, Y) && timerr > 0.5f) { // TODO remove
-		createEnemy(E_KOOPA, vector2f(getPlayerPos(playerTurn).x + 500.f, 200.f));
-		timerr = 0.f;
+	if (getState() == GAME && isDebug && !isAtFinish && isPlayerAlive(playerTurn) && startTimer <= 0.f) {
+		if (canPressKey) {
+			if (sfKeyboard_isKeyPressed(sfKeyI)) {
+				int randomItem = 0;
+				randomItem = rand() % 4;
+				createItem(randomItem, vector2f(getPlayerPos(playerTurn).x, getPlayerPos(playerTurn).y - 300.f));
+				canPressKey = sfFalse;
+			}
+			else if (sfKeyboard_isKeyPressed(sfKeyF)) {
+				setPlayerPos(playerTurn, vector2f(FINISH_XPOS - 100.f, 900.f));
+				canPressKey = sfFalse;
+			}
+
+		}
+		else if (!sfKeyboard_isKeyPressed(sfKeyI) && !sfKeyboard_isKeyPressed(sfKeyF)) {
+			canPressKey = sfTrue;
+		}
+
+		if (sfKeyboard_isKeyPressed(sfKeyT)) {
+			gameTime -= dt * 2.2f * 10.f;
+		}
 	}
 
 	if (startTimer <= 0.f && !isAtFinish && isPlayerAlive(playerTurn)) {
 		gameTime -= dt * 2.2f;
-		gameTime = max(gameTime, 0.f);
 	}
+	gameTime = max(gameTime, 0.f);
 	if (gameTime < 101.f && !hasTimeWarning && !isAtFinish && startTimer <= 0.f) {
 		hasTimeWarning = sfTrue;
-		PlayASound("timeWarningMusic", sfFalse);
+		StopASound("gameMusic");
+		PlayASound("lowTimerMusic", sfTrue);
+		//PlayASound("timeWarningMusic", sfFalse);
 	}
 
 
 	startTimer -= dt;
 	if (startTimer > 0.f) {
 		StopASound("gameMusic");
+		StopASound("lowTimerMusic");
 	}
 	if (startTimer <= 0.f && (wantedPlayerTurn != playerTurn || firstGame)) {
 		firstGame = sfFalse;
@@ -131,6 +152,7 @@ void updateGame(Window* _window)
 		resetPlayer(wantedPlayerTurn);
 		gameTime = 400.f;
 		playerTurn = wantedPlayerTurn;
+		StopASound("lowTimerMusic");
 		PlayASound("gameMusic", sfTrue);
 		hasTimeWarning = sfFalse;
 	}

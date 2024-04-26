@@ -29,6 +29,7 @@ static sfBool onePass = sfFalse;
 static sfBool isPaused = sfFalse;
 static sfBool isOption = sfFalse;
 sfBool isEditor;
+sfBool isDebug;
 
 sfThread* loadingThread;
 sfSprite* spLoading;

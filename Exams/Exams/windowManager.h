@@ -87,3 +87,5 @@ void windowUpdate(Window* This);
 /// </summary>
 /// <param name="This">The whole structure of the Window</param>
 void windowDraw(Window* This);
+
+void isInDebugMode(int _argc, char** _argv);

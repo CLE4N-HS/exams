@@ -34,15 +34,15 @@ void stateInit(Window* _window)
 		SFXVolume = 50.0f;
 		musicVolume = 50.0f;
 		timeScale = 1.f;
-		w.state = sfTrue;
 
-		PlayASound("test", sfTrue);
 		nbPlayer = NbConnectedControllers();
 		
 		firstload = sfTrue;
 		isEditor = sfFalse;
 		initHud();
 		loadLeaderboard();
+
+		w.state = sfTrue;
 	}
 
 	if (!onePass)
@@ -143,24 +143,24 @@ void stateUpdate(Window* _window)
 	}
 	else if (!w.state)
 	{
-		static sfIntRect AnimRect = { 0, 0, 128, 128 };
-		static int frame = 0;
-		static float timer = 0.0f;
-		timer += getDeltaTime();
+		//static sfIntRect AnimRect = { 0, 0, 128, 128 };
+		//static int frame = 0;
+		//static float timer = 0.0f;
+		//timer += getDeltaTime();
 
 		sfMutex_lock(w.mutex);
-		sfSprite_setOrigin(spLoading, vector2f(64.0f, 64.0f));
-		sfSprite_setPosition(spLoading, vector2f(mainView->PosView.x, mainView->PosView.y));
-		sfSprite_setTextureRect(spLoading, AnimRect);
-		if (timer > 0.1f)
-		{
-			frame++;
-			if (frame > 8)
-				frame = 0;
-			AnimRect.left = frame * 128;
-			
-			timer = 0.0f;
-		}
+		//sfSprite_setOrigin(spLoading, vector2f(64.0f, 64.0f));
+		//sfSprite_setPosition(spLoading, vector2f(mainView->PosView.x, mainView->PosView.y));
+		//sfSprite_setTextureRect(spLoading, AnimRect);
+		//if (timer > 0.1f)
+		//{
+		//	frame++;
+		//	if (frame > 8)
+		//		frame = 0;
+		//	AnimRect.left = frame * 128;
+		//	
+		//	timer = 0.0f;
+		//}
 		sfMutex_unlock(w.mutex);
 	}
 }
@@ -210,7 +210,7 @@ void stateDisplay(Window* _window)
 	{
 		sfMutex_lock(w.mutex);
 			
-		sfRenderTexture_drawSprite(_window->renderTexture, spLoading, NULL);
+		//sfRenderTexture_drawSprite(_window->renderTexture, spLoading, NULL);
 		
 		sfMutex_unlock(w.mutex);
 	}

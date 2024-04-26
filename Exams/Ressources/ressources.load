@@ -31,4 +31,5 @@ music gameMusic ../Ressources/Musics/gameMusic.ogg
 music dieMusic ../Ressources/Musics/dieMusic.wav
 music gameOverMusic ../Ressources/Musics/gameOverMusic.wav
 music timeWarningMusic ../Ressources/Musics/timeWarningMusic.wav
+music lowTimerMusic ../Ressources/Musics/lowTimerMusic.ogg
 [end]

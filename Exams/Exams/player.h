@@ -2,6 +2,9 @@
 #include "tools.h"
 #include "stateManager.h"
 
+#define FINISH_XPOS 14259.f
+
+
 int playerTurn;
 int wantedPlayerTurn;
 sfBool isAtFinish;

@@ -13,9 +13,6 @@ sfText* txtReturnGame;
 sfText* txtReturnMenu;
 sfText* txtSoundVolume;
 
-sfTexture* texCursor;
-sfSprite* spCursor;
-
 int pauseSelect;
 
 void initPause(Window* _window)
@@ -43,9 +40,6 @@ void initPause(Window* _window)
 	sfText_setColor(txtSoundVolume, sfWhite);
 	sfText_setString(txtSoundVolume, "Options");
 
-	texCursor = sfTexture_createFromFile("../Ressources/Textures/cursor.png", NULL);
-	spCursor = sfSprite_create();
-	sfSprite_setTexture(spCursor, texCursor, sfTrue);
 	pauseSelect = 0;
 }
 
@@ -152,17 +146,17 @@ void updatePause(Window* _window)
 	if (pauseSelect == 0)
 	{
 		sfText_setPosition(txtReturnGame, vector2f(GetViewPosition(mainView).x - 80.0f, GetViewPosition(mainView).y - 200.0f));
-		sfSprite_setPosition(spCursor, vector2f(GetViewPosition(mainView).x - 100.0f, GetViewPosition(mainView).y - 195.0f));
+		//sfSprite_setPosition(spCursor, vector2f(GetViewPosition(mainView).x - 100.0f, GetViewPosition(mainView).y - 195.0f));
 	}
 	else if(pauseSelect == 1)
 	{
 		sfText_setPosition(txtSoundVolume, vector2f(GetViewPosition(mainView).x - 80.0f, GetViewPosition(mainView).y - 150.0f));
-		sfSprite_setPosition(spCursor, vector2f(GetViewPosition(mainView).x - 100.0f, GetViewPosition(mainView).y - 145.0f));
+		//sfSprite_setPosition(spCursor, vector2f(GetViewPosition(mainView).x - 100.0f, GetViewPosition(mainView).y - 145.0f));
 	}
 	else if (pauseSelect == 2)
 	{
 		sfText_setPosition(txtReturnMenu, vector2f(GetViewPosition(mainView).x - 80.0f, GetViewPosition(mainView).y - 100.0f));
-		sfSprite_setPosition(spCursor, vector2f(GetViewPosition(mainView).x - 100.0f, GetViewPosition(mainView).y - 95.0f));
+		//sfSprite_setPosition(spCursor, vector2f(GetViewPosition(mainView).x - 100.0f, GetViewPosition(mainView).y - 95.0f));
 	}
 }
 
@@ -171,7 +165,7 @@ void displayPause(Window* _window)
 	sfRenderTexture_setView(_window->renderTexture, mainView->view);
 	sfRenderTexture_drawRectangleShape(_window->renderTexture, rshape, NULL);
 	
-	sfRenderTexture_drawSprite(_window->renderTexture, spCursor, NULL);
+	//sfRenderTexture_drawSprite(_window->renderTexture, spCursor, NULL);
 	
 	sfRenderTexture_drawText(_window->renderTexture, txtPause, NULL);
 	sfRenderTexture_drawText(_window->renderTexture, txtReturnGame, NULL);
@@ -186,6 +180,6 @@ void deinitPause()
 	sfText_destroy(txtReturnGame);
 	sfText_destroy(txtReturnMenu);
 	sfText_destroy(txtSoundVolume);
-	sfSprite_destroy(spCursor);
-	sfTexture_destroy(texCursor);
+	//sfSprite_destroy(spCursor);
+	//sfTexture_destroy(texCursor);
 }

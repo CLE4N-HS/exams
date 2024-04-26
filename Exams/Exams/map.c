@@ -569,8 +569,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 							hud[playerTurn].score += 50;
 							PlayASound("breakBlocSFX", sfFalse);
 						}
-						if (!isBig)
+						if (!isBig) {
 							b[blockPos.y - 1][blockPos.x].timer = UP_BLOCK_TIMER;
+							PlayASound("bumpSFX", sfFalse);
+						}
 						collide = sfTrue;
 						break;
 					case T_QUESTION:
@@ -590,8 +592,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 							hud[playerTurn].score += 50;
 							PlayASound("breakBlocSFX", sfFalse);
 						}
-						if (!isBig)
+						if (!isBig) {
 							b[blockPos.y - 1][blockPos.x].timer = UP_BLOCK_TIMER;
+							PlayASound("bumpSFX", sfFalse);
+						}
 						collide = sfTrue;
 						break;
 					case T_HIDDEN_BLOCK:
@@ -632,8 +636,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 							hud[playerTurn].score += 50;
 							PlayASound("breakBlocSFX", sfFalse);
 						}
-						if (!isBig)
+						if (!isBig) {
 							b[blockPos2.y - 1][blockPos2.x].timer = UP_BLOCK_TIMER;
+							PlayASound("bumpSFX", sfFalse);
+						}
 						collide = sfTrue;
 						break;
 					case T_QUESTION:
@@ -653,8 +659,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 							hud[playerTurn].score += 50;
 							PlayASound("breakBlocSFX", sfFalse);
 						}
-						if (!isBig)
+						if (!isBig) {
 							b[blockPos2.y - 1][blockPos2.x].timer = UP_BLOCK_TIMER;
+							PlayASound("bumpSFX", sfFalse);
+						}
 						collide = sfTrue;
 						break;
 					case T_HIDDEN_BLOCK:
@@ -695,8 +703,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 							hud[playerTurn].score += 50;
 							PlayASound("breakBlocSFX", sfFalse);
 						}
-						if (!isBig)
+						if (!isBig) {
 							b[blockPos3.y - 1][blockPos3.x].timer = UP_BLOCK_TIMER;
+							PlayASound("bumpSFX", sfFalse);
+						}
 						collide = sfTrue;
 						break;
 					case T_QUESTION:
@@ -716,8 +726,10 @@ sfBool isCollision2(sfFloatRect _rect, sfBool _XAxis, sfBool _UpOrLeft, sfVector
 							hud[playerTurn].score += 50;
 							PlayASound("breakBlocSFX", sfFalse);
 						}
-						if (!isBig)
+						if (!isBig) {
 							b[blockPos3.y - 1][blockPos3.x].timer = UP_BLOCK_TIMER;
+							PlayASound("bumpSFX", sfFalse);
+						}
 						collide = sfTrue;
 						break;
 					case T_HIDDEN_BLOCK:

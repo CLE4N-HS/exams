@@ -130,6 +130,16 @@ void displayHud(Window* _window)
 	sfRenderTexture_drawText(_window->renderTexture, hudText, NULL);
 
 
+	if (getState() == GAME && isDebug && startTimer <= 0.f) {
+		sfText_setCharacterSize(hudText, 15);
+		sfText_setString(hudText, "Debug mode :\nPress I to spawn items\nPress F to get close to finish\nHold T to lower the timer");
+		sfText_setPosition(hudText, vector2f(50.f, 150.f));
+		sfRenderTexture_drawText(_window->renderTexture, hudText, NULL);
+
+		sfText_setCharacterSize(hudText, 30);
+	}
+
+
 
 	sfRenderTexture_setView(_window->renderTexture, mainView->view);
 }

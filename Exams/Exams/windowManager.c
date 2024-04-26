@@ -137,3 +137,14 @@ void windowDraw(Window* This)
 	sfRenderWindow_clear(This->renderWindow, sfBlack);
 	sfRenderWindow_drawSprite(This->renderWindow, allSprites, NULL);
 }
+
+void isInDebugMode(int _argc, char** _argv)
+{
+	isDebug = sfFalse;
+	for (int i = 1; i < _argc; i++)
+	{
+		if (strcmp(_argv[i], "-debug") == 0) {
+			isDebug = sfTrue;
+		}
+	}
+}

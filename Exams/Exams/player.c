@@ -37,7 +37,6 @@
 
 
 #define STAR_TIMER_DURATION 10.f
-#define FINISH_XPOS 14259.f
 
 typedef enum playerState {
 	P_IDLE,
@@ -144,6 +143,7 @@ void updatePlayer(Window* _window)
 				if (p[i].canPlayDieMusic) {
 					p[i].canPlayDieMusic = sfFalse;
 					StopASound("gameMusic");
+					StopASound("lowTimerMusic");
 					PlayASound("dieMusic", sfFalse);
 				}
 
@@ -471,10 +471,6 @@ void updatePlayer(Window* _window)
 				p[i].rect = IntRect(256, 53, 16, 32);
 			}
 
-			if (sfKeyboard_isKeyPressed(sfKeyP)) { // TODO remove debug
-				p[i].pos.x = FINISH_XPOS - 100.f;
-			}
-
 			if (p[i].pos.x >= FINISH_XPOS) {
 				p[i].isAtFlag = sfTrue;
 			}
@@ -496,6 +492,7 @@ void updatePlayer(Window* _window)
 			if (p[i].canPlayFlagPoleSFX) {
 				p[i].canPlayFlagPoleSFX = sfFalse;
 				StopASound("gameMusic");
+				StopASound("lowTimerMusic");
 				PlayASound("flagpoleSFX", sfFalse);
 			}
 			
@@ -623,11 +620,6 @@ void updatePlayer(Window* _window)
 				}
 			}
 		}
-
-		if (sfKeyboard_isKeyPressed(sfKeyA)) {
-			hud[i].score++;
-		}
-
 	}
 
 
