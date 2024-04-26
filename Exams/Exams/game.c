@@ -38,7 +38,6 @@ void initGame(Window* _window)
 	timer = 0.f;
 
 	gameText = sfText_create();
-	//sfText_setFont(gameText, GetFont("marioFont"));
 	sfText_setFont(gameText, getDefaultFont());
 	sfText_setColor(gameText, sfWhite);
 	sfText_setCharacterSize(gameText, 30);
@@ -51,7 +50,6 @@ void initGame(Window* _window)
 	hasTimeWarning = sfFalse;
 	canPressKey = sfTrue;
 
-	initEditor();
 
 	initEnemies();
 	initItems();
@@ -61,6 +59,7 @@ void initGame(Window* _window)
 	initMap();
 
 	initPlayer();
+
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -134,8 +133,13 @@ void updateGame(Window* _window)
 	if (gameTime < 101.f && !hasTimeWarning && !isAtFinish && startTimer <= 0.f) {
 		hasTimeWarning = sfTrue;
 		StopASound("gameMusic");
-		PlayASound("lowTimerMusic", sfTrue);
-		//PlayASound("timeWarningMusic", sfFalse);
+		StopASound("undergroundMusic");
+		if (nbMap == 2) {
+			PlayASound("lowUndergroundMusic", sfTrue);
+		}
+		else {
+			PlayASound("lowTimerMusic", sfTrue);
+		}
 	}
 
 
@@ -153,16 +157,20 @@ void updateGame(Window* _window)
 		gameTime = 400.f;
 		playerTurn = wantedPlayerTurn;
 		StopASound("lowTimerMusic");
+		StopASound("undergroundMusic");
+		StopASound("lowUndergroundMusic");
 		PlayASound("gameMusic", sfTrue);
 		hasTimeWarning = sfFalse;
 	}
-	
+
 	updateMap(_window);
 	updatePlayer(_window);
 	updateItem(_window);
 	updateEnemies(_window);
 	updateFireballs(_window);
 	updateScore(_window);
+	
+
 
 	int shouldRetrunToMenu = 0;
 	for (int nb = 0; nb < nbTotalPlayers; nb++)
@@ -188,7 +196,6 @@ void displayGame(Window* _window)
 	}
 
 	displayHud(_window);
-
 }
 
 void addCoin()

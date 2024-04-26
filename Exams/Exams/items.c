@@ -282,6 +282,8 @@ void updateItem(Window* _window)
 				{
 					if (sfFloatRect_intersects(pgetPlayerBounds(j), &GD_ITEM->bounds, NULL)) {
 						PlayASound("collectPowerupSFX", sfFalse);
+						PlayASound("starMusic", sfFalse);
+						setPlayerCanReplayMusic(j, sfTrue);
 						createScore(1000, GD_ITEM->pos);
 						itemList->erase(&itemList, i);
 						setPlayerStarPower(j);

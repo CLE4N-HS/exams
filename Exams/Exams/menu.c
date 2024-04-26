@@ -163,7 +163,7 @@ void updateMenu(Window* _window)
 				nbTotalPlayers = 1;
 				break;
 			case 1:
-				isEditor = sfFalse;
+				isEditor = sfTrue;
 				nbNamesToChoose = 2;
 				menuTimer = 0.f;
 				nbTotalPlayers = 2;

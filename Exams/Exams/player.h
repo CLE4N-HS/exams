@@ -34,3 +34,5 @@ void setPlayerStarPower(int _id);
 sfBool PlayerHasStar(int _id);
 void resetPlayer(int _id);
 sfBool isPlayerAlive(int _id);
+void setPlayerCanReplayMusic(int _id, sfBool _canHe);
+

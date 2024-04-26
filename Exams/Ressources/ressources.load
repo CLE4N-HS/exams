@@ -30,6 +30,8 @@ soundfx stompSFX ../Ressources/SoundsFx/stompSFX.wav
 music gameMusic ../Ressources/Musics/gameMusic.ogg
 music dieMusic ../Ressources/Musics/dieMusic.wav
 music gameOverMusic ../Ressources/Musics/gameOverMusic.wav
-music timeWarningMusic ../Ressources/Musics/timeWarningMusic.wav
 music lowTimerMusic ../Ressources/Musics/lowTimerMusic.ogg
+music undergroundMusic ../Ressources/Musics/undergroundMusic.ogg
+music lowUndergroundMusic ../Ressources/Musics/lowUndergroundMusic.ogg
+music starMusic ../Ressources/Musics/starMusic.ogg
 [end]

@@ -38,7 +38,7 @@ void stateInit(Window* _window)
 		nbPlayer = NbConnectedControllers();
 		
 		firstload = sfTrue;
-		isEditor = sfFalse;
+		isEditor = sfTrue;
 		initHud();
 		loadLeaderboard();
 

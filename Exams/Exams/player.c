@@ -77,6 +77,7 @@ typedef struct Player {
 	sfBool canPlayClearStageMusic;
 	sfBool canPlayFlagPoleSFX;
 	sfBool canPlayJumpSFX;
+	sfBool canReplayMusic;
 }Player;
 Player p[2];
 
@@ -138,12 +139,45 @@ void updatePlayer(Window* _window)
 				p[i].power = P_DEAD;
 			}
 
+			if (p[i].starTimer > 0.f) {
+				StopASound("gameMusic");
+				StopASound("lowTimerMusic");
+				StopASound("undergroundMusic");
+				StopASound("lowUndergroundMusic");
+			}
+			else if (p[i].canReplayMusic) {
+				p[i].canReplayMusic = sfFalse;
+				StopASound("gameMusic");
+				StopASound("lowTimerMusic");
+				StopASound("undergroundMusic");
+				StopASound("lowUndergroundMusic");
+				if (nbMap == 2) {
+					if (gameTime <= 100.f) {
+						PlayASound("lowUndergroundMusic", sfTrue);
+					}
+					else {
+						PlayASound("undergroundMusic", sfTrue);
+					}
+				}
+				else {
+					if (gameTime <= 100.f) {
+						PlayASound("lowTimerMusic", sfTrue);
+					}
+					else {
+						PlayASound("gameMusic", sfTrue);
+					}
+				}
+			}
+
 			if (p[i].power <= P_DEAD) {
 				
 				if (p[i].canPlayDieMusic) {
 					p[i].canPlayDieMusic = sfFalse;
 					StopASound("gameMusic");
 					StopASound("lowTimerMusic");
+					StopASound("undergroundMusic");
+					StopASound("lowUndergroundMusic");
+					StopASound("starMusic");
 					PlayASound("dieMusic", sfFalse);
 				}
 
@@ -427,6 +461,15 @@ void updatePlayer(Window* _window)
 				nbMap = 2;
 				loadMap(2);
 				PlayASound("pipeSFX", sfFalse);
+				StopASound("gameMusic");
+				StopASound("lowTimerMusic");
+				if (gameTime <= 100.f) {
+					PlayASound("lowUndergroundMusic", sfTrue);
+				}
+				else {
+					PlayASound("undergroundMusic", sfTrue);
+				}
+
 				for (int j = 0; j < 2; j++)
 				{
 					p[j].pos = vector2f(2.f * BLOCK_SCALE * BLOCK_SIZE + p[i].origin.x * BLOCK_SCALE, 3.f * BLOCK_SCALE * BLOCK_SIZE);
@@ -439,6 +482,15 @@ void updatePlayer(Window* _window)
 				nbMap = 1;
 				loadMap(1);
 				PlayASound("pipeSFX", sfFalse);
+				StopASound("undergroundMusic");
+				StopASound("lowUndergroundMusic");
+				if (gameTime <= 100.f) {
+					PlayASound("lowTimerMusic", sfTrue);
+				}
+				else {
+					PlayASound("gameMusic", sfTrue);
+				}
+
 				for (int j = 0; j < 2; j++)
 				{
 					p[j].pos = vector2f(163.5f * BLOCK_SCALE * BLOCK_SIZE + p[i].origin.x * BLOCK_SCALE, 11.f * BLOCK_SCALE * BLOCK_SIZE);
@@ -493,6 +545,7 @@ void updatePlayer(Window* _window)
 				p[i].canPlayFlagPoleSFX = sfFalse;
 				StopASound("gameMusic");
 				StopASound("lowTimerMusic");
+				StopASound("starMusic");
 				PlayASound("flagpoleSFX", sfFalse);
 			}
 			
@@ -857,8 +910,10 @@ void resetPlayer(int _id)
 	p[_id].canPlayClearStageMusic = sfTrue;
 	p[_id].canPlayFlagPoleSFX = sfTrue;
 	p[_id].canPlayJumpSFX = sfTrue;
+	p[_id].canReplayMusic = sfFalse;
 
 	isAtFinish = sfFalse;
+	greatestViewPos = vector2f(960.f, 540.f);
 }
 
 sfBool isPlayerAlive(int _id)
@@ -867,4 +922,9 @@ sfBool isPlayerAlive(int _id)
 		return sfFalse;
 
 	return sfTrue;
+}
+
+void setPlayerCanReplayMusic(int _id, sfBool _canHe)
+{
+	p[_id].canReplayMusic = _canHe;
 }
